@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd">
+<module configVersion="1.0">
+	
+	<!-- Base Module Properties -->
+	<id>mobileformentry</id>
+	<name>Mobile Form Entry</name>
+	<version>1.0</version>
+	<package>org.openmrs.module.@MODULE_ID@</package>
+	<author>Samuel Mbugua</author>
+	<description>
+			Allows for submitting of xforms from mobile devices - Handles household data
+	</description>
+	<activator>@MODULE_PACKAGE@.MobileFormEntryActivator</activator>
+	
+	<!-- None so far -->
+	<updateURL></updateURL>
+	<!-- /Base Module Properties -->
+	
+	<require_version>1.5.0.00</require_version>
+
+	<!-- Place here any required modules (Most possibly xform) -->
+	<require_modules>
+		<require_module>org.openmrs.module.xforms</require_module>
+	</require_modules>
+	
+	<!-- Extensions -->
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>@MODULE_PACKAGE@.extension.html.MobileFormEntryAdminExt</class>
+	</extension>
+	<!-- /Extensions -->
+	
+    <!-- Required Privileges -->
+    <privilege>
+		<name>Manage Economic Objects</name>
+		<description>
+			Allows user to manage economic objects
+		</description>
+	</privilege>
+	<privilege>
+		<name>View Mobile Form Entry Properties</name>
+		<description>
+			Allows user to view module properties 
+		</description>
+	</privilege>
+	<privilege>
+		<name>View Mobile Form Errors</name>
+		<description>
+			Allows user to view mobile form entry errors
+		</description>
+	</privilege>
+	<privilege>
+		<name>Comment on Mobile Form Entry Errors</name>
+		<description>
+			Allows user to review and comment on mobile form errors
+		</description>
+	</privilege>
+	<privilege>
+		<name>Resolve Mobile Form Entry Error</name>
+		<description>
+			Allows user to resolve mobile form entry error
+		</description>
+	</privilege>
+	<!-- /Required Privileges -->
+	
+
+	<!-- Any required properties goes here-->
+	<globalProperty>
+		<property>@MODULE_ID@.resources_dir</property>
+		<defaultValue>mobileformentry/resources</defaultValue>
+		<description>Directory for storing xforms to be filled in and other special files.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.drop_dir</property>
+		<defaultValue>/mobile_drop_dir</defaultValue>
+		<description>Directory where mobile devices drop forms.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.split_queue_dir</property>
+		<defaultValue>mobileformentry/split_queue</defaultValue>
+		<description>Directory where split mobile forms are placed</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.queue_dir</property>
+		<defaultValue>mobileformentry/queue</defaultValue>
+		<description>Directory for queuing mobile forms before they are processed.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.error_dir</property>
+		<defaultValue>mobileformentry/error</defaultValue>
+		<description>Directory for keeping erred forms during processing</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.archive_dir</property>
+		<defaultValue>mobileformentry/archive/%Y/%M</defaultValue>
+		<description>Directory for storing successfully processed forms.</description>
+	</globalProperty>
+	
+	<!-- Servlets -->
+	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
+	<servlet>
+		<servlet-name>fileUpload</servlet-name>
+		<servlet-class>@MODULE_PACKAGE@.web.MobileFormFileUploadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>formList</servlet-name>
+		<servlet-class>@MODULE_PACKAGE@.web.MobileFormListServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>fileDownload</servlet-name>
+		<servlet-class>@MODULE_PACKAGE@.web.MobileFormDownloadServlet</servlet-class>
+	</servlet>
+	
+	<!-- Add a location header Filter, Necessary a security check for the submitting forms -->
+	<filter>
+    	<filter-name>locationFilter</filter-name>
+        <filter-class>@MODULE_PACKAGE@.web.LocationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>locationFilter</filter-name>
+ 		<url-pattern>/*</url-pattern>
+    </filter-mapping>
+	
+	<!-- Internationalization -->
+	<!-- All message codes should start with moduleId.* -->
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<!-- /Internationalization -->
+	
+	<mappingFiles>
+		Household.hbm.xml
+		HouseholdMember.hbm.xml
+		Economic.hbm.xml
+		EconomicObject.hbm.xml
+		Survey.hbm.xml
+		MobileFormEntryError.hbm.xml
+	</mappingFiles>
+	
+</module>
