@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class PropertiesPageController {
 	
-	@RequestMapping(value="/module/mobileformentry/propertiesPage", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/propertiesPage", method=RequestMethod.GET)
 	public Map<String, Object> populateForm() {
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		Map<String, Object> map =new HashMap<String, Object>();
 		map.put("systemVars", mfs.getSystemVariables());
 		return map;
-		
 	}
 }

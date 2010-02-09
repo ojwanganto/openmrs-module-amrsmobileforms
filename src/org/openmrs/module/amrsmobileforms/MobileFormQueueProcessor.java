@@ -88,8 +88,9 @@ public class MobileFormQueueProcessor {
 				
 			}else{
 				//compare the households
-
 				log.debug("Will edit household with id " + householdIdentifier);
+				//Archive this file
+				saveFormInArchive(queue.getFileSystemUrl());
 			}
 		}
 		catch (Throwable t) {

@@ -5,7 +5,7 @@
 <!-- ** @author Samuel Mbugua								** -->
 <!-- ** @version 1.0										** -->
 <!-- ********************************************************* -->
-<project name="MobileFormEntryModule" default="package-module">
+<project name="AmrsMobileFormsModule" default="package-module">
 		
 	<!-- *********************************************************** -->
 	<!-- **                     TARGETS                           ** -->

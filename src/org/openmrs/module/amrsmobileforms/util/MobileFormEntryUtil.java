@@ -16,6 +16,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.Economic;
@@ -25,9 +26,12 @@ import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
 import org.openmrs.module.amrsmobileforms.Survey;
+import org.openmrs.module.xforms.util.DOMUtil;
 import org.openmrs.util.OpenmrsUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Provides utilities needed when processing mobile forms.
@@ -89,6 +93,19 @@ public class MobileFormEntryUtil {
 	}
 	
 	/**
+	 * Directory where forms are placed pending to be linked to households
+	 * @return directory
+	 */
+	public static File getMobileFormsPendingLinkDir() {
+		String folderName = MobileFormEntryConstants.GP_MOBILE_FORMS_PENDING_LINK_DIR;
+		File mobileFormsPendingLinkDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+		if (log.isDebugEnabled())
+			log.debug("Loaded mobile forms pending link directory from global properties: " + mobileFormsPendingLinkDir.getAbsolutePath());
+		
+		return mobileFormsPendingLinkDir;
+	}
+	
+	/**
 	 * Directory where forms are dropped by mobile devices
 	 * @return directory
 	 */
@@ -103,7 +120,6 @@ public class MobileFormEntryUtil {
 		return mobileFormsDropDir;
 	}
 	
-
 	public static File getMobileFormsQueueDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_QUEUE_DIR, 
@@ -345,8 +361,6 @@ public class MobileFormEntryUtil {
 			}
 		}
     }
-	
-	
 
 	/**
 	 * Authenticate in-line users
@@ -365,5 +379,79 @@ public class MobileFormEntryUtil {
 			}
 		}
 		return authenticated;
+	}
+	
+	public static String getPatientIdentifier(Document doc){
+		NodeList elemList = doc.getDocumentElement().getElementsByTagName("patient");
+		if (!(elemList != null && elemList.getLength() > 0))
+			return null;
+
+		Element patientNode = (Element)elemList.item(0);
+
+		NodeList children = patientNode.getChildNodes();
+		int len = patientNode.getChildNodes().getLength();
+		for(int index=0; index<len; index++){
+			Node child = children.item(index);
+			if(child.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+
+			if("patient_identifier".equalsIgnoreCase(((Element)child).getAttribute("openmrs_table")) &&
+					"identifier".equalsIgnoreCase(((Element)child).getAttribute("openmrs_attribute")))
+				return child.getTextContent();
+		}
+
+		return null;
+	}
+	
+	public static Integer getBirthDateFromAge(Document doc) {
+		String age = DOMUtil.getElementValue(doc, MobileFormEntryConstants.ESTIMATED_AGE);
+		try {	
+			if(age == null || age.trim().length() == 0)
+				throw new Exception("Cannot get age");
+			
+			Double dbl= Double.valueOf(age);
+			int ageInMonths=dbl.intValue();
+	
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(new Date());
+			
+			//convert age to days
+			ageInMonths*=-30.4375;
+			
+			// add (actually subtract) number of days
+			cal.add(Calendar.DATE ,ageInMonths);
+			return cal.get(Calendar.YEAR);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static Integer getProviderId(String providerName) {
+		
+		// assume its a normal user-name or systemId formatted with a dash
+		User provider = Context.getUserService().getUserByUsername(providerName);
+		if ( provider != null)
+			return provider.getUserId();
+		
+		// next assume it is a internal providerId and try again
+		try {
+			provider = Context.getUserService().getUser(Integer.parseInt(providerName));
+		}catch (NumberFormatException e) {e.printStackTrace();}
+		
+		if ( provider != null)
+			return provider.getUserId();
+		
+		// now assume its a systemId without a dash: fix the dash and try again
+		if (providerName != null && providerName.trim() != "") {
+			if (providerName.indexOf("-") == -1 && providerName.length() > 1) {
+				providerName=providerName.substring(0,providerName.length()-1) + "-" + providerName.substring(providerName.length()-1);
+				provider = Context.getUserService().getUserByUsername(providerName);
+				if ( provider != null)
+					return provider.getUserId();
+			}
+		}
+		
+		return null;
 	}
 }

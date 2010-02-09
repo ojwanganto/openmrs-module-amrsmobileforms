@@ -22,7 +22,7 @@ public class MobileFormEntryAdminExt extends AdministrationSectionExt {
 	
 
 	public String getTitle() {
-		return "mobileformentry.title";
+		return "amrsmobileforms.title";
 	}
 	
 	public String getRequiredPrivilege() {
@@ -37,10 +37,11 @@ public class MobileFormEntryAdminExt extends AdministrationSectionExt {
 	public Map<String, String> getLinks() {
 		
 		Map<String, String> map = new TreeMap<String, String>(new InsertedOrderComparator());
-		map.put("module/mobileformentry/propertiesPage.form", "mobileformentry.properties");
-		map.put("module/mobileformentry/mobileResources.list", "mobileformentry.mobileResources");
-		map.put("module/mobileformentry/economicObject.form", "mobileformentry.economicObjects");
-		map.put("module/mobileformentry/resolveErrors.list", "mobileformentry.resolveErrors.title");
+		map.put("module/amrsmobileforms/propertiesPage.form", "amrsmobileforms.properties");
+		map.put("module/amrsmobileforms/mobileResources.list", "amrsmobileforms.mobileResources");
+		map.put("module/amrsmobileforms/economicObject.form", "amrsmobileforms.economicObjects");
+		map.put("module/amrsmobileforms/resolveErrors.list", "amrsmobileforms.resolveErrors.title");
+		map.put("module/amrsmobileforms/syncLog.list", "amrsmobileforms.sync.title");
 		return map;
 	}
 	

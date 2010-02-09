@@ -30,7 +30,7 @@
 			(
 				'Process Mobile Forms',
 				'This class calls the mobile form processor to process all forms in the mobile form entry queue.',
-				'org.openmrs.module.mobileformentry.ProcessMobileFormTask',
+				'org.openmrs.module.amrsmobileforms.ProcessMobileFormTask',
 				'2009-09-15 22:22:00',
 				30,
 				1,

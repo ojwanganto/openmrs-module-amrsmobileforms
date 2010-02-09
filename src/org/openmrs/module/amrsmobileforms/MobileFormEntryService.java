@@ -52,4 +52,6 @@ public interface MobileFormEntryService {
 	 * @param householdMember
 	 */
 	public void saveHouseholdMember(HouseholdMember householdMember);
+
+	public List<Survey> getSyncLog();
 }

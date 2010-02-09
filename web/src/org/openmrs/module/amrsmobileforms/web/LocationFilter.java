@@ -18,7 +18,7 @@ public final class LocationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletResponse hrs = null;
 		hrs = (HttpServletResponse)response;
-		hrs.setHeader("Location", "openmrs/moduleServlet/mobileformentry/fileUpload");
+		hrs.setHeader("Location", "openmrs/moduleServlet/amrsmobileforms/fileUpload");
 		chain.doFilter(request, hrs);
     }
     public void destroy() {

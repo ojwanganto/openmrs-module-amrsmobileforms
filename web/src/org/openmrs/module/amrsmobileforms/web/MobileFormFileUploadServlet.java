@@ -19,8 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  * Provides file upload services to the module
@@ -36,18 +35,12 @@ public class MobileFormFileUploadServlet extends HttpServlet{
 	 * Authenticates in-line user then just delegates to doGet()
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String auth=new String(Base64.decode(request.getHeader("Authorization")));
-			if (MobileFormEntryUtil.authenticate(auth))
-				doGet(request,response);
-			else {
-				log.warn(this.getClass().getName() + "Error authenticating");
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			}
-		} catch (Base64DecodingException e) {
+		String auth=new String(Base64.decode(request.getHeader("Authorization")));
+		if (MobileFormEntryUtil.authenticate(auth))
+			doGet(request,response);
+		else {
 			log.warn(this.getClass().getName() + "Error authenticating");
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			e.printStackTrace();
 		}
 	}
 

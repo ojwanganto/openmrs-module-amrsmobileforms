@@ -1,18 +1,18 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 
-<openmrs:require privilege="View Mobile Form Errors" otherwise="/login.htm" redirect="/module/mobileformentry/resolveErrors.list"/>
+<openmrs:require privilege="View Mobile Form Errors" otherwise="/login.htm" redirect="/module/amrsmobileforms/resolveErrors.list"/>
 
 <%@ include file="/WEB-INF/template/header.jsp" %>
 <%@ include file="localHeader.jsp"%>
 
-<h2><spring:message code="mobileformentry.resolveErrors.title"/></h2>
+<h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
 
 <c:set var="errorSize" value="${fn:length(formEntryErrors)}" />
 
 <c:choose>
 	<c:when test="${errorSize < 1}">
 		<br/>
-		<i>(<spring:message code="mobileformentry.resolveErrors.empty"/>)</i>
+		<i>(<spring:message code="amrsmobileforms.resolveErrors.empty"/>)</i>
 		<br/>
 	</c:when>
 	<c:otherwise>

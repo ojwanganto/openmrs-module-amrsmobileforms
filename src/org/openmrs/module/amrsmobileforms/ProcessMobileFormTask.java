@@ -53,4 +53,3 @@ public class ProcessMobileFormTask  extends AbstractTask {
 		log.debug("Shutting down ProcessMobileForms task ...");
 	}
 }
-

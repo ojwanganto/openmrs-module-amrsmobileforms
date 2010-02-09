@@ -123,4 +123,8 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 	public void saveHouseholdMember(HouseholdMember householdMember) {
 		dao.saveHouseholdMember(householdMember);
 	}
+
+	public List<Survey> getSyncLog() {
+		return dao.getSyncLog();
+	}
 }

@@ -1,11 +1,11 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 
-<openmrs:require privilege="Manage Economic Objects" otherwise="/login.htm" redirect="/module/mobileformentry/economicObject.list"/>
+<openmrs:require privilege="Manage Economic Objects" otherwise="/login.htm" redirect="/module/amrsmobileforms/economicObject.list"/>
 
 <%@ include file="/WEB-INF/template/header.jsp" %>
 <%@ include file="localHeader.jsp"%>
 
-<h2><spring:message code="mobileformentry.economicObjects"/></h2>
+<h2><spring:message code="amrsmobileforms.economicObjects"/></h2>
 <a href="#addObject">Add Object</a><br/><br/>
 
 

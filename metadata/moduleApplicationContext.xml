@@ -13,15 +13,15 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>org.openmrs.module.mobileformentry.MobileFormEntryService</value> <!-- service interface name -->
+				<value>org.openmrs.module.amrsmobileforms.MobileFormEntryService</value> <!-- service interface name -->
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager">
 						<ref bean="transactionManager" />
 					</property>
 					<property name="target">
-						<bean class="org.openmrs.module.mobileformentry.impl.MobileFormEntryServiceImpl">
+						<bean class="org.openmrs.module.amrsmobileforms.impl.MobileFormEntryServiceImpl">
 							<property name="mobileFormEntryDAO">
-								<bean class="org.openmrs.module.mobileformentry.db.hibernate.HibernateMobileFormEntryDAO">
+								<bean class="org.openmrs.module.amrsmobileforms.db.hibernate.HibernateMobileFormEntryDAO">
 									<property name="sessionFactory">
 										<ref bean="sessionFactory" />
 									</property>

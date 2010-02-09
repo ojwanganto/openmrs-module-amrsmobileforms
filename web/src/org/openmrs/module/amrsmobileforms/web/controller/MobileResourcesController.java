@@ -29,7 +29,7 @@ public class MobileResourcesController {
 	public static final String VALID_XML_FILE = "[ _\\-\\.A-Za-z0-9]*.x[ht]*ml";
 
 	@ModelAttribute("mobileResources")
-	@RequestMapping(value="/module/mobileformentry/mobileResources", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/mobileResources", method=RequestMethod.GET)
 	public List<Object> populateForm() {
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		List<Object> lst=new ArrayList<Object>();
@@ -46,7 +46,7 @@ public class MobileResourcesController {
 		return lst;
 	}
 	
-	@RequestMapping(value="/module/mobileformentry/mobileResources", method=RequestMethod.POST, params = "action=Upload")
+	@RequestMapping(value="/module/amrsmobileforms/mobileResources", method=RequestMethod.POST, params = "action=Upload")
 	public String saveObject(HttpSession httpSession,HttpServletRequest request, @RequestParam Object resourceFile){
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 		MultipartFile multipartFile = multipartRequest.getFile("resourceFile");
@@ -72,7 +72,7 @@ public class MobileResourcesController {
 		return "redirect:mobileResources.list";
 	}
 	
-	@RequestMapping(value="/module/mobileformentry/mobileResources", method=RequestMethod.POST, params = "action=Delete Selected Resource(s)")
+	@RequestMapping(value="/module/amrsmobileforms/mobileResources", method=RequestMethod.POST, params = "action=Delete Selected Resource(s)")
 	public String deleteObject(HttpSession httpSession, @RequestParam("absoluteName") List<String> listNames){
 		if (listNames.size() > 0) {
 			for (String name : listNames) {

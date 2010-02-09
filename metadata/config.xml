@@ -3,8 +3,8 @@
 <module configVersion="1.0">
 	
 	<!-- Base Module Properties -->
-	<id>mobileformentry</id>
-	<name>Mobile Form Entry</name>
+	<id>amrsmobileforms</id>
+	<name>AMRS Mobile Forms</name>
 	<version>1.0</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Samuel Mbugua</author>
@@ -68,32 +68,32 @@
 	<!-- Any required properties goes here-->
 	<globalProperty>
 		<property>@MODULE_ID@.resources_dir</property>
-		<defaultValue>mobileformentry/resources</defaultValue>
+		<defaultValue>amrsmobileforms/resources</defaultValue>
 		<description>Directory for storing xforms to be filled in and other special files.</description>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.drop_dir</property>
-		<defaultValue>/mobile_drop_dir</defaultValue>
+		<defaultValue>amrsmobileforms/drop_dir</defaultValue>
 		<description>Directory where mobile devices drop forms.</description>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.split_queue_dir</property>
-		<defaultValue>mobileformentry/split_queue</defaultValue>
+		<defaultValue>amrsmobileforms/split_queue</defaultValue>
 		<description>Directory where split mobile forms are placed</description>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.queue_dir</property>
-		<defaultValue>mobileformentry/queue</defaultValue>
+		<defaultValue>amrsmobileforms/queue</defaultValue>
 		<description>Directory for queuing mobile forms before they are processed.</description>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.error_dir</property>
-		<defaultValue>mobileformentry/error</defaultValue>
+		<defaultValue>amrsmobileforms/error</defaultValue>
 		<description>Directory for keeping erred forms during processing</description>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.archive_dir</property>
-		<defaultValue>mobileformentry/archive/%Y/%M</defaultValue>
+		<defaultValue>amrsmobileforms/archive/%Y/%M</defaultValue>
 		<description>Directory for storing successfully processed forms.</description>
 	</globalProperty>
 	

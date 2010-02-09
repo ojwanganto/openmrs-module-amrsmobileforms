@@ -29,6 +29,8 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String encounterDate = "";
 	private String formModelName = "";
 	private String formId = "";
+	private String formPath="";
+
 
 	/**
 	 * Creates a model object from the given MobileFormEntryError. Parses data out of
@@ -188,7 +190,15 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	public void setFormId(String formId) {
 		this.formId = formId;
 	}
+	
+	public String getFormPath() {
+		return formPath;
+	}
 
+	public void setFormPath(String formPath) {
+		this.formPath = formPath;
+	}
+	
 	/**
 	 * Fetch the xml doc for this error
 	 * 

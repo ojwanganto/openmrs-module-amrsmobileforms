@@ -16,28 +16,33 @@ import org.apache.commons.logging.LogFactory;
 public class MobileFormProcessor {
 	
 	private static final Log log = LogFactory.getLog(MobileFormProcessor.class);
-	private MobileFormSplitProcessor splitter = null;
+	private MobileFormSplitProcessor splitProcessor = null;
 	private MobileFormQueueProcessor queueProcessor = null;
 	private MobileFormUploadProcessor uploadProcessor = null;
+	private MobileFormHouseholdLinksProcessor linksProcessor = null;
 	
 	
 	public void processMobileForms() {
-		log.debug("Splitting Mobile forms");
+		log.debug("Processing Mobile forms");
 		
-		//First split submitted xforms
-		if (splitter == null)
-			splitter=new MobileFormSplitProcessor();
-		splitter.splitForms();
+		// First split submitted xforms
+		if (splitProcessor == null)
+			splitProcessor=new MobileFormSplitProcessor();
+		splitProcessor.splitForms();
 		
-		//Process household data part of xforms 
+		// Process household data part of xforms 
 		if (queueProcessor == null)
 			queueProcessor=new MobileFormQueueProcessor();
 		queueProcessor.processMobileFormQueue();
 		
-		//Finally upload patients to xforms module for processing
+		// Upload patients to xforms module for processing
 		if (uploadProcessor == null)
 			uploadProcessor=new MobileFormUploadProcessor();
-		uploadProcessor.processMobileFormSplitQueue();
+		uploadProcessor.processMobileFormUploadQueue();
+		
+		// Finally link patients to house holds
+		if (linksProcessor == null)
+			linksProcessor=new MobileFormHouseholdLinksProcessor();
+		linksProcessor.processMobileFormPendingLinkQueue();
 	}
 }
-

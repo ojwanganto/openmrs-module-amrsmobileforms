@@ -41,4 +41,6 @@ public interface MobileFormEntryDAO {
 
 	public void saveHouseholdMember(HouseholdMember householdMember);
 
+	public List<Survey> getSyncLog();
+
 }

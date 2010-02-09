@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EconomicObjectController {
 
 	@ModelAttribute("economicObject")
-	@RequestMapping(value="/module/mobileformentry/economicObject", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/economicObject", method=RequestMethod.GET)
 	public List<EconomicObject> populateForm() {
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		return mfs.getAllEconomicObjects();
 	}
 	
-	@RequestMapping(value="/module/mobileformentry/economicObject", method=RequestMethod.POST, params = "action=Create New Object")
+	@RequestMapping(value="/module/amrsmobileforms/economicObject", method=RequestMethod.POST, params = "action=Create New Object")
 	public String saveObject(HttpSession httpSession, @RequestParam String objectName, @RequestParam String objectType){
 		
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
@@ -38,10 +38,10 @@ public class EconomicObjectController {
 		}else
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "An Object already exists with similar name" );
 		
-		return "redirect:/module/mobileformentry/economicObject.form";
+		return "redirect:/module/amrsmobileforms/economicObject.form";
 	}
 
-	@RequestMapping(value="/module/mobileformentry/economicObject", method=RequestMethod.POST,params="action=Delete Selected Object(s)")
+	@RequestMapping(value="/module/amrsmobileforms/economicObject", method=RequestMethod.POST,params="action=Delete Selected Object(s)")
 	public String deleteObject(HttpSession httpSession,
 								@RequestParam("objectId") List<Integer> selectedIds){
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
@@ -55,6 +55,6 @@ public class EconomicObjectController {
 		else
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error deleting selected objects");
 		
-		return "redirect:/module/mobileformentry/economicObject.form";
+		return "redirect:/module/amrsmobileforms/economicObject.form";
 	}
 }	

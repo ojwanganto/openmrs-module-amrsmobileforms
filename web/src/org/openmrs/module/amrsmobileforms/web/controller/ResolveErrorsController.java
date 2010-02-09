@@ -1,6 +1,9 @@
 package org.openmrs.module.amrsmobileforms.web.controller;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -38,7 +41,7 @@ public class ResolveErrorsController {
 	 * Controller for Error list jsp page
 	 */
 	@ModelAttribute("formEntryErrors")
-	@RequestMapping(value="/module/mobileformentry/resolveErrors", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/resolveErrors", method=RequestMethod.GET)
 	public List<MobileFormEntryError> populateForm() {
 		if (Context.isAuthenticated()) {
 			MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
@@ -51,7 +54,7 @@ public class ResolveErrorsController {
 	 * Controller for commentOnError jsp Page
 	 */
 	@ModelAttribute("errorFormComment")
-	@RequestMapping(value="/module/mobileformentry/commentOnError", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/commentOnError", method=RequestMethod.GET)
 	public List<MobileFormEntryErrorModel> populateCommentForm(@RequestParam Integer errorId) {
 		return getErrorObject(errorId);
 	}
@@ -59,7 +62,7 @@ public class ResolveErrorsController {
 	/**
 	 * Controller for commentOnError post jsp Page
 	 */
-	@RequestMapping(value="/module/mobileformentry/commentOnError", method=RequestMethod.POST)
+	@RequestMapping(value="/module/amrsmobileforms/commentOnError", method=RequestMethod.POST)
 	public String saveComment(HttpSession httpSession, @RequestParam Integer errorId, @RequestParam String comment) {
 		if (comment.trim().length() > 0) {
 			MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
@@ -77,7 +80,7 @@ public class ResolveErrorsController {
 	 * Controller for resolveError jsp Page
 	 */
 	@ModelAttribute("errorFormResolve")
-	@RequestMapping(value="/module/mobileformentry/resolveError", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/resolveError", method=RequestMethod.GET)
 	public List<MobileFormEntryErrorModel> populateErrorForm(@RequestParam Integer errorId) {
 		return getErrorObject(errorId);	
 	}
@@ -86,9 +89,11 @@ public class ResolveErrorsController {
 	/**
 	 * Controller for resolveError post jsp Page
 	 */
-	@RequestMapping(value="/module/mobileformentry/resolveError", method=RequestMethod.POST)
+	@RequestMapping(value="/module/amrsmobileforms/resolveError", method=RequestMethod.POST)
 	public String resolveError(HttpSession httpSession, @RequestParam String householdId,
-								@RequestParam Integer errorId, @RequestParam String errorItemAction){
+								@RequestParam Integer errorId, @RequestParam String errorItemAction,
+								@RequestParam String birthDate, @RequestParam String patientIdentifier,
+								@RequestParam String providerId){
 		MobileFormEntryService mobileService;
 		String filePath;
 		
@@ -96,7 +101,7 @@ public class ResolveErrorsController {
 		if (Context.isAuthenticated()) {
 			if (!Context.getAuthenticatedUser().hasPrivilege(
 					MobileFormEntryConstants.PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR)) {
-				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "mobileformentry.action.noRights");
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.action.noRights");
 				return "redirect:resolveErrors.list";
 			}
 				
@@ -107,7 +112,7 @@ public class ResolveErrorsController {
 			filePath= MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + errorItem.getFormName();
 			if ("linkHousehold".equals(errorItemAction)) {
 				if (mobileService.getHousehold(householdId)==null) {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "mobileformentry.resolveErrors.action.createLink.error");
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createLink.error");
 					return "redirect:resolveErrors.list";
 				}
 				else {
@@ -120,6 +125,56 @@ public class ResolveErrorsController {
 					}
 				}
 			}
+			else if ("assignBirthdate".equals(errorItemAction)) {
+				if (birthDate!=null && birthDate.trim()!="") {
+					DateFormat df=new SimpleDateFormat();
+					try {
+						birthDate = (String) df.parseObject(birthDate);
+						if (XFormEditor.editNode(filePath, 
+								MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate)) {
+							// put form in queue for normal processing
+							saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+							// delete the mobileformentry error queue item
+							mobileService.deleteError(errorItem);
+						}
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+				}else {
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
+					return "redirect:resolveErrors.list";
+				}
+			}
+			else if ("newIdentifier".equals(errorItemAction)) {
+				if (patientIdentifier != null && patientIdentifier.trim() != "") {
+					if (XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientIdentifier)) {
+						// put form in queue for normal processing
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+						// delete the mobileformentry error queue item
+						mobileService.deleteError(errorItem);
+					}
+				}
+				else {
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
+					return "redirect:resolveErrors.list";
+				}
+			}else if ("linkProvider".equals(errorItemAction)) {
+				if (providerId != null && providerId.trim() != "") {
+					providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
+					if (XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
+						// put form in queue for normal processing
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+						// delete the mobileformentry error queue item
+						mobileService.deleteError(errorItem);
+					}
+				}
+				else {
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
+					return "redirect:resolveErrors.list";
+				}
+			}
 			else if ("createPatient".equals(errorItemAction)) {
 				// process the form 
 				try {
@@ -129,7 +184,7 @@ public class ResolveErrorsController {
 					mobileService.deleteError(errorItem);
 				} catch (Exception e) {
 					log.debug("Error submitting to XForms", e);
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "mobileformentry.resolveErrors.action.createPatient.error"); 
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createPatient.error"); 
 					return "redirect:resolveErrors.list";
 				}
 				
@@ -151,7 +206,7 @@ public class ResolveErrorsController {
 				throw new APIException("Invalid action selected for: " + errorId);
 		}
 		
-		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "mobileformentry.resolveErrors.action.success"); 
+		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "amrsmobileforms.resolveErrors.action.success"); 
 		return "redirect:resolveErrors.list";		
 	}
 	
@@ -165,8 +220,10 @@ public class ResolveErrorsController {
 		List<MobileFormEntryErrorModel> list= new Vector<MobileFormEntryErrorModel>();
 		MobileFormEntryError error= mfs.getErrorById(errorId);
 		if (error !=null) {
+			String filePath=getAbsoluteFilePath(error.getFormName(), mfs);
 			error.setFormName(createFormData(error.getFormName(), mfs));
 			MobileFormEntryErrorModel errorForm = new MobileFormEntryErrorModel(error);
+			errorForm.setFormPath(filePath);
 			list.add(errorForm);
 		}
 		return list;
@@ -185,11 +242,23 @@ public class ResolveErrorsController {
 		return queue.getFormData();
 	}
 	
+	/**
+	 * Takes in Mobile Queue and returns an absolute Path
+	 * @param formPath
+	 * @param mfs
+	 * @return String absolute path of the file
+	 */
+	private static String getAbsoluteFilePath (String formName, MobileFormEntryService mfs) {
+		
+		MobileFormQueue queue= mfs.getMobileFormEntryQueue(MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath()
+								+ formName);
+		return queue.getFileSystemUrl();
+	}
 
 	/**
 	 * Stores a form in a specified folder
 	 */
-	private void saveForm(String oldFormPath, String newFormPath){
+	private static void saveForm(String oldFormPath, String newFormPath){
 		try{
 			if(oldFormPath != null){
 				File file=new File(oldFormPath);

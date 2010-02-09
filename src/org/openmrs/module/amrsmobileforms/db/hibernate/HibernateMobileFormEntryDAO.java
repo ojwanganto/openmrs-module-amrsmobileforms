@@ -14,7 +14,7 @@ import org.openmrs.module.amrsmobileforms.Survey;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 
 public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
-	
+
 	/**
 	 * Hibernate session factory
 	 */
@@ -124,23 +124,46 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 		return (MobileFormEntryError) criteria.uniqueResult();
 	}
 
+	/**
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getHouseholdMemberById(java.lang.Integer)
+	 */
 	public HouseholdMember getHouseholdMemberById(Integer identifier) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HouseholdMember.class);
 		criteria.add(Expression.eq("householdMemberId", identifier));
 		return (HouseholdMember) criteria.uniqueResult();
 	}
 
+	/**
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getEconomicObjectById(java.lang.Integer)
+	 */
 	public EconomicObject getEconomicObjectById(Integer economicObjectId) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(EconomicObject.class);
 		criteria.add(Expression.like("objectId", economicObjectId));
 		return (EconomicObject) criteria.uniqueResult();
 	}
 
+	/**
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#deleteError(org.openmrs.module.amrsmobileforms.MobileFormEntryError)
+	 */
 	public void deleteError(MobileFormEntryError error) {
 		sessionFactory.getCurrentSession().delete(error);
 	}
 
+	/**
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#saveHouseholdMember(org.openmrs.module.amrsmobileforms.HouseholdMember)
+	 */
 	public void saveHouseholdMember(HouseholdMember householdMember) {
 		sessionFactory.getCurrentSession().saveOrUpdate(householdMember);
+	}
+
+	/**
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getSyncLog()
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Survey> getSyncLog() {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Survey.class)
+								.createAlias("household", "household");
+		List<Survey> lstSurveys=criteria.list();
+		return lstSurveys;
 	}
 }

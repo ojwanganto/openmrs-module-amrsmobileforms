@@ -11,45 +11,45 @@ public class MobileFormEntryConstants {
 	/** 
 	  * Name of the global property for the directory where mobile xforms and other special files are stored.
 	 */
-	public final static String GP_MOBILE_FORMS_RESOURCES_DIR = "mobileformentry.resources_dir";
+	public final static String GP_MOBILE_FORMS_RESOURCES_DIR = "amrsmobileforms.resources_dir";
 
 	/** The default mobile-forms-resources  directory. */
-	public final static String GP_MOBILE_FORMS_RESOURCES_DIR_DEFAULT = "mobileformentry/resources_dir";
+	public final static String GP_MOBILE_FORMS_RESOURCES_DIR_DEFAULT = "amrsmobileforms/resources_dir";
 	
 	/** 
 	  * Name of the global property for the directory where mobile devices sends forms.
 	 */
-	public final static String GP_MOBILE_FORMS_DROP_DIR = "mobileformentry.drop_dir";
+	public final static String GP_MOBILE_FORMS_DROP_DIR = "amrsmobileforms.drop_dir";
 
 	/** The default mobile-forms-drop  directory. */
-	public final static String GP_MOBILE_FORMS_DROP_DIR_DEFAULT = "mobileformentry/drop_dir";
+	public final static String GP_MOBILE_FORMS_DROP_DIR_DEFAULT = "amrsmobileforms/drop_dir";
 	
 	/**
 	 * Name of the global property for the directory where mobile forms
 	 * are dropped.
 	 */
-	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR = "mobileformentry.split_queue_dir";
+	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR = "amrsmobileforms.split_queue_dir";
 
 	/** The default mobile-forms-split queue directory. */
-	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR_DEFAULT = "mobileformentry/split_queue";
+	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR_DEFAULT = "amrsmobileforms/split_queue";
 	
 	/**
 	 * Name of the global property for the directory for queuing mobile forms
 	 * before they are processed.
 	 */
-	public final static String GP_MOBILE_FORMS_QUEUE_DIR = "mobileformentry.queue_dir";
+	public final static String GP_MOBILE_FORMS_QUEUE_DIR = "amrsmobileforms.queue_dir";
 
 	/** The default mobile-forms queue directory. */
-	public final static String GP_MOBILE_FORMS_QUEUE_DIR_DEFAULT = "mobileformentry/queue";
+	public final static String GP_MOBILE_FORMS_QUEUE_DIR_DEFAULT = "amrsmobileforms/queue";
 
 	/**
 	 * Name of the global property for the directory where to put forms that
 	 * erred during processing
 	 */
-	public final static String GP_MOBILE_FORMS_ERROR_DIR = "mobileformentry.error_dir";
+	public final static String GP_MOBILE_FORMS_ERROR_DIR = "amrsmobileforms.error_dir";
 
 	/** The default mobile-forms error directory. */
-	public final static String GP_MOBILE_FORMS_ERROR_DIR_DEFAULT = "mobileformentry/error";
+	public final static String GP_MOBILE_FORMS_ERROR_DIR_DEFAULT = "amrsmobileforms/error";
 
 	/*
 	 * I do not believe this is the best way since the xform module will archive
@@ -57,10 +57,13 @@ public class MobileFormEntryConstants {
 	 * with just form names that can later be retrieved from the xform archive
 	 * directory
 	 */
-	public final static String GP_MOBILE_FORMS_ARCHIVE_DIR = "mobileformentry.archive_dir";
+	public final static String GP_MOBILE_FORMS_ARCHIVE_DIR = "amrsmobileforms.archive_dir";
 
 	/** The default mobile forms archive directory. */
-	public final static String GP_MOBILE_FORMS_ARCHIVE_DIR_DEFAULT = "mobileformentry/archive/%Y/%M";
+	public final static String GP_MOBILE_FORMS_ARCHIVE_DIR_DEFAULT = "amrsmobileforms/archive/%Y/%M";
+	
+	/** Mobile-forms-pending link directory. */
+	public final static String GP_MOBILE_FORMS_PENDING_LINK_DIR = "amrsmobileforms/pendingLink";
 	
 	/** The metadata nodes prefix. */
 	public static final String METADATA_PREFIX = "/form/meta";
@@ -118,12 +121,16 @@ public class MobileFormEntryConstants {
 	public final static String ECONOMIC_CHILDREN_IN_HOUSEHOLD = "children_in_household";
 	public final static String ECONOMIC_CHILDREN_IN_SCHOOL = "children_in_school";
 	
+	public final static String PATIENT_NODE = "/form/patient";
 	public final static String PATIENT_IDENTIFIER = "patient.medical_record_number";
 	public final static String PATIENT_IDENTIFIER_TYPE = "patient_identifier.identifier_type_id";
 	public final static String PATIENT_HCT_IDENTIFIER = "patient.hct_id";
 	public final static String HOUSEHOLD_IDENTIFIER = "household";
-	public final static String ENCOUNTER_DATETIME = "/form/encounter/encounter.encounter_datetime";
-	public final static String PATIENT_NODE = "/form/patient";
+	public final static String ESTIMATED_AGE = "approximate_age";
+	public final static String PATIENT_BIRTHDATE = "patient.birthdate";
+	
+	public final static String ENCOUNTER_NODE = "/form/encounter";
+	public final static String ENCOUNTER_PROVIDER = "encounter.provider_id";
 	
 	//PRIVILEGES
 	public static final String PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR = "Resolve Mobile Form Entry Error";
