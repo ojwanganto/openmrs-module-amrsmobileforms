@@ -13,23 +13,51 @@
  */
 package org.openmrs.module.amrsmobileforms.web.controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpSession;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-
+/**
+ * Controller for the synclog jsp page
+ * 
+ * @author Samuel Mbugua
+ */
 @Controller
 public class SyncLogController {
-	
+	private static Date syncLogDate;
 	@RequestMapping(value = "/module/amrsmobileforms/syncLog", method = RequestMethod.GET)
 	public String showPage(ModelMap model) throws Exception {
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
-		model.addAttribute("logs", mfs.getSyncLog());
+		model.addAttribute("logs", mfs.getSyncLog(syncLogDate));
+		model.addAttribute("files", mfs.getAllSyncLogs());
 		
 		return "/module/amrsmobileforms/syncLog";
 	}
 	
+	@RequestMapping(value="/module/amrsmobileforms/syncLog", method=RequestMethod.POST)
+	public String changeLogDate(HttpSession httpSession, @RequestParam String logDate) {
+		if (logDate.trim().length() > 0) {
+			try {
+				DateFormat df =new SimpleDateFormat("yyyy-MMM-dd");
+				syncLogDate=df.parse(logDate);
+			} catch (ParseException e) {
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Invalid date format" );
+				e.printStackTrace();
+			}
+		}else
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "No Date selected");
+		return "redirect:syncLog.list";		
+	}	
 }

@@ -6,6 +6,8 @@ import org.openmrs.module.Activator;
 
 /**
  * Activator startup/shutdown methods for the mobile form entry module
+ *
+ * @author  Samuel Mbugua
  */
 public class MobileFormEntryActivator implements Activator {
 

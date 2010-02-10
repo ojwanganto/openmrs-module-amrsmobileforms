@@ -13,6 +13,8 @@ import org.w3c.dom.Document;
 /**
  * This class is only used as the model for the ResolveErrosFormController and
  * its jsp page
+ * 
+ * @author  Samuel Mbugua
  */
 public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	

@@ -22,6 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+/**
+ * Controller for Mobile resources jsp page
+ * 
+ * @author Samuel Mbugua
+ */
 @Controller
 public class MobileResourcesController {
 	

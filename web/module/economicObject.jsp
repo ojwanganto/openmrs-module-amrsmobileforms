@@ -27,7 +27,7 @@
 						</tr>
 					</c:forEach>
 				</table>
-				<input type="submit" name="action" value="Delete Selected Object(s)">
+				<input type="submit" name="action" value="Delete Selected Object(s)"/>
 				<span class="error" id="objectIdError">Nothing is selected to delete!</span>
 			</form>
 		</c:if>
@@ -54,7 +54,7 @@
 					</td>
 				</tr>
 			</table>
-			<input type="submit" name="action" value="Create New Object" />
+			<input type="submit" name="action" value="Create New Object"/>
 		</form>
 	</div>
 </div>

@@ -9,6 +9,11 @@ import org.openmrs.module.amrsmobileforms.HouseholdMember;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
 import org.openmrs.module.amrsmobileforms.Survey;
 
+/**
+ * Public Interface to the HibernateMobileFormEntryDAO
+ * 
+ * @author Samuel Mbugua
+ */
 public interface MobileFormEntryDAO {
 	
 	public Household getHousehold(String householdIdentifier);
@@ -40,7 +45,5 @@ public interface MobileFormEntryDAO {
 	public void deleteError(MobileFormEntryError error);
 
 	public void saveHouseholdMember(HouseholdMember householdMember);
-
-	public List<Survey> getSyncLog();
 
 }

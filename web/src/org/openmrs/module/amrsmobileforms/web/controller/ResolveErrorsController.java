@@ -30,8 +30,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
+ * Controller for Mobile errors resolution jsp pages
+ * 
  * @author Samuel Mbugua
- *
  */
 @Controller
 public class ResolveErrorsController {

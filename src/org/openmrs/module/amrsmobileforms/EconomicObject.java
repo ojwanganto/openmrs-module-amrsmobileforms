@@ -6,6 +6,10 @@ import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.User;
 
+/**
+ * Economic Java Object 
+ * @author Samuel Mbugua
+ */
 public class EconomicObject extends BaseOpenmrsObject implements Auditable{
 	private Integer objectId;
 	private String objectName;

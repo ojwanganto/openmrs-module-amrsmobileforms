@@ -8,6 +8,9 @@ import org.openmrs.User;
 
 
 
+/**
+ * @author Samuel Mbugua
+ */
 public class Economic extends BaseOpenmrsObject implements Auditable{
 	private Integer economicId;
 	private Household household;

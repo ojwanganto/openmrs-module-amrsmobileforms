@@ -11,15 +11,17 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
+import org.openmrs.module.amrsmobileforms.util.SyncLogger;
 import org.openmrs.module.amrsmobileforms.util.XFormEditor;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
-
 /**
- * Processes Mobile forms Queue entries.
+ * Processes Mobile forms Drop Queue entries.
  * 
- * When the processing is successful, the queue entry is submitted to the XFormEntry Queue.
+ * Splits composite forms from the drop queue
+ * When the processing is successful, the queue entry is submitted to the Mobile form entry Queue while
+ * the split forms are submitted to xformsEntry queue
  * For unsuccessful processing, the queue entry is put in the Mobile forms error folder.
  * 
  * @author Samuel Mbugua
@@ -33,6 +35,7 @@ public class MobileFormSplitProcessor {
 	private static final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	private DocumentBuilder docBuilder;
 	private MobileFormEntryService mobileService;
+	private SyncLogger syncLogger;
 	
 	public MobileFormSplitProcessor(){
 		try{
@@ -92,6 +95,10 @@ public class MobileFormSplitProcessor {
 			File dropDir = MobileFormEntryUtil.getMobileFormsDropDir();
 			for (File file : dropDir.listFiles()) {
 				MobileFormQueue queue = mobileService.getMobileFormEntryQueue(file.getAbsolutePath());
+				// Log this sync
+				SyncLogger logger=getSyncLogger();
+				logger.createSyncLog(file);
+				
 				if (splitMobileForm(queue))
 					//Move form to queue for processing
 					putFormInQueue(queue.getFileSystemUrl());
@@ -160,5 +167,21 @@ public class MobileFormSplitProcessor {
 			}
 		}
 		return mobileService;
+	}
+	
+	
+	/**
+	 * @return SyncLogger to be used by the process
+	 */
+	private SyncLogger getSyncLogger() {
+		if (syncLogger == null) {
+			try {
+				syncLogger= new SyncLogger();
+			}catch (APIException e) {
+				log.debug("SyncLogger not found");
+				return null;
+			}
+		}
+		return syncLogger;
 	}
 }

@@ -16,6 +16,9 @@ public class MobileFormEntryConstants {
 	/** The default mobile-forms-resources  directory. */
 	public final static String GP_MOBILE_FORMS_RESOURCES_DIR_DEFAULT = "amrsmobileforms/resources_dir";
 	
+	/** Mobile-forms-sync-log directory. */
+	public final static String GP_MOBILE_FORMS_SYNC_LOG_DIR_DEFAULT = "amrsmobileforms/synclog";
+	
 	/** 
 	  * Name of the global property for the directory where mobile devices sends forms.
 	 */
@@ -65,6 +68,9 @@ public class MobileFormEntryConstants {
 	/** Mobile-forms-pending link directory. */
 	public final static String GP_MOBILE_FORMS_PENDING_LINK_DIR = "amrsmobileforms/pendingLink";
 	
+	/** The text/xml http content type. */
+	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
+	
 	/** The metadata nodes prefix. */
 	public static final String METADATA_PREFIX = "/form/meta";
 
@@ -82,10 +88,6 @@ public class MobileFormEntryConstants {
 
 	/** The individuals nodes prefix. */
 	public final static String HOUSEHOLD_INDIVIDUALS_PREFIX = "/individuals";
-	
-	/** The text/xml http content type. */
-    public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
-
 
 	public final static String META_START_TIME = "start_time";
 	public final static String META_END_TIME = "end_time";

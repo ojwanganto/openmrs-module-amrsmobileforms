@@ -9,8 +9,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet filter to return the location of syncing server
+ * 
+ * @author Samuel Mbugua
+ *
+ */
 public final class LocationFilter implements Filter {
-
 
     @SuppressWarnings("unused")
 	private FilterConfig filterConfig = null;

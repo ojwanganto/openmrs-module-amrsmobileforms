@@ -7,6 +7,10 @@ import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.User;
 
+/**
+ * @author Samuel Mbugua
+ *
+ */
 public class Survey extends BaseOpenmrsObject implements Auditable {
 	private Integer householdSurveyId;
 	private Household household;

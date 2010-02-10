@@ -70,6 +70,18 @@ public class MobileFormEntryUtil {
 		return mobileFormsArchiveDir;
 	}
 	
+	public static File getMobileFormsSyncLogDir() {
+    	
+		String folderName = MobileFormEntryConstants.GP_MOBILE_FORMS_SYNC_LOG_DIR_DEFAULT;
+		// get the file object for this potentially new file
+		File mobileFormsSyncLogDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+		
+		if (log.isDebugEnabled())
+			log.debug("Loaded mobile forms sync log directory from global properties: " + mobileFormsSyncLogDir.getAbsolutePath());
+    	
+		return mobileFormsSyncLogDir;
+	}
+	
 	public static File getMobileFormsErrorDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_ERROR_DIR,

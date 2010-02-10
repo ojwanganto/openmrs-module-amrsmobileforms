@@ -8,6 +8,9 @@ import org.openmrs.module.web.extension.AdministrationSectionExt;
 import org.openmrs.util.InsertedOrderComparator;
 
 /**
+ * Anchor for the module in the Main OpenMRS administration page
+ * 
+ * @author Samuel Mbugua
  *
  */
 @SuppressWarnings("deprecation")

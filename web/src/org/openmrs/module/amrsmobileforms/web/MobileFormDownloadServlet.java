@@ -19,7 +19,6 @@ import org.openmrs.module.xforms.XformConstants;
  * Provides MobileForm download services.
  * 
  * @author Samuel Mbugua
- * @version 1.0
  */
 public class MobileFormDownloadServlet extends HttpServlet {
 	public static final long serialVersionUID = 123427878377111L;

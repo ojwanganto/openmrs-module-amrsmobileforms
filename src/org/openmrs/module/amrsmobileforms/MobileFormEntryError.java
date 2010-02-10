@@ -6,6 +6,11 @@ import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.User;
 
+/**
+ * Error object, stores errors that occur during mobile forms processing
+ * @author  Samuel Mbugua
+ *
+ */
 public class MobileFormEntryError extends BaseOpenmrsObject implements Auditable{
 
 	private Integer mobileFormEntryErrorId;

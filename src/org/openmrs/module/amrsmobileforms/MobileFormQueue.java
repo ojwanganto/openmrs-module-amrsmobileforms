@@ -11,6 +11,9 @@ import org.openmrs.util.OpenmrsUtil;
 
 /**
  * Object holding the metadata around the mobile form queue
+ * 
+ * @author Samuel Mbugua
+ *
  */
 public class MobileFormQueue {
 	

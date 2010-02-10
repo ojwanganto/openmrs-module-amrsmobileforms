@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Controller for economic objects jsp page
+ * 
+ * @author Samuel Mbugua
+ */
 @Controller
 public class EconomicObjectController {
 

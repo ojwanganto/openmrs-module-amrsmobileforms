@@ -8,6 +8,11 @@ import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.User;
 
+/**
+ *  A household facility object
+ *  
+ * @author  Samuel Mbugua
+ */
 public class Household extends BaseOpenmrsObject implements Auditable {
 	
 	private Integer householdId;

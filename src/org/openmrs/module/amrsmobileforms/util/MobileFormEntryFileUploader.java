@@ -9,6 +9,11 @@ import org.openmrs.module.xforms.download.XformDataUploadManager;
 import org.openmrs.module.xforms.util.XformsUtil;
 import org.openmrs.util.OpenmrsUtil;
 
+/**
+ * Uploads patient forms from this module to the xforms module
+ * 
+ * @author Samuel Mbugua
+ */
 public class MobileFormEntryFileUploader {
 	
 	public static void submitXFormFile(String filePath) throws IOException, Exception {
@@ -25,5 +30,4 @@ public class MobileFormEntryFileUploader {
 		SecureRandom random = new SecureRandom();
 		return new BigInteger(130, random).toString(32);
 	}
-	
 }

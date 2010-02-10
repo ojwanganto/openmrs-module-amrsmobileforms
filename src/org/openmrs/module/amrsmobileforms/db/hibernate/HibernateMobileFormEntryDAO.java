@@ -13,6 +13,12 @@ import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
 import org.openmrs.module.amrsmobileforms.Survey;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 
+/**
+ * Database interface for the module 
+ * 
+ * @author Samuel Mbugua
+ *
+ */
 public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 
 	/**
@@ -154,16 +160,5 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	 */
 	public void saveHouseholdMember(HouseholdMember householdMember) {
 		sessionFactory.getCurrentSession().saveOrUpdate(householdMember);
-	}
-
-	/**
-	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getSyncLog()
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Survey> getSyncLog() {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Survey.class)
-								.createAlias("household", "household");
-		List<Survey> lstSurveys=criteria.list();
-		return lstSurveys;
 	}
 }
