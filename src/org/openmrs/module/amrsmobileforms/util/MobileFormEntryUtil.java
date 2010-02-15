@@ -244,6 +244,10 @@ public class MobileFormEntryUtil {
 		household.setAdults(getInteger(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ADULTS , householdMetaNode)));
 		household.setChildren(getInteger(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_CHILDREN_UNDER13 , householdMetaNode)));
 		
+		//Set eligibles for testing
+		household.setAdultsEligible(getInteger(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ADULTS_ELIGIBLE, householdMetaNode)));
+		household.setChildrenEligible(getInteger(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_CHILDREN_UNDER13_ELIGIBLE, householdMetaNode)));
+		
 		//Set GPS location
 		household.setGpsLocation(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, householdMetaNode));
     	return household;
