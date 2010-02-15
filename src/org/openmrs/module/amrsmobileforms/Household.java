@@ -25,6 +25,8 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	private String gpsLocation;
 	private Integer adults;
 	private Integer children;
+	private Integer adultsEligible;
+	private Integer childrenEligible;
 	private User creator;
 	private Date dateCreated;
 	private User changedBy;
@@ -151,6 +153,30 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	 */
 	public void setChildren(Integer children) {
 		this.children = children;
+	}
+	/**
+	 * @return the adultsEligible
+	 */
+	public Integer getAdultsEligible() {
+		return adultsEligible;
+	}
+	/**
+	 * @param adultsEligible the adultsEligible to set
+	 */
+	public void setAdultsEligible(Integer adultsEligible) {
+		this.adultsEligible = adultsEligible;
+	}
+	/**
+	 * @return the childrenEligible
+	 */
+	public Integer getChildrenEligible() {
+		return childrenEligible;
+	}
+	/**
+	 * @param childrenEligible the childrenEligible to set
+	 */
+	public void setChildrenEligible(Integer childrenEligible) {
+		this.childrenEligible = childrenEligible;
 	}
 	/**
 	 * @return the creator

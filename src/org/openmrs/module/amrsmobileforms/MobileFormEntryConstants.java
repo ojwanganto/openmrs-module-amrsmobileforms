@@ -110,8 +110,8 @@ public class MobileFormEntryConstants {
 	public final static String HOUSEHOLD_META_DIVISION = "division";
 	public final static String HOUSEHOLD_META_HOUSEHOLD_ADULTS = "household_adults";
 	public final static String HOUSEHOLD_META_CHILDREN_UNDER13 = "children_under13";
-	
-	
+	public final static String HOUSEHOLD_META_HOUSEHOLD_ADULTS_ELIGIBLE = "eligible_adults";
+	public final static String HOUSEHOLD_META_CHILDREN_UNDER13_ELIGIBLE = "eligible_under13";
 	
 	public final static String ECONOMIC_BEDNETS_OWNED = "bednets_owned";
 	public final static String ECONOMIC_BEDNETS_GIVEN = "bednets_given";
