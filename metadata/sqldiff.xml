@@ -50,6 +50,8 @@
 			  `gps_location` varchar(50),
 			  `adults` int(11) default '0',
 			  `children` int(11) default '0',
+			  `adults_eligible` int(11) default '0',
+			  `children_eligible` int(11) default '0',
 			  `created_by` int(11) NOT NULL default '0',
 			  `changed_by` int(11) default '0',
 			  `date_created` datetime NOT NULL default '0000-00-00 00:00:00',

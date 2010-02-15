@@ -36,6 +36,10 @@
 		<property name="adults" type="int" column="adults" />
 		
 		<property name="children" type="int" column="children" />
+		
+		<property name="adultsEligible" type="int" column="adults_eligible" />
+		
+		<property name="childrenEligible" type="int" column="children_eligible" />
 			
 		<many-to-one name="changedBy" class="org.openmrs.User" not-null="true">
 			<column name="changed_by" />
