@@ -37,11 +37,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class SyncLogController {
 	private static Date syncLogDate;
+	private DateFormat df =new SimpleDateFormat("yyyy-MMM-dd");
 	@RequestMapping(value = "/module/amrsmobileforms/syncLog", method = RequestMethod.GET)
 	public String showPage(ModelMap model) throws Exception {
 		MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		model.addAttribute("logs", mfs.getSyncLog(syncLogDate));
 		model.addAttribute("files", mfs.getAllSyncLogs());
+		model.addAttribute("logDate", syncLogDate == null?df.format(new Date()):df.format(syncLogDate));
 		
 		return "/module/amrsmobileforms/syncLog";
 	}
@@ -50,7 +52,6 @@ public class SyncLogController {
 	public String changeLogDate(HttpSession httpSession, @RequestParam String logDate) {
 		if (logDate.trim().length() > 0) {
 			try {
-				DateFormat df =new SimpleDateFormat("yyyy-MMM-dd");
 				syncLogDate=df.parse(logDate);
 			} catch (ParseException e) {
 				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Invalid date format" );

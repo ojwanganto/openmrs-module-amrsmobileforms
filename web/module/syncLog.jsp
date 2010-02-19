@@ -25,11 +25,11 @@
 <c:choose>
 	<c:when test="${logSize < 1}">
 		<br/>
-		<i>&nbsp;&nbsp;&nbsp;(<spring:message code="amrsmobileforms.sync.empty"/>)</i>
+		<i>&nbsp;&nbsp;&nbsp;(<spring:message code="amrsmobileforms.sync.empty" arguments="${logDate}"/>)</i>
 		<br/>
 	</c:when>
 	<c:otherwise>
-		<b class="boxHeader"><spring:message code="amrsmobileforms.sync.log"/></b>
+		<b class="boxHeader"><spring:message code="amrsmobileforms.sync.log"/>${logDate}</b>
 		<table cellpadding="4" cellspacing="0" border="0" class="box">
 			<tr>
 				<th style="white-space: nowrap"><spring:message code="amrsmobileforms.sync.provider" /></th>
