@@ -24,16 +24,16 @@ public class MobileFormProcessor {
 	public void processMobileForms() {
 		log.debug("Processing Mobile forms");
 
-		// First split submitted xforms
-		if (splitProcessor == null)
-			splitProcessor = new MobileFormSplitProcessor();
-		splitProcessor.splitForms();
-
-		// Process household data part of xforms
+		// First process household data part of xforms
 		if (queueProcessor == null)
 			queueProcessor = new MobileFormQueueProcessor();
 		queueProcessor.processMobileFormQueue();
 
+		// Split submitted xforms
+		if (splitProcessor == null)
+			splitProcessor = new MobileFormSplitProcessor();
+		splitProcessor.splitForms();
+		
 		// Upload patients to xforms module for processing
 		if (uploadProcessor == null)
 			uploadProcessor = new MobileFormUploadProcessor();

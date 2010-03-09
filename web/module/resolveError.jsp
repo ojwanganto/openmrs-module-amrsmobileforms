@@ -67,6 +67,10 @@
 							<td>
 								<input type="hidden" name="amrsmobileformsErrorId" value="${queueItem.mobileFormEntryErrorId}"/>
 								
+								<!-- Pick a provider -->
+								<input type="radio" name="errorItemAction" value="linkProvider"/> <spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>:
+								<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.findProvider" initialValue="" callback="setErrorAction" />
+								
 								<!-- Have the machinery create a new patient -->
 								<input type="radio" name="errorItemAction" value="createPatient" /> <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/> <br/>
 								
@@ -91,9 +95,8 @@
 								<input type="radio" name="errorItemAction" value="assignBirthdate" /> <spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
 								<input type="text" name="birthDate" onClick="showCalendar(this)"/><br/>
 								
-								<!-- Pick a provider -->
-								<div></div><input type="radio" name="errorItemAction" value="linkProvider"/> <spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>:
-								<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.findProvider" initialValue="" callback="setErrorAction" /></div>
+								<input type="radio" name="errorItemAction" value="newHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
+								<input type="text" name="householdIdentifier"/><br/>
 							</td>
 						</tr>
 						<tr>

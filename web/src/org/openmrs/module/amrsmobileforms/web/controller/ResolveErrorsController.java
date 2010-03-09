@@ -94,7 +94,7 @@ public class ResolveErrorsController {
 	public String resolveError(HttpSession httpSession, @RequestParam String householdId,
 								@RequestParam Integer errorId, @RequestParam String errorItemAction,
 								@RequestParam String birthDate, @RequestParam String patientIdentifier,
-								@RequestParam String providerId){
+								@RequestParam String providerId, @RequestParam String householdIdentifier){
 		MobileFormEntryService mobileService;
 		String filePath;
 		
@@ -118,9 +118,9 @@ public class ResolveErrorsController {
 				}
 				else {
 					if (XFormEditor.editNode(filePath, 
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.HOUSEHOLD_IDENTIFIER, householdId)) {
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
 						// delete the mobileformentry error queue item
 						mobileService.deleteError(errorItem);
 					}
@@ -134,12 +134,14 @@ public class ResolveErrorsController {
 						if (XFormEditor.editNode(filePath, 
 								MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate)) {
 							// put form in queue for normal processing
-							saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+							saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
 							// delete the mobileformentry error queue item
 							mobileService.deleteError(errorItem);
 						}
 					} catch (ParseException e) {
+						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Invalid date entered");
 						e.printStackTrace();
+						return "redirect:resolveErrors.list";
 					}
 				}else {
 					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
@@ -151,7 +153,7 @@ public class ResolveErrorsController {
 					if (XFormEditor.editNode(filePath, 
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientIdentifier)) {
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
 						// delete the mobileformentry error queue item
 						mobileService.deleteError(errorItem);
 					}
@@ -166,7 +168,7 @@ public class ResolveErrorsController {
 					if (XFormEditor.editNode(filePath, 
 							MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() + errorItem.getFormName());
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
 						// delete the mobileformentry error queue item
 						mobileService.deleteError(errorItem);
 					}
@@ -199,6 +201,35 @@ public class ResolveErrorsController {
 				//set comment to null and save
 				errorItem.setComment(null);
 				mobileService.saveErrorInDatabase(errorItem);
+			}
+			else if ("newHousehold".equals(errorItemAction)) {
+				if (householdIdentifier != null && householdIdentifier.trim() != "") {
+					// first change household id
+					if (XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX + "/" + 
+							MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, householdIdentifier)) {
+					}else {
+						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+						return "redirect:resolveErrors.list";
+					}
+					
+					// then change all patient household pointers
+					if (XFormEditor.editNodeList(filePath, 
+							MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_INDIVIDUALS_PREFIX,
+							"patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
+						// drop form in queue for normal processing
+						saveForm(filePath, MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath() + errorItem.getFormName());
+						// delete the mobileformentry error queue item
+						mobileService.deleteError(errorItem);
+					}else {
+						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+						return "redirect:resolveErrors.list";
+					}
+				}
+				else {
+					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+					return "redirect:resolveErrors.list";
+				}
 			}
 			else if ("noChange".equals(errorItemAction)) {
 				// do nothing here

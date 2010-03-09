@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
-import org.openmrs.module.amrsmobileforms.util.SyncLogger;
 import org.openmrs.module.amrsmobileforms.util.XFormEditor;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
@@ -35,7 +35,6 @@ public class MobileFormSplitProcessor {
 	private static final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	private DocumentBuilder docBuilder;
 	private MobileFormEntryService mobileService;
-	private SyncLogger syncLogger;
 	
 	public MobileFormSplitProcessor(){
 		try{
@@ -92,16 +91,13 @@ public class MobileFormSplitProcessor {
 			return;
 		}
 		try {			
-			File dropDir = MobileFormEntryUtil.getMobileFormsDropDir();
-			for (File file : dropDir.listFiles()) {
+			File pendingSplitDir = MobileFormEntryUtil.getMobileFormsPendingSplitDir();
+			for (File file : pendingSplitDir.listFiles()) {
 				MobileFormQueue queue = mobileService.getMobileFormEntryQueue(file.getAbsolutePath());
-				// Log this sync
-				SyncLogger logger=getSyncLogger();
-				logger.createSyncLog(file);
 				
 				if (splitMobileForm(queue))
-					//Move form to queue for processing
-					putFormInQueue(queue.getFileSystemUrl());
+					//Move form to archive
+					saveFormInArchive(queue.getFileSystemUrl());
 			}
 		}
 		catch(Exception e){
@@ -132,13 +128,13 @@ public class MobileFormSplitProcessor {
 	}
 
 	/**
-	 * Moves split file to the queue for processing
+	 * Archives a mobile form after successful processing
 	 */
-	private void putFormInQueue(String formPath){
-		String queueFilePath= MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + getFormName(formPath);
-		
-		saveForm(formPath, queueFilePath);
+	private void saveFormInArchive(String formPath){
+		String archiveFilePath= MobileFormEntryUtil.getMobileFormsArchiveDir(new Date()).getAbsolutePath() + getFormName(formPath);
+		saveForm(formPath, archiveFilePath);
 	}
+
 	
 	private void saveFormInError(String formPath){
 		String errorFilePath= MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + getFormName(formPath);
@@ -169,19 +165,4 @@ public class MobileFormSplitProcessor {
 		return mobileService;
 	}
 	
-	
-	/**
-	 * @return SyncLogger to be used by the process
-	 */
-	private SyncLogger getSyncLogger() {
-		if (syncLogger == null) {
-			try {
-				syncLogger= new SyncLogger();
-			}catch (APIException e) {
-				log.debug("SyncLogger not found");
-				return null;
-			}
-		}
-		return syncLogger;
-	}
 }

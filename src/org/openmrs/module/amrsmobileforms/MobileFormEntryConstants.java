@@ -28,15 +28,6 @@ public class MobileFormEntryConstants {
 	public final static String GP_MOBILE_FORMS_DROP_DIR_DEFAULT = "amrsmobileforms/drop_dir";
 	
 	/**
-	 * Name of the global property for the directory where mobile forms
-	 * are dropped.
-	 */
-	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR = "amrsmobileforms.split_queue_dir";
-
-	/** The default mobile-forms-split queue directory. */
-	public final static String GP_MOBILE_FORMS_SPLIT_QUEUE_DIR_DEFAULT = "amrsmobileforms/split_queue";
-	
-	/**
 	 * Name of the global property for the directory for queuing mobile forms
 	 * before they are processed.
 	 */
@@ -66,7 +57,10 @@ public class MobileFormEntryConstants {
 	public final static String GP_MOBILE_FORMS_ARCHIVE_DIR_DEFAULT = "amrsmobileforms/archive/%Y/%M";
 	
 	/** Mobile-forms-pending link directory. */
-	public final static String GP_MOBILE_FORMS_PENDING_LINK_DIR = "amrsmobileforms/pendingLink";
+	public final static String GP_MOBILE_FORMS_PENDING_LINK_DIR = "amrsmobileforms/pending_link";
+	
+	/** Mobile-forms-pending split directory. */
+	public final static String GP_MOBILE_FORMS_PENDING_SPLIT_DIR = "amrsmobileforms/pending_split";
 	
 	/** The text/xml http content type. */
 	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
@@ -127,7 +121,7 @@ public class MobileFormEntryConstants {
 	public final static String PATIENT_IDENTIFIER = "patient.medical_record_number";
 	public final static String PATIENT_IDENTIFIER_TYPE = "patient_identifier.identifier_type_id";
 	public final static String PATIENT_HCT_IDENTIFIER = "patient.hct_id";
-	public final static String HOUSEHOLD_IDENTIFIER = "household";
+	public final static String PATIENT_HOUSEHOLD_IDENTIFIER = "household";
 	public final static String ESTIMATED_AGE = "approximate_age";
 	public final static String PATIENT_BIRTHDATE = "patient.birthdate";
 	

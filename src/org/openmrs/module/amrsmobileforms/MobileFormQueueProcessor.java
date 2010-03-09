@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
-import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
+import org.openmrs.module.amrsmobileforms.util.SyncLogger;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 /**
  * Processes Mobile forms Queue entries.
  * 
- * When the processing is successful, the queue entry is submitted to the XFormEntry Queue.
+ * When the processing is successful, 
  * For unsuccessful processing, the queue entry is put in the Mobile forms error folder.
  * 
  * @author Samuel Mbugua
@@ -37,6 +37,7 @@ public class MobileFormQueueProcessor {
 	private static Boolean isRunning = false; // allow only one running
 	private static final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	private DocumentBuilder docBuilder;
+	private SyncLogger syncLogger;
 	
 	public MobileFormQueueProcessor(){
 		try{
@@ -55,6 +56,7 @@ public class MobileFormQueueProcessor {
 		log.debug("Transforming mobile form entry queue");
 		String formData = queue.getFormData();
 		String householdIdentifier = null;
+		String householdGps=null;
 		MobileFormEntryService mfse=(MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		
 		try {
@@ -64,7 +66,7 @@ public class MobileFormQueueProcessor {
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
 			Node curNode=(Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID , curNode); 
-			
+			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
 			//pull out household data: includes meta, survey, economic, household_meta
 			
 			//Search for the identifier in the household database
@@ -83,14 +85,20 @@ public class MobileFormQueueProcessor {
 				//Save the household
 				mfse.createHouseholdInDatabase(household);
 				
-				//Archive this file
-				saveFormInArchive(queue.getFileSystemUrl());
+				//queue form for splitting
+				saveFormInPendingSplit(queue.getFileSystemUrl());
 				
 			}else{
-				//compare the households
-				log.debug("Will edit household with id " + householdIdentifier);
-				//Archive this file
-				saveFormInArchive(queue.getFileSystemUrl());
+				if (!MobileFormEntryUtil.isSameHousehold(householdIdentifier,householdGps)){
+					log.debug("Duplicate household with id " + householdIdentifier);
+					saveFormInError(queue.getFileSystemUrl());
+					mfse.saveErrorInDatabase(MobileFormEntryUtil.
+							createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
+									"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")"));
+				}
+				else 
+					//queue form for splitting
+					saveFormInPendingSplit(queue.getFileSystemUrl());
 			}
 		}
 		catch (Throwable t) {
@@ -124,9 +132,13 @@ public class MobileFormQueueProcessor {
 			return;
 		}
 		try {			
-			File queueDir = MobileFormEntryUtil.getMobileFormsQueueDir();
+			File queueDir = MobileFormEntryUtil.getMobileFormsDropDir();
 			for (File file : queueDir.listFiles()) {
 				MobileFormQueue queue = mobileService.getMobileFormEntryQueue(file.getAbsolutePath());
+				
+				// Log this sync
+				SyncLogger logger=getSyncLogger();
+				logger.createSyncLog(file);
 				processMobileForm(queue);
 			}
 		}
@@ -160,10 +172,10 @@ public class MobileFormQueueProcessor {
 	/**
 	 * Archives a mobile form after successful processing
 	 */
-	private void saveFormInArchive(String formPath){
-		String archiveFilePath= MobileFormEntryUtil.getMobileFormsArchiveDir(new Date()).getAbsolutePath() + getFormName(formPath);
+	private void saveFormInPendingSplit(String formPath){
+		String pendingSplitFilePath= MobileFormEntryUtil.getMobileFormsPendingSplitDir().getAbsolutePath() + getFormName(formPath);
 		
-		saveForm(formPath, archiveFilePath);
+		saveForm(formPath, pendingSplitFilePath);
 	}
 
 	/**
@@ -191,6 +203,22 @@ public class MobileFormQueueProcessor {
 		if (xPathFactory == null)
 			xPathFactory = XPathFactory.newInstance();
 		return xPathFactory;
+	}
+	
+	
+	/**
+	 * @return SyncLogger to be used by the process
+	 */
+	private SyncLogger getSyncLogger() {
+		if (syncLogger == null) {
+			try {
+				syncLogger= new SyncLogger();
+			}catch (APIException e) {
+				log.debug("SyncLogger not found");
+				return null;
+			}
+		}
+		return syncLogger;
 	}
 }
 

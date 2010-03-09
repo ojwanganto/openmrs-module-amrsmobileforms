@@ -76,7 +76,7 @@ public class MobileFormHouseholdLinksProcessor {
 			
 			Node curNode=(Node)  xp.evaluate("/form/patient", doc, XPathConstants.NODE);
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode); 
-			String householdId=xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_IDENTIFIER, curNode);
+			String householdId=xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
 			
 			if (householdId==null || householdId=="" || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);

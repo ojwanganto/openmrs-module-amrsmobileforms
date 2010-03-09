@@ -93,17 +93,6 @@ public class MobileFormEntryUtil {
 		return mobileFormsErrorDir;
 	}
 	
-	public static File getMobileFormsSplitQueueDir() {
-		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_SPLIT_QUEUE_DIR,
-													MobileFormEntryConstants.GP_MOBILE_FORMS_SPLIT_QUEUE_DIR_DEFAULT);
-		File mobileFormsSplitQueueDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-		if (log.isDebugEnabled())
-			log.debug("Loaded mobile forms split queue directory from global properties: " + mobileFormsSplitQueueDir.getAbsolutePath());
-		
-		return mobileFormsSplitQueueDir;
-	}
-	
 	/**
 	 * Directory where forms are placed pending to be linked to households
 	 * @return directory
@@ -115,6 +104,19 @@ public class MobileFormEntryUtil {
 			log.debug("Loaded mobile forms pending link directory from global properties: " + mobileFormsPendingLinkDir.getAbsolutePath());
 		
 		return mobileFormsPendingLinkDir;
+	}
+	
+	/**
+	 * Directory where forms are placed pending to be split into individual persons
+	 * @return directory
+	 */
+	public static File getMobileFormsPendingSplitDir() {
+		String folderName = MobileFormEntryConstants.GP_MOBILE_FORMS_PENDING_SPLIT_DIR;
+		File mobileFormsPendingSplitDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+		if (log.isDebugEnabled())
+			log.debug("Loaded mobile forms pending split directory from global properties: " + mobileFormsPendingSplitDir.getAbsolutePath());
+		
+		return mobileFormsPendingSplitDir;
 	}
 	
 	/**
@@ -188,10 +190,18 @@ public class MobileFormEntryUtil {
     	
     	return str;
     }
-
-	public static boolean isNewHousehold(String householdId){
+    
+    public static boolean isNewHousehold(String householdId){
 		MobileFormEntryService mfes=(MobileFormEntryService) Context.getService(MobileFormEntryService.class);
 		if (mfes.getHousehold(householdId) == null)
+			return true;
+		return false;
+	}
+
+	public static boolean isSameHousehold(String identifier, String gpsLocation){
+		MobileFormEntryService mfes=(MobileFormEntryService) Context.getService(MobileFormEntryService.class);
+		Household household = mfes.getHousehold(identifier);
+		if (household.getGpsLocation().equals(getGPS(gpsLocation)))
 			return true;
 		return false;
 	}
@@ -224,7 +234,7 @@ public class MobileFormEntryUtil {
 	
 	public static Household getHousehold(Document doc, XPath xp) throws XPathExpressionException{
     	Node householdMetaNode = (Node)xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
-		Household household=new Household();
+    	Household	household=new Household();
 		if (xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode)!= null)
 			setLocations(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode));
 		
@@ -249,7 +259,7 @@ public class MobileFormEntryUtil {
 		household.setChildrenEligible(getInteger(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_CHILDREN_UNDER13_ELIGIBLE, householdMetaNode)));
 		
 		//Set GPS location
-		household.setGpsLocation(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, householdMetaNode));
+		household.setGpsLocation(getGPS(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, householdMetaNode)));
     	return household;
 
 	}
@@ -344,6 +354,38 @@ public class MobileFormEntryUtil {
 			return null;
 		}
 	}
+	
+	private static String getGPS(String s) {
+        String[] sa = s.split(" ");
+        return formatGps(Double.parseDouble(sa[0]),"lat") + " " + formatGps(Double.parseDouble(sa[1]),"lon");
+    }
+	
+    private static String formatGps(double coordinates, String type) {
+        String location = Double.toString(coordinates);
+        String degreeSign = "\u00B0";
+        String degree = location.substring(0, location.indexOf(".")) + degreeSign;
+        location = "0." + location.substring(location.indexOf(".") + 1);
+        double temp = Double.valueOf(location) * 60;
+        location = Double.toString(temp);
+        String mins = location.substring(0, location.indexOf(".")) + "'";
+
+        location = "0." + location.substring(location.indexOf(".") + 1);
+        temp = Double.valueOf(location) * 60;
+        location = Double.toString(temp);
+        String secs = location.substring(0, location.indexOf(".")) + '"';
+        if (type.equalsIgnoreCase("lon")) {
+            if (degree.startsWith("-")) {
+                degree = "W" + degree.replace("-", "") + mins + secs;
+            } else
+                degree = "E" + degree.replace("-", "") + mins + secs;
+        } else {
+            if (degree.startsWith("-")) {
+                degree = "S" + degree.replace("-", "") + mins + secs;
+            } else
+                degree = "N" + degree.replace("-", "") + mins + secs;
+        }
+        return degree;
+    }
 	
 	private static void setLocations(String item){
     	village=district=division=location=sublocation="";

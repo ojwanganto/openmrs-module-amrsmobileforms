@@ -66,7 +66,6 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 		TreeMap<String, String> systemVariables = new TreeMap<String, String>();
 		systemVariables.put("MOBILE_FORMS_RESOURCES_DIR", MobileFormEntryUtil.getMobileFormsResourcesDir().getAbsolutePath());
 		systemVariables.put("MOBILE_FORMS_DROP_DIR", MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath());
-		systemVariables.put("MOBILE_FORMS_SPLIT_QUEUE_DIR", MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath());
 		systemVariables.put("MOBILE_FORMS_QUEUE_DIR", MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath());
 		systemVariables.put("MOBILE_FORMS_ARCHIVE_DIR", MobileFormEntryUtil.getMobileFormsArchiveDir(null).getAbsolutePath());
 		systemVariables.put("MOBILE_FORMS_ERROR_DIR", MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath());

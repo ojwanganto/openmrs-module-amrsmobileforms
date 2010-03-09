@@ -77,11 +77,6 @@
 		<description>Directory where mobile devices drop forms.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.split_queue_dir</property>
-		<defaultValue>amrsmobileforms/split_queue</defaultValue>
-		<description>Directory where split mobile forms are placed</description>
-	</globalProperty>
-	<globalProperty>
 		<property>@MODULE_ID@.queue_dir</property>
 		<defaultValue>amrsmobileforms/queue</defaultValue>
 		<description>Directory for queuing mobile forms before they are processed.</description>

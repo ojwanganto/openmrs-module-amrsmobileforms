@@ -88,6 +88,44 @@ public class XFormEditor {
 
 		return false;
 	}
+	
+	public static boolean editNodeList(String filePath, String nodeListPath, String nodePath, String nodeValue) {
+		try {
+			File file = new File(filePath);
+			
+			// Create instance of DocumentBuilderFactory
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = factory.newDocumentBuilder();
+	
+			// Using existing XML Document
+			Document doc = docBuilder.parse(file);
+	
+			XPathFactory xpf=XPathFactory.newInstance();
+			XPath xp=xpf.newXPath();
+			Node listNode = (Node) xp.evaluate(nodeListPath, doc, XPathConstants.NODE);
+			NodeList nodeList=listNode.getChildNodes();
+			for (int s = 0; s < nodeList.getLength(); s++) {
+				Node individualNode = nodeList.item(s);
+				Node editNode=(Node) xp.evaluate(nodePath,individualNode,XPathConstants.NODE);
+				if (editNode!=null)
+					editNode.setTextContent(nodeValue);
+			}
+			if (saveXMLDocument(doc, filePath))
+				return true;
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	/**
 	 *  Initiates the splitter to create individual files
 	 */
@@ -188,7 +226,7 @@ public class XFormEditor {
 			}
 			
 			//save the individual document
-			String targetFileName=MobileFormEntryUtil.getMobileFormsSplitQueueDir().getAbsolutePath() +
+			String targetFileName=MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() +
 			"/" + getRandomFileName() + ".xml";
 			saveXMLDocument(newXMLDocument,targetFileName);
 		}

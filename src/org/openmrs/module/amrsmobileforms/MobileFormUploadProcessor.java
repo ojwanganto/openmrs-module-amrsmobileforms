@@ -65,7 +65,7 @@ public class MobileFormUploadProcessor {
 			Node curNode=(Node)  xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode); 
 			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
-			String householdId=xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_IDENTIFIER, curNode);
+			String householdId=xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
 			String birthDate=xp.evaluate(MobileFormEntryConstants.PATIENT_BIRTHDATE, curNode);
 			
 			
@@ -167,7 +167,7 @@ public class MobileFormUploadProcessor {
 		}
 
 		try {			
-			File splitQueueDir = MobileFormEntryUtil.getMobileFormsSplitQueueDir();
+			File splitQueueDir = MobileFormEntryUtil.getMobileFormsQueueDir();
 			for (File file : splitQueueDir.listFiles()) {
 				MobileFormQueue queue = mobileService.getMobileFormEntryQueue(file.getAbsolutePath());
 				processSplitForm(file.getAbsolutePath(), queue);
