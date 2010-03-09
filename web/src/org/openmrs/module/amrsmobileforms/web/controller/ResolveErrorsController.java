@@ -55,7 +55,7 @@ public class ResolveErrorsController {
 	 * Controller for commentOnError jsp Page
 	 */
 	@ModelAttribute("errorFormComment")
-	@RequestMapping(value="/module/amrsmobileforms/commentOnError", method=RequestMethod.GET)
+	@RequestMapping(value="/module/amrsmobileforms/resolveErrorComment", method=RequestMethod.GET)
 	public List<MobileFormEntryErrorModel> populateCommentForm(@RequestParam Integer errorId) {
 		return getErrorObject(errorId);
 	}
@@ -63,7 +63,7 @@ public class ResolveErrorsController {
 	/**
 	 * Controller for commentOnError post jsp Page
 	 */
-	@RequestMapping(value="/module/amrsmobileforms/commentOnError", method=RequestMethod.POST)
+	@RequestMapping(value="/module/amrsmobileforms/resolveErrorComment", method=RequestMethod.POST)
 	public String saveComment(HttpSession httpSession, @RequestParam Integer errorId, @RequestParam String comment) {
 		if (comment.trim().length() > 0) {
 			MobileFormEntryService mfs = (MobileFormEntryService)Context.getService(MobileFormEntryService.class);

@@ -28,7 +28,7 @@
 	</openmrs:hasPrivilege>
 	
 	<openmrs:hasPrivilege privilege="View Mobile Form Errors">
-		<li <c:if test='<%= request.getRequestURI().contains("amrsmobileforms/resolveErrors") %>'>class="active"</c:if>>
+		<li <c:if test='<%= request.getRequestURI().contains("amrsmobileforms/resolveError") %>'>class="active"</c:if>>
 			<a href="${pageContext.request.contextPath}/module/amrsmobileforms/resolveErrors.list">
 				<spring:message code="amrsmobileforms.resolveErrors.title"/>
 			</a>

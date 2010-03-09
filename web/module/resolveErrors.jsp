@@ -48,7 +48,7 @@
 									<c:set var="isCommented" value="${fn:length(error.comment)}" />
 									<c:choose>
 										<c:when test="${isCommented < 1}">
-											<a href="commentOnError.form?errorId=${error.id}"><input type="button" value='Comment' class="closeButton"/></a>
+											<a href="resolveErrorComment.form?errorId=${error.id}"><input type="button" value='Comment' class="closeButton"/></a>
 										</c:when>
 										<c:otherwise>
 											<a href="resolveError.form?errorId=${error.id}"><input type="button" value='Resolve' class="closeButton"/></a>
