@@ -5,7 +5,7 @@
 	<!-- Base Module Properties -->
 	<id>amrsmobileforms</id>
 	<name>AMRS Mobile Forms</name>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Samuel Mbugua</author>
 	<description>
@@ -19,9 +19,8 @@
 	
 	<require_version>1.5.0.00</require_version>
 
-	<!-- Place here any required modules (Most possibly xform) -->
 	<require_modules>
-		<require_module>org.openmrs.module.xforms</require_module>
+		<require_module version="3.8.5">org.openmrs.module.xforms</require_module>
 	</require_modules>
 	
 	<!-- Extensions -->
