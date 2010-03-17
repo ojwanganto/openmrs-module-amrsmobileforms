@@ -18,6 +18,7 @@
 	<!-- /Base Module Properties -->
 	
 	<require_version>1.5.0.00</require_version>
+	<require_database_version>1.2.04</require_database_version>
 
 	<require_modules>
 		<require_module version="3.8.5">org.openmrs.module.xforms</require_module>
@@ -30,7 +31,7 @@
 	</extension>
 	<!-- /Extensions -->
 	
-    <!-- Required Privileges -->
+	<!-- Required Privileges -->
     <privilege>
 		<name>Manage Economic Objects</name>
 		<description>
@@ -63,7 +64,6 @@
 	</privilege>
 	<!-- /Required Privileges -->
 	
-
 	<!-- Any required properties goes here-->
 	<globalProperty>
 		<property>@MODULE_ID@.resources_dir</property>
@@ -91,7 +91,7 @@
 		<description>Directory for storing successfully processed forms.</description>
 	</globalProperty>
 	
-	<!-- Servlets -->
+		<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
 	<servlet>
 		<servlet-name>fileUpload</servlet-name>
@@ -115,7 +115,7 @@
         <filter-name>locationFilter</filter-name>
  		<url-pattern>/*</url-pattern>
     </filter-mapping>
-	
+
 	<!-- Internationalization -->
 	<!-- All message codes should start with moduleId.* -->
 	<messages>
@@ -132,5 +132,6 @@
 		Survey.hbm.xml
 		MobileFormEntryError.hbm.xml
 	</mappingFiles>
+
 	
 </module>
