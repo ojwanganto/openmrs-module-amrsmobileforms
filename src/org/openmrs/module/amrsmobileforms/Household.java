@@ -133,7 +133,7 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	/**
 	 * @return the adults
 	 */
-	public int getAdults() {
+	public Integer getAdults() {
 		return adults;
 	}
 	/**
@@ -145,7 +145,7 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	/**
 	 * @return the children
 	 */
-	public int getChildren() {
+	public Integer getChildren() {
 		return children;
 	}
 	/**
