@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -227,7 +228,7 @@ public class XFormEditor {
 			
 			//save the individual document
 			String targetFileName=MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() +
-			"/" + getRandomFileName() + ".xml";
+			"/" + generateFileName(new Date()) + ".xml";
 			saveXMLDocument(newXMLDocument,targetFileName);
 		}
 	}
@@ -314,8 +315,22 @@ public class XFormEditor {
 	 * Generate a random alphanumeric string 
 	 * @return a random string
 	 */
-	private static String getRandomFileName() {
-		SecureRandom random = new SecureRandom();
-		return new BigInteger(130, random).toString(32);
+	private static String generateFileName(Date date) {
+		// format to print date in filename
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HHmm-ssSSS");
+		
+		// use current date if none provided
+		if (date == null)
+			date = new Date();
+		
+		StringBuilder filename = new StringBuilder();
+		
+		// the start of the filename is the time so we can do some sorting
+		filename.append(dateFormat.format(date));
+		
+		// the end of the filename is a random number between 0 and 10000
+		filename.append((int) (Math.random() * 10000));
+		
+		return filename.toString();
 	}
 }

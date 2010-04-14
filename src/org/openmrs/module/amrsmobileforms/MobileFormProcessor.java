@@ -39,7 +39,7 @@ public class MobileFormProcessor {
 			uploadProcessor = new MobileFormUploadProcessor();
 		uploadProcessor.processMobileFormUploadQueue();
 
-		// Finally link patients to house holds
+		// Finally link patients to households
 		if (linksProcessor == null)
 			linksProcessor = new MobileFormHouseholdLinksProcessor();
 		linksProcessor.processMobileFormPendingLinkQueue();

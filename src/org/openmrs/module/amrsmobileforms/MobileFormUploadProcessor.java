@@ -95,12 +95,12 @@ public class MobileFormUploadProcessor {
 			
 			// If patient has an AMPATH ID we use it to create the patient
 			if (patientAmpathIdentifier != null && patientAmpathIdentifier != "") {
-				XFormEditor.editNode(filePath, 
-						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
-				XFormEditor.editNode(filePath, 
-						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
-				XFormEditor.editNode(filePath, 
-						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
 			}
 
 			if (MobileFormEntryUtil.isNewPatient(patientIdentifier)) {
@@ -113,7 +113,7 @@ public class MobileFormUploadProcessor {
 								createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate"));
 						return;
 					}else {
-						//fix birth-date form age
+						//fix birth-date from age
 						birthDate = "" + yearOfBirth + "-01-01";
 						XFormEditor.editNode(filePath, 
 								MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate);

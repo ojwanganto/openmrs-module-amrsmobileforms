@@ -360,6 +360,12 @@ public class MobileFormEntryUtil {
         return formatGps(Double.parseDouble(sa[0]),"lat") + " " + formatGps(Double.parseDouble(sa[1]),"lon");
     }
 	
+    /**
+     * Format Gps from double to a readable string
+     * @param coordinates
+     * @param type
+     * @return
+     */
     private static String formatGps(double coordinates, String type) {
         String location = Double.toString(coordinates);
         String degreeSign = "\u00B0";
@@ -387,6 +393,10 @@ public class MobileFormEntryUtil {
         return degree;
     }
 	
+	/**
+	 * Breaks a comma separated string to the individual portions
+	 * @param item
+	 */
 	private static void setLocations(String item){
     	village=district=division=location=sublocation="";
      	//First get the district
@@ -439,6 +449,11 @@ public class MobileFormEntryUtil {
 		return authenticated;
 	}
 	
+	/**
+	 * Retrieves a patient identifier from a patient form
+	 * @param doc
+	 * @return patientIdentifier
+	 */
 	public static String getPatientIdentifier(Document doc){
 		NodeList elemList = doc.getDocumentElement().getElementsByTagName("patient");
 		if (!(elemList != null && elemList.getLength() > 0))
@@ -461,6 +476,11 @@ public class MobileFormEntryUtil {
 		return null;
 	}
 	
+	/**
+	 * Given an age it returns a birth year
+	 * @param doc
+	 * @return
+	 */
 	public static Integer getBirthDateFromAge(Document doc) {
 		String age = DOMUtil.getElementValue(doc, MobileFormEntryConstants.ESTIMATED_AGE);
 		try {	
@@ -485,26 +505,30 @@ public class MobileFormEntryUtil {
 		return null;
 	}
 	
-	public static Integer getProviderId(String providerName) {
+	/** Returns provider id given username
+	 * @param userName
+	 * @return
+	 */
+	public static Integer getProviderId(String userName) {
 		
 		// assume its a normal user-name or systemId formatted with a dash
-		User provider = Context.getUserService().getUserByUsername(providerName);
+		User provider = Context.getUserService().getUserByUsername(userName);
 		if ( provider != null)
 			return provider.getUserId();
 		
 		// next assume it is a internal providerId and try again
 		try {
-			provider = Context.getUserService().getUser(Integer.parseInt(providerName));
+			provider = Context.getUserService().getUser(Integer.parseInt(userName));
 		}catch (NumberFormatException e) {e.printStackTrace();}
 		
 		if ( provider != null)
 			return provider.getUserId();
 		
 		// now assume its a systemId without a dash: fix the dash and try again
-		if (providerName != null && providerName.trim() != "") {
-			if (providerName.indexOf("-") == -1 && providerName.length() > 1) {
-				providerName=providerName.substring(0,providerName.length()-1) + "-" + providerName.substring(providerName.length()-1);
-				provider = Context.getUserService().getUserByUsername(providerName);
+		if (userName != null && userName.trim() != "") {
+			if (userName.indexOf("-") == -1 && userName.length() > 1) {
+				userName=userName.substring(0,userName.length()-1) + "-" + userName.substring(userName.length()-1);
+				provider = Context.getUserService().getUserByUsername(userName);
 				if ( provider != null)
 					return provider.getUserId();
 			}
@@ -512,4 +536,23 @@ public class MobileFormEntryUtil {
 		
 		return null;
 	}
+	
+	/**
+	 * Deletes a file specified by form path
+	 */
+	public static void deleteFile(String filePath){
+		try{
+			if(filePath != null){
+				File fileToDelete=new File(filePath);
+				
+				//delete the file
+				fileToDelete.delete();
+			}
+		}
+		catch(Exception e){
+			log.error(e.getMessage(),e);
+		}
+
+	}
+
 }

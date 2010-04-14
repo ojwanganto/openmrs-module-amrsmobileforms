@@ -106,7 +106,7 @@ public class MobileFormQueueProcessor {
 			//put file in error table and move it to error directory
 			saveFormInError(queue.getFileSystemUrl());
 			mfse.saveErrorInDatabase(MobileFormEntryUtil.
-					createError(getFormName(queue.getFileSystemUrl()), "Error Passing household form", t.getMessage()));
+					createError(getFormName(queue.getFileSystemUrl()), "Error Parsing household form", t.getMessage()));
 		}
 	}
 	

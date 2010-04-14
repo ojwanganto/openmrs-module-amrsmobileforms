@@ -62,6 +62,12 @@
 			Allows user to resolve mobile form entry error
 		</description>
 	</privilege>
+	<privilege>
+		<name>Manage Mobile Resources</name>
+		<description>
+			Allows user to manage Mobile Form Xforms/Resources
+		</description>
+	</privilege>
 	<!-- /Required Privileges -->
 	
 	<!-- Any required properties goes here-->

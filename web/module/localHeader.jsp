@@ -11,7 +11,7 @@
 		</li>
 	</openmrs:hasPrivilege>
 	
-	<openmrs:hasPrivilege privilege="View Mobile Form Entry Properties">
+	<openmrs:hasPrivilege privilege="Manage Mobile Resources">
 		<li <c:if test='<%= request.getRequestURI().contains("amrsmobileforms/mobileResources") %>'>class="active"</c:if>>
 			<a href="${pageContext.request.contextPath}/module/amrsmobileforms/mobileResources.list">
 				<spring:message code="amrsmobileforms.mobileResources"/>

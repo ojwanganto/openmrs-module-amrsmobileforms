@@ -15,8 +15,8 @@ import org.openmrs.util.OpenmrsUtil;
  * @author Samuel Mbugua
  */
 public class MobileFormEntryFileUploader {
+	
 	public static void submitXFormFile(String filePath) throws IOException, Exception {
-
 		File file = new File(filePath);
 		XformDataUploadManager.processXform(OpenmrsUtil.getFileAsString(file), getRandomSessionString(), XformsUtil.getEnterer(),true,null);
 	}

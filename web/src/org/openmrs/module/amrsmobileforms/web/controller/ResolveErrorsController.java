@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +33,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Controller for Mobile errors resolution jsp pages
@@ -150,10 +157,11 @@ public class ResolveErrorsController {
 			}
 			else if ("newIdentifier".equals(errorItemAction)) {
 				if (patientIdentifier != null && patientIdentifier.trim() != "") {
-					if (XFormEditor.editNode(filePath, 
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientIdentifier)) {
+					if (reverseNodes(filePath, patientIdentifier)) {
+	
 						// put form in queue for normal processing
 						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
+						
 						// delete the mobileformentry error queue item
 						mobileService.deleteError(errorItem);
 					}
@@ -195,6 +203,9 @@ public class ResolveErrorsController {
 			else if ("deleteError".equals(errorItemAction)) {
 				// delete the mobileformentry error queue item
 				mobileService.deleteError(errorItem);
+				
+				//and delete from the file system
+				MobileFormEntryUtil.deleteFile(filePath);
 				
 			}
 			else if ("deleteComment".equals(errorItemAction)) {
@@ -303,5 +314,45 @@ public class ResolveErrorsController {
 			log.error(e.getMessage(),e);
 		}
 
+	}
+	
+	/**
+	 * Reverses patient Identifier nodes after for a form with more than one
+	 * @param filePath
+	 * @param patientIdentifier
+	 * @return
+	 */
+	private static boolean reverseNodes(String filePath, String patientIdentifier) {
+		try {
+			
+			File file = new File(filePath);
+
+			// Create instance of DocumentBuilderFactory
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = factory.newDocumentBuilder();
+
+			// Using existing XML Document
+			Document doc = docBuilder.parse(file);
+			XPathFactory xpf=XPathFactory.newInstance();
+			XPath xp=xpf.newXPath();
+			
+			Node curNode=(Node)  xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
+			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
+			
+			// If patient has an AMPATH ID we use it to create the patient
+			if (patientAmpathIdentifier != null && patientAmpathIdentifier != "") {
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
+			}
+		}
+		catch (Throwable t) {
+			log.error("Error reversing nodes", t);
+			return false;
+		}
+		return true;
 	}
 }	
