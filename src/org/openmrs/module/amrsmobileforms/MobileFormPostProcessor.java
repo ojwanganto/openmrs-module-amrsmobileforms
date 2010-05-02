@@ -129,7 +129,7 @@ public class MobileFormPostProcessor {
 			canArchive=true;
 		}
 		
-		//put form in archive if ready to archive
+		//put form in archive if ready to archive - actually delete it
 		if (canArchive)
 			saveFormInArchive(filePath);
 	}
@@ -166,35 +166,8 @@ public class MobileFormPostProcessor {
 	 * Archives a mobile form after successful processing
 	 */
 	private void saveFormInArchive(String formPath){
-		String archiveFilePath= MobileFormEntryUtil.getMobileFormsArchiveDir(new Date()).getAbsolutePath() + getFormName(formPath);
-		saveForm(formPath, archiveFilePath);
-	}
-
-	/**
-	 * Stores a form in a specified folder after processing.
-	 */
-	private void saveForm(String oldFormPath, String newFormPath){
-		try{
-			if(oldFormPath != null){
-				File file=new File(oldFormPath);
-				
-				//move the file to specified new directory
-				file.renameTo(new File(newFormPath));
-			}
-		}
-		catch(Exception e){
-			log.error(e.getMessage(),e);
-		}
-
-	}
-	
-	/**
-	 * Extracts form name from an absolute file path
-	 * @param formPath
-	 * @return
-	 */
-	private String getFormName(String formPath) {
-		return formPath.substring(formPath.lastIndexOf(File.separatorChar)); 
+		//Since xforms has already archived this file delete this copy
+		MobileFormEntryUtil.deleteFile(formPath);
 	}
 	
 	/**

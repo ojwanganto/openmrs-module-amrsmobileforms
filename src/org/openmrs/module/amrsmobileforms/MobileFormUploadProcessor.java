@@ -76,11 +76,8 @@ public class MobileFormUploadProcessor {
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
 				if ((familyName == null || familyName.trim() == "") &&
 						(givenName == null || givenName == "")) {
-					File file = new File(filePath);
-					if (file.exists()){
-						file.delete();
-						log.info("Deleted an empty individual file");
-					}
+					MobileFormEntryUtil.deleteFile(filePath);
+					log.info("Deleted an empty individual file");
 				} else {
 					// form has no patient identifier but has names : move to error
 					saveFormInError(filePath);

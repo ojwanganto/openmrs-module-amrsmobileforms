@@ -111,8 +111,7 @@ public class MobileFormQueueProcessor {
 		}
 		catch (SAXParseException s){
 			log.info("An invalid household file. Automatically deleted", s);
-			File f = new File(queue.getFileSystemUrl());
-			if (f.exists()) f.delete();
+			MobileFormEntryUtil.deleteFile(queue.getFileSystemUrl());
 		}
 		catch (Throwable t) {
 			log.error("Error while parsing mobile entry (" + householdIdentifier + ")", t);
