@@ -18,7 +18,7 @@ public interface MobileFormEntryDAO {
 	
 	public Household getHousehold(String householdIdentifier);
 	
-	public void createHouseholdInDatabase(Household household);
+	public void saveHousehold(Household household);
 
 	public EconomicObject getEconomicObjectByObjectName(String objectName);
 
@@ -46,4 +46,5 @@ public interface MobileFormEntryDAO {
 
 	public void saveHouseholdMember(HouseholdMember householdMember);
 
+	public List<HouseholdMember> getAllMembersInHousehold(Household Household);
 }

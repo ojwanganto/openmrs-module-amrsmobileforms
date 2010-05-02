@@ -62,6 +62,9 @@ public class MobileFormEntryConstants {
 	/** Mobile-forms-pending split directory. */
 	public final static String GP_MOBILE_FORMS_PENDING_SPLIT_DIR = "amrsmobileforms/pending_split";
 	
+	/** Mobile-forms post processing directory. */
+	public final static String GP_MOBILE_FORMS_POST_PROCESS_DIR = "amrsmobileforms/post_process";
+	
 	/** The text/xml http content type. */
 	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
 	
@@ -121,12 +124,20 @@ public class MobileFormEntryConstants {
 	public final static String PATIENT_IDENTIFIER = "patient.medical_record_number";
 	public final static String PATIENT_IDENTIFIER_TYPE = "patient_identifier.identifier_type_id";
 	public final static String PATIENT_HCT_IDENTIFIER = "patient.hct_id";
+	public final static String PATIENT_FAMILYNAME = "patient.family_name";
+	public final static String PATIENT_GIVENNAME = "patient.given_name";
+	public final static String PATIENT_MIDDLENAME = "patient.middle_name";
 	public final static String PATIENT_HOUSEHOLD_IDENTIFIER = "household";
 	public final static String ESTIMATED_AGE = "approximate_age";
 	public final static String PATIENT_BIRTHDATE = "patient.birthdate";
+	public final static String PATIENT_PHONE = "patient.contact_phone_number";
 	
 	public final static String ENCOUNTER_NODE = "/form/encounter";
 	public final static String ENCOUNTER_PROVIDER = "encounter.provider_id";
+	
+	//TEMPORAL
+	public final static String OBS_NODE = "/form/obs";
+	public final static String OBS_RELATIONSHIP = "relation_to_househead";
 	
 	//PRIVILEGES
 	public static final String PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR = "Resolve Mobile Form Entry Error";

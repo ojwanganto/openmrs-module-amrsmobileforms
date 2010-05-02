@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
-import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,7 +77,7 @@ public class MobileFormHouseholdLinksProcessor {
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode); 
 			String householdId=xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
 			
-			if (householdId==null || householdId=="" || MobileFormEntryUtil.isNewHousehold(householdId)) {
+			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.
 						createError(getFormName(filePath), "Error processing patient", 
@@ -94,7 +93,7 @@ public class MobileFormHouseholdLinksProcessor {
 						mobileService.saveHouseholdMember(householdMember);
 					}
 				}
-				saveFormInArchive(filePath);
+				saveFormInPostProcessor(filePath);
 			}
 		}
 		catch (Throwable t) {
@@ -135,11 +134,11 @@ public class MobileFormHouseholdLinksProcessor {
 	}
 	
 	/**
-	 * Archives a mobile form after successful processing
+	 * Sends a form to post processor after successful processing
 	 */
-	private void saveFormInArchive(String formPath){
-		String archiveFilePath= MobileFormEntryUtil.getMobileFormsArchiveDir(new Date()).getAbsolutePath() + getFormName(formPath);
-		saveForm(formPath, archiveFilePath);
+	private void saveFormInPostProcessor(String formPath){
+		String postProcessFilePath= MobileFormEntryUtil.getMobileFormsPostProcessDir().getAbsolutePath() + getFormName(formPath);
+		saveForm(formPath, postProcessFilePath);
 	}
 
 	/**

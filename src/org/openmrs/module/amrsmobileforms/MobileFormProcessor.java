@@ -6,9 +6,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Processes Composite Mobile forms (With both household and patient data) .
  * 
- * First splits the forms to create distinct forms for each individual then
- * sends the forms to xform module for processing. Then process the form to
- * extract household and survey data
+ * First  process the form to extract household, economic and survey data. Then splits the forms to 
+ * create distinct forms for each individual and send them to xform module for processing. The 
+ * process then links patients their respective households 
  * 
  * @author Samuel Mbugua
  */
@@ -39,7 +39,7 @@ public class MobileFormProcessor {
 			uploadProcessor = new MobileFormUploadProcessor();
 		uploadProcessor.processMobileFormUploadQueue();
 
-		// Finally link patients to households
+		// Finally Link patients to households
 		if (linksProcessor == null)
 			linksProcessor = new MobileFormHouseholdLinksProcessor();
 		linksProcessor.processMobileFormPendingLinkQueue();

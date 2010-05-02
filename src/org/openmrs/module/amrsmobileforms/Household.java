@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
+import org.openmrs.Person;
 import org.openmrs.User;
 
 /**
@@ -27,6 +28,7 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	private Integer children;
 	private Integer adultsEligible;
 	private Integer childrenEligible;
+	private Person househead;
 	private User creator;
 	private Date dateCreated;
 	private User changedBy;
@@ -177,6 +179,18 @@ public class Household extends BaseOpenmrsObject implements Auditable {
 	 */
 	public void setChildrenEligible(Integer childrenEligible) {
 		this.childrenEligible = childrenEligible;
+	}
+	/**
+	 * @return the househead
+	 */
+	public Person getHousehead() {
+		return househead;
+	}
+	/**
+	 * @param househead the househead to set
+	 */
+	public void setHousehead(Person househead) {
+		this.househead = househead;
 	}
 	/**
 	 * @return the creator

@@ -42,10 +42,10 @@ public interface MobileFormEntryService {
 	public Household getHousehold(String householdIdentifier);
 	
 	/**
-	 * Create a new household in the database
+	 * Create or update a household in the database
 	 * @param household
 	 */
-	public void createHouseholdInDatabase(Household household);
+	public void saveHousehold(Household household);
 	
 	/**
 	 * Get a single household member object given a member identifier
@@ -53,6 +53,18 @@ public interface MobileFormEntryService {
 	 * @return {@link HouseholdMember}
 	 */
 	public HouseholdMember getHouseholdMemberById(Integer identifier);
+	
+	/** Create a new HouseholdMember object in the database. If <b> {@link HouseholdMember} </b> exists
+	 * it updates the existing object.
+	 * @param householdMember
+	 */
+	public void saveHouseholdMember(HouseholdMember householdMember);
+	
+	/**
+	 * Get all persons in a household
+	 * @param householdId
+	 */
+	public List<HouseholdMember> getAllMembersInHousehold(Household Household);
 	
 	//ECONOMIC RELATED METHODS
 	/**
@@ -125,12 +137,6 @@ public interface MobileFormEntryService {
 	 * @param error
 	 */
 	public void deleteError(MobileFormEntryError error);
-
-	/** Create a new HouseholdMember object in the database. If <b> {@link HouseholdMember} </b> exists
-	 * it updates the existing object.
-	 * @param householdMember
-	 */
-	public void saveHouseholdMember(HouseholdMember householdMember);
 
 	/**
 	 * Generate sync logs for a specific date. If no logs return null

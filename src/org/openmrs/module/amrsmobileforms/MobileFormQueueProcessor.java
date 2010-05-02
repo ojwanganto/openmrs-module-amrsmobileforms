@@ -18,6 +18,7 @@ import org.openmrs.module.amrsmobileforms.util.SyncLogger;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXParseException;
 
 
 /**
@@ -57,7 +58,7 @@ public class MobileFormQueueProcessor {
 		String formData = queue.getFormData();
 		String householdIdentifier = null;
 		String householdGps=null;
-		MobileFormEntryService mfse=(MobileFormEntryService)Context.getService(MobileFormEntryService.class);
+		MobileFormEntryService mfes=(MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -67,14 +68,33 @@ public class MobileFormQueueProcessor {
 			Node curNode=(Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID , curNode); 
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
+			
+			// check household identifier and gps were entered correctly
+			if (householdIdentifier == null || householdIdentifier.trim() == "" ||
+					householdGps == null || householdGps.trim() == ""){
+				log.debug("Null household identifier or GPS");
+				saveFormInError(queue.getFileSystemUrl());
+				mfes.saveErrorInDatabase(MobileFormEntryUtil.
+						createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
+								"This household has no identifier or GPS specified"));
+				return;
+			}
+			
 			//pull out household data: includes meta, survey, economic, household_meta
 			
 			//Search for the identifier in the household database
-			if (MobileFormEntryUtil.isNewHousehold(householdIdentifier)) {
+			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier) && 
+					!MobileFormEntryUtil.isSameHousehold(householdIdentifier,householdGps)){
+				
+				saveFormInError(queue.getFileSystemUrl());
+				mfes.saveErrorInDatabase(MobileFormEntryUtil.
+						createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
+								"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")"));
+			}else{
 				
 				//create household
 				log.debug("Creating a new household with id " + householdIdentifier);
-				Household household = MobileFormEntryUtil.getHousehold(doc, xp);
+				Household household = MobileFormEntryUtil.getHousehold(mfes.getHousehold(householdIdentifier), doc, xp);
 				
 				//Add economic
 				for (Economic economic : MobileFormEntryUtil.getEconomic(doc, xp)) {
@@ -83,29 +103,22 @@ public class MobileFormQueueProcessor {
 				//Add Survey
 				household.addSurvey(MobileFormEntryUtil.getSurvey(doc, xp));
 				//Save the household
-				mfse.createHouseholdInDatabase(household);
+				mfes.saveHousehold(household);
 				
 				//queue form for splitting
 				saveFormInPendingSplit(queue.getFileSystemUrl());
-				
-			}else{
-				if (!MobileFormEntryUtil.isSameHousehold(householdIdentifier,householdGps)){
-					log.debug("Duplicate household with id " + householdIdentifier);
-					saveFormInError(queue.getFileSystemUrl());
-					mfse.saveErrorInDatabase(MobileFormEntryUtil.
-							createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
-									"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")"));
-				}
-				else 
-					//queue form for splitting
-					saveFormInPendingSplit(queue.getFileSystemUrl());
 			}
+		}
+		catch (SAXParseException s){
+			log.info("An invalid household file. Automatically deleted", s);
+			File f = new File(queue.getFileSystemUrl());
+			if (f.exists()) f.delete();
 		}
 		catch (Throwable t) {
 			log.error("Error while parsing mobile entry (" + householdIdentifier + ")", t);
 			//put file in error table and move it to error directory
 			saveFormInError(queue.getFileSystemUrl());
-			mfse.saveErrorInDatabase(MobileFormEntryUtil.
+			mfes.saveErrorInDatabase(MobileFormEntryUtil.
 					createError(getFormName(queue.getFileSystemUrl()), "Error Parsing household form", t.getMessage()));
 		}
 	}

@@ -120,6 +120,19 @@ public class MobileFormEntryUtil {
 	}
 	
 	/**
+	 * Directory where forms are placed pending post processing
+	 * @return directory
+	 */
+	public static File getMobileFormsPostProcessDir() {
+		String folderName = MobileFormEntryConstants.GP_MOBILE_FORMS_POST_PROCESS_DIR;
+		File mobileFormsPostProcessDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+		if (log.isDebugEnabled())
+			log.debug("Loaded mobile forms post process directory from global properties: " + mobileFormsPostProcessDir.getAbsolutePath());
+		
+		return mobileFormsPostProcessDir;
+	}
+	
+	/**
 	 * Directory where forms are dropped by mobile devices
 	 * @return directory
 	 */
@@ -232,9 +245,10 @@ public class MobileFormEntryUtil {
 		return mobileFormEntryError;
 	}
 	
-	public static Household getHousehold(Document doc, XPath xp) throws XPathExpressionException{
+	public static Household getHousehold(Household household, Document doc, XPath xp) throws XPathExpressionException{
     	Node householdMetaNode = (Node)xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
-    	Household	household=new Household();
+    	if (household == null)
+    		household=new Household();
 		if (xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode)!= null)
 			setLocations(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode));
 		

@@ -18,7 +18,7 @@
 		<author>Samuel Mbugua</author>
 		<date>Sept 15th 2009</date>
 		<description>
-			Inserts the process mobile queue task into the scheduler
+			Creates all required tables and the processor tasks
 		</description>
 		<sql>
 			INSERT INTO
@@ -31,6 +31,17 @@
 				'Process Mobile Forms',
 				'This class calls the mobile form processor to process all forms in the mobile form entry queue.',
 				'org.openmrs.module.amrsmobileforms.ProcessMobileFormTask',
+				'2009-09-15 22:22:00',
+				30,
+				1,
+				1,
+				'2009-09-15 22:22:00',
+				uuid()
+			),
+			(
+				'Mobile Forms Create Relationships Task',
+				'This class calls the mobile form Relationships processor to create relationships.',
+				'org.openmrs.module.amrsmobileforms.ProcessRelationshipsTask',
 				'2009-09-15 22:22:00',
 				30,
 				1,
@@ -52,10 +63,13 @@
 			  `children` int(11) default '0',
 			  `adults_eligible` int(11) default '0',
 			  `children_eligible` int(11) default '0',
+			  `household_head_id` int(11) default NULL,
 			  `created_by` int(11) NOT NULL default '0',
 			  `changed_by` int(11) default '0',
 			  `date_created` datetime NOT NULL default '0000-00-00 00:00:00',
 			  PRIMARY KEY  (`household_id`),
+			  KEY `Household Head` (`household_head_id`),
+			  CONSTRAINT `Household Head` FOREIGN KEY (`household_head_id`) REFERENCES `person` (`person_id`),
 			  KEY `User who created household` (`created_by`),
 			  CONSTRAINT `User who created household` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`),
 			  KEY `User who changed household` (`changed_by`),

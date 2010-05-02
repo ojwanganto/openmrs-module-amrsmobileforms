@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
-import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.PersonName;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryFileUploader;
@@ -65,17 +65,38 @@ public class MobileFormUploadProcessor {
 			Node curNode=(Node)  xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode); 
 			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
-			String householdId=xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
-			String birthDate=xp.evaluate(MobileFormEntryConstants.PATIENT_BIRTHDATE, curNode);
+			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
+			String birthDate = xp.evaluate(MobileFormEntryConstants.PATIENT_BIRTHDATE, curNode);
+			String familyName = xp.evaluate(MobileFormEntryConstants.PATIENT_FAMILYNAME, curNode);
+			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, curNode);
+			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, curNode);
 			
-			
-			// First Ensure there is at least a patient identifier in the form
+			//Ensure there is a patient identifier in the form and 
+			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
-				// form has no patient identifier : move to error
+				if ((familyName == null || familyName.trim() == "") &&
+						(givenName == null || givenName == "")) {
+					File file = new File(filePath);
+					if (file.exists()){
+						file.delete();
+						log.info("Deleted an empty individual file");
+					}
+				} else {
+					// form has no patient identifier but has names : move to error
+					saveFormInError(filePath);
+					mobileService.saveErrorInDatabase(MobileFormEntryUtil.
+							createError(getFormName(filePath), "Error processing patient", 
+									"Patient has no identifier, or the identifier provided is invalid"));
+				}
+				return;
+			}
+			
+			//Ensure Family name and Given names are not blanks
+			if (familyName == null || familyName.trim() == "" || givenName == null || givenName == "") {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.
 						createError(getFormName(filePath), "Error processing patient", 
-								"Patient has no identifier, or the identifier provided is invalid"));
+								"Patient has no valid names specified, Family Name and Given Name are required"));
 				return;
 			}
 			
@@ -91,58 +112,59 @@ public class MobileFormUploadProcessor {
 			}else
 				XFormEditor.editNode(filePath, 
 						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId.toString());
-			
-			
-			// If patient has an AMPATH ID we use it to create the patient
-			if (patientAmpathIdentifier != null && patientAmpathIdentifier != "") {
-					XFormEditor.editNode(filePath, 
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
-					XFormEditor.editNode(filePath, 
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
-					XFormEditor.editNode(filePath, 
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
-			}
 
-			if (MobileFormEntryUtil.isNewPatient(patientIdentifier)) {
-				// ensure patient has birth date
-				if (birthDate == null || birthDate.trim().length() == 0 ) {
-					Integer yearOfBirth = MobileFormEntryUtil.getBirthDateFromAge(doc);
-					if (yearOfBirth == null) {//patient has no valid birth-date
-						saveFormInError(filePath);
-						mobileService.saveErrorInDatabase(MobileFormEntryUtil.
-								createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate"));
-						return;
-					}else {
-						//fix birth-date from age
-						birthDate = "" + yearOfBirth + "-01-01";
-						XFormEditor.editNode(filePath, 
-								MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate);
-						
-					}
+			// ensure patient has birth date
+			if (birthDate == null || birthDate.trim().length() == 0 ) {
+				Integer yearOfBirth = MobileFormEntryUtil.getBirthDateFromAge(doc);
+				if (yearOfBirth == null) {//patient has no valid birth-date
+					saveFormInError(filePath);
+					mobileService.saveErrorInDatabase(MobileFormEntryUtil.
+							createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate"));
+					return;
+				}else {
+					//fix birth-date from age
+					birthDate = "" + yearOfBirth + "-01-01";
+					XFormEditor.editNode(filePath, 
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate);
+					
 				}
-				if (householdId==null || householdId=="" || MobileFormEntryUtil.isNewHousehold(householdId)) {
+			}
+			
+			//Ensure that the patient has a household to link to
+			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
+				saveFormInError(filePath);
+				mobileService.saveErrorInDatabase(MobileFormEntryUtil.
+						createError(getFormName(filePath), "Error processing patient", 
+								"Patient is not linked to household or household Id provided is invalid"));
+				return;
+			}
+			
+			//Ensure if not new it is same person
+			if (!MobileFormEntryUtil.isNewPatient(patientIdentifier)){
+				Patient pat = MobileFormEntryUtil.getPatient(patientIdentifier);
+				PersonName personName = new PersonName(givenName, middleName, familyName);
+				if (!pat.getPersonName().equalsContent(personName)) {
 					saveFormInError(filePath);
 					mobileService.saveErrorInDatabase(MobileFormEntryUtil.
 							createError(getFormName(filePath), "Error processing patient", 
-									"Patient is not linked to household or household Id provided is invalid"));
-				}else
-					MobileFormEntryFileUploader.submitXFormFile(filePath);
-					saveFormInPendingLink(filePath);
-			}
-			else {
-				//should update patient here
-				Patient pat=MobileFormEntryUtil.getPatient(patientIdentifier);
-				Household household=mobileService.getHousehold(householdId);
-				if (pat != null && household != null) {
-					if (MobileFormEntryUtil.isNewLink(pat.getId())) {
-						HouseholdMember householdMember=new HouseholdMember();
-						householdMember.setHouseholdMemberId(pat.getId());
-						householdMember.setHousehold(household);
-						mobileService.saveHouseholdMember(householdMember);
-					}
+									"A different person (By Name) exists with the same identifier (" + patientIdentifier + ")"));
+					return;
 				}
-				saveFormInArchive(filePath);
 			}
+			
+			// If patient has an AMPATH ID we use it to create the patient
+			if (patientAmpathIdentifier != null && patientAmpathIdentifier != "") {
+				XFormEditor.editNode(filePath, 
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
+				XFormEditor.editNode(filePath, 
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
+				XFormEditor.editNode(filePath, 
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
+			}
+			
+			//Finally send to xforms for processing
+			MobileFormEntryFileUploader.submitXFormFile(filePath);
+			saveFormInPendingLink(filePath);
 		}
 		catch (Throwable t) {
 			log.error("Error while sending form to xform module", t);
@@ -179,14 +201,6 @@ public class MobileFormUploadProcessor {
 		finally {
 			isRunning = false;
 		}
-	}
-	
-	/**
-	 * Archives a mobile form after successful processing
-	 */
-	private void saveFormInArchive(String formPath){
-		String archiveFilePath= MobileFormEntryUtil.getMobileFormsArchiveDir(new Date()).getAbsolutePath() + getFormName(formPath);
-		saveForm(formPath, archiveFilePath);
 	}
 
 	/**

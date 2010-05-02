@@ -58,29 +58,34 @@ public class SyncLogger {
 	public void createSyncLog(File syncedFile) throws Exception {
 		docBuilder = docBuilderFactory.newDocumentBuilder();
 		SyncLogModel syncLog =new SyncLogModel();
-		Document doc = docBuilder.parse(syncedFile);
 		XPathFactory xpf=XPathFactory.newInstance();
 		XPath xp=xpf.newXPath();
-		syncLog.setSyncDate(new Date(syncedFile.lastModified()));
-		syncLog.setFileName(syncedFile.getName());
-		syncLog.setFileSize(Math.round(Double.valueOf(syncedFile.length())/1024) + "KB");
-
-		Node curNode=(Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-		if (curNode != null) {
-			syncLog.setProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, curNode)); 
+		try {
+			Document doc = docBuilder.parse(syncedFile);
+			syncLog.setSyncDate(new Date(syncedFile.lastModified()));
+			syncLog.setFileName(syncedFile.getName());
+			syncLog.setFileSize(Math.round(Double.valueOf(syncedFile.length())/1024) + "KB");
+	
+			Node curNode=(Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+			if (curNode != null) {
+				syncLog.setProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, curNode)); 
+			}
+			
+			curNode=(Node) xp.evaluate(MobileFormEntryConstants.METADATA_PREFIX, doc, XPathConstants.NODE);
+			if (curNode != null) {
+				syncLog.setDeviceId(xp.evaluate(MobileFormEntryConstants.META_DEVICE_ID, curNode)); 
+			}
+			
+			curNode=(Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
+			if (curNode != null) {
+				syncLog.setHouseholdId(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode)); 
+			}
+			
+			File syncLogFile = getLogFile();
+			writer(syncLogFile.getAbsolutePath(),syncLog.getOutputLine());
 		}
-		
-		curNode=(Node) xp.evaluate(MobileFormEntryConstants.METADATA_PREFIX, doc, XPathConstants.NODE);
-		if (curNode != null) {
-			syncLog.setDeviceId(xp.evaluate(MobileFormEntryConstants.META_DEVICE_ID, curNode)); 
+		catch (Throwable t) {
+			log.error("Cannot create log for file, probably an empty file");
 		}
-		
-		curNode=(Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
-		if (curNode != null) {
-			syncLog.setHouseholdId(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode)); 
-		}
-		
-		File syncLogFile = getLogFile();
-		writer(syncLogFile.getAbsolutePath(),syncLog.getOutputLine());
 	}
 }

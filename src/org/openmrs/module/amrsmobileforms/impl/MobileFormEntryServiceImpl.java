@@ -94,8 +94,8 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 	/* (non-Javadoc)
 	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#createHouseholdInDatabase(org.openmrs.module.amrsmobileforms.Household)
 	 */
-	public void createHouseholdInDatabase(Household household) {
-		dao.createHouseholdInDatabase(household);
+	public void saveHousehold(Household household) {
+		dao.saveHousehold(household);
 	}
 
 	/* (non-Javadoc)
@@ -187,6 +187,13 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 	 */
 	public void saveHouseholdMember(HouseholdMember householdMember) {
 		dao.saveHouseholdMember(householdMember);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#getAllMembersInHousehold(java.lang.Integer)
+	 */
+	public List<HouseholdMember> getAllMembersInHousehold(Household household) {
+		return dao.getAllMembersInHousehold(household);
 	}
 
 	/* (non-Javadoc)

@@ -40,6 +40,10 @@
 		<property name="adultsEligible" type="int" column="adults_eligible" />
 		
 		<property name="childrenEligible" type="int" column="children_eligible" />
+		
+		<many-to-one name="househead" class="org.openmrs.Person" not-null="true">
+			<column name="household_head_id" />
+		</many-to-one>
 			
 		<many-to-one name="changedBy" class="org.openmrs.User" not-null="true">
 			<column name="changed_by" />
@@ -52,12 +56,12 @@
 		<property name="dateCreated" type="java.util.Date" 
 			column="date_created" not-null="true" length="19" />
 		
-		<set name="economics" lazy="true" cascade="all-delete-orphan,evict" inverse="true" access="field" order-by="name asc">
+		<set name="economics" lazy="true" cascade="all-delete-orphan,evict" inverse="true" access="field" order-by="economic_id asc">
 			<key column="household_id" not-null="true" />
 			<one-to-many class="Economic" />
 		</set>
 		
-		<set name="surveys" lazy="true" cascade="all-delete-orphan,evict" inverse="true" access="field" order-by="name asc">
+		<set name="surveys" lazy="true" cascade="all-delete-orphan,evict" inverse="true" access="field" order-by="household_survey_id asc">
 			<key column="household_id" not-null="true" />
 			<one-to-many class="Survey" />
 		</set>

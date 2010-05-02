@@ -46,14 +46,13 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	public Household getHousehold(String householdIdentifier) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Household.class);
 		Household household = (Household) criteria.add(Expression.like("householdIdentifier", householdIdentifier)).uniqueResult();
-		
 		return household;	
 	}
 
 	/**
-	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#createHouseholdInDatabase(org.openmrs.module.amrsmobileforms.Household)
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#saveHousehold(org.openmrs.module.amrsmobileforms.Household)
 	 */
-	public void createHouseholdInDatabase(Household household) {
+	public void saveHousehold(Household household) {
 		sessionFactory.getCurrentSession().saveOrUpdate(household);
 	}
 
@@ -160,5 +159,12 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	 */
 	public void saveHouseholdMember(HouseholdMember householdMember) {
 		sessionFactory.getCurrentSession().saveOrUpdate(householdMember);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<HouseholdMember> getAllMembersInHousehold(Household household) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HouseholdMember.class);
+		criteria.add(Expression.eq("household", household));
+		return (List<HouseholdMember>) criteria.list();
 	}
 }
