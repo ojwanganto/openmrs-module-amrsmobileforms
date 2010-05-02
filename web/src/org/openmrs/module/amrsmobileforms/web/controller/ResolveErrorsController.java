@@ -193,6 +193,10 @@ public class ResolveErrorsController {
 					
 					// delete the mobileformentry error queue item
 					mobileService.deleteError(errorItem);
+					
+					//and delete from the file system
+					MobileFormEntryUtil.deleteFile(filePath);
+					
 				} catch (Exception e) {
 					log.debug("Error submitting to XForms", e);
 					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createPatient.error"); 
