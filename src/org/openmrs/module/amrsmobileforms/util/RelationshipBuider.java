@@ -37,7 +37,7 @@ public class RelationshipBuider {
 			
 			//IF HOUSEHEAD IS NULL, RETURN HERE
 			if (househead == null) {
-				log.error("Household has no head yet .... NOT CREATING RELATIONSHIP");
+				log.info("Household has no head yet .... NOT CREATING RELATIONSHIP");
 				return false;
 			}
 			
@@ -145,9 +145,9 @@ public class RelationshipBuider {
 			rlp.setPersonB(personB);
 			rlp.setRelationshipType(rlpType);
 			ps.saveRelationship(rlp);
-			log.error("Created a relationship of type: " + relationshipCode);
+			log.info("Created a relationship of type: " + relationshipCode);
 		}else
-			log.error("Similar relationship exists between these people");
+			log.info("Similar relationship exists between these people");
 	}
 	
 	private static boolean isNewRelationship(Person personA, Person personB, RelationshipType relationshipType) {
