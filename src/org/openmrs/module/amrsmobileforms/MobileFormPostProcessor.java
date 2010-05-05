@@ -110,7 +110,6 @@ public class MobileFormPostProcessor {
 			}
 			//Check Phone number and add it
 			if (phoneNumber != null && phoneNumber.trim() != ""){
-				log.error("Adding Phone number");
 				PersonAttributeType perAttType = Context.getPersonService().getPersonAttributeType(10);
 				PersonAttribute personAttribute = new PersonAttribute(perAttType, phoneNumber);
 				pat.addAttribute(personAttribute);
