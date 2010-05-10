@@ -267,13 +267,23 @@ public class ResolveErrorsController {
 		List<MobileFormEntryErrorModel> list= new Vector<MobileFormEntryErrorModel>();
 		MobileFormEntryError error= mfs.getErrorById(errorId);
 		if (error !=null) {
-			String filePath=getAbsoluteFilePath(error.getFormName(), mfs);
+			String formName = error.getFormName();
+			String filePath = getAbsoluteFilePath(formName, mfs);
 			error.setFormName(createFormData(error.getFormName(), mfs));
-			MobileFormEntryErrorModel errorForm = new MobileFormEntryErrorModel(error);
+			MobileFormEntryErrorModel errorForm = new MobileFormEntryErrorModel(error,getFormType(formName));
 			errorForm.setFormPath(filePath);
 			list.add(errorForm);
 		}
 		return list;
+	}
+	
+	private static String getFormType(String formName) {
+		if (formName == null || formName.trim() == "")
+			return null;
+		if (formName.startsWith("/HCT"))
+			return "household";
+		else
+			return "patient";
 	}
 	
 	/**

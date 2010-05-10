@@ -46,7 +46,7 @@
 			}
 		</style>
 
-		<div><b class="boxHeader">Mobile Form Entry Errors</b>
+		<div><b class="boxHeader">Mobile Form Entry Errors: (${errorSize})</b>
 			<div class="box">
 			
 				<form method="post">

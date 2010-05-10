@@ -37,7 +37,7 @@ public class RelationshipBuider {
 			
 			//IF HOUSEHEAD IS NULL, RETURN HERE
 			if (househead == null) {
-				log.info("Household (" + householdIdentifier + ") has no head yet .... NOT CREATING RELATIONSHIP");
+				log.debug("Household (" + householdIdentifier + ") has no head yet .... NOT CREATING RELATIONSHIP");
 				return false;
 			}
 			

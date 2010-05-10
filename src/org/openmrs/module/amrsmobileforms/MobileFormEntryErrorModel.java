@@ -19,8 +19,9 @@ import org.w3c.dom.Document;
 public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	
 	protected final Log log = LogFactory.getLog(getClass());
+	private DocumentBuilderFactory documentBuilderFactory;
 	
-	// data from the formData PID
+	// data from the formData
 	private String name = "";
 	private String birthdate = "";
 	private String gender = "";
@@ -32,7 +33,8 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String formModelName = "";
 	private String formId = "";
 	private String formPath="";
-
+	
+	private String errorType="";
 
 	/**
 	 * Creates a model object from the given MobileFormEntryError. Parses data out of
@@ -40,7 +42,9 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	 * 
 	 * @param error MobileFormEntryError to duplicate
 	 */
-	public MobileFormEntryErrorModel(MobileFormEntryError error) {
+	public MobileFormEntryErrorModel(MobileFormEntryError error, String errorType) {
+		
+		setErrorType(errorType);
 		
 		setMobileFormEntryErrorId(error.getMobileFormEntryErrorId());
 		setFormName(error.getFormName());
@@ -58,10 +62,9 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 				Document formDataDoc = getDocumentForErrorQueueItem(getFormName());
 				XPath xp = getXPathFactory().newXPath();
 				
-				String firstName = xp.evaluate("/form/patient/patient.given_name", formDataDoc);
-				String middleName = xp.evaluate("/form/patient/patient.middle_name", formDataDoc);
-				String familyName = xp.evaluate("/form/patient/patient.family_name", formDataDoc);
-				setName(firstName + "  " + middleName + " " + familyName);
+				setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
+						xp.evaluate("/form/patient/patient.middle_name", formDataDoc) + " " +
+						xp.evaluate("/form/patient/patient.family_name", formDataDoc));
 				
 				setBirthdate(xp.evaluate("/form/patient/patient.birthdate", formDataDoc));
 				setIdentifier(xp.evaluate("/form/patient/patient.medical_record_number", formDataDoc));
@@ -201,11 +204,25 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		this.formPath = formPath;
 	}
 	
+
+	/**
+	 * @return the errorType
+	 */
+	public String getErrorType() {
+		return errorType;
+	}
+
+	/**
+	 * @param errorType the errorType to set
+	 */
+	public void setErrorType(String errorType) {
+		this.errorType = errorType;
+	}
+	
 	/**
 	 * Fetch the xml doc for this error
 	 * 
 	 * @param formData
-	 * @return
 	 * @throws Exception
 	 */
 	public Document getDocumentForErrorQueueItem(String formData) throws Exception {
@@ -214,8 +231,6 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		Document doc = db.parse(IOUtils.toInputStream(formData));
 		return doc;
 	}
-	
-	private DocumentBuilderFactory documentBuilderFactory;
 	
 	private DocumentBuilderFactory getDocumentBuilderFactory() {
 		if (documentBuilderFactory == null)
