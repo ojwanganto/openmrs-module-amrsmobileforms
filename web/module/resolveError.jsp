@@ -67,34 +67,29 @@
 						<tr class="secondRow <c:choose><c:when test="${queueItemStatus.index % 2 == 0}">evenRow</c:when><c:otherwise>oddRow</c:otherwise></c:choose>">
 							<td>
 								<input type="hidden" name="amrsmobileformsErrorId" value="${queueItem.mobileFormEntryErrorId}"/>
-								<c:choose>
-									<c:when test="${queueItem.errorType == errorType}">
-										<!-- Pick a provider -->
-										<input type="radio" name="errorItemAction" value="linkProvider"/> <spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>:
-										<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
-										
-										<!-- Have the machinery create a new patient -->
-										<input type="radio" name="errorItemAction" value="createPatient" /> <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/> <br/>
-										
-										<!-- Assign a new patient identifier-->
-										<input type="radio" name="errorItemAction" value="newIdentifier" /> <spring:message code="amrsmobileforms.resolveErrors.action.newIdentifier"/>:
-										<input type="text" name="patientIdentifier"/><br/>
-										
-										<!-- Assign a birth date to patient -->
-										<input type="radio" name="errorItemAction" value="assignBirthdate" /> <spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
-										<input type="text" name="birthDate" onClick="showCalendar(this)"/><br/>
-										
-										<!-- Link patient to household -->
-										<input type="radio" name="errorItemAction" value="linkHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.createLink"/>:
-										<input type="text" name="householdId"/><br/>
-									</c:when>
-									<c:otherwise>
-										<input type="radio" name="errorItemAction" value="newHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
-										<input type="text" name="householdIdentifier"/><br/>
-									</c:otherwise>
-								</c:choose>
+								<!-- Pick a provider -->
+								<input type="radio" name="errorItemAction" value="linkProvider"/> <spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>:
+								<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
+								
+								<!-- Have the machinery create a new patient -->
+								<input type="radio" name="errorItemAction" value="createPatient" /> <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/> <br/>
+								
+								<!-- Assign a new patient identifier-->
+								<input type="radio" name="errorItemAction" value="newIdentifier" /> <spring:message code="amrsmobileforms.resolveErrors.action.newIdentifier"/>:
+								<input type="text" name="patientIdentifier"/><br/>
+								
+								<!-- Assign a birth date to patient -->
+								<input type="radio" name="errorItemAction" value="assignBirthdate" /> <spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
+								<input type="text" name="birthDate" onClick="showCalendar(this)"/><br/>
+								
+								<!-- Link patient to household -->
+								<input type="radio" name="errorItemAction" value="linkHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.createLink"/>:
+								<input type="text" name="householdId"/><br/>
 							</td>
 							<td >
+								<input type="radio" name="errorItemAction" value="newHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
+								<input type="text" name="householdIdentifier"/><br/>
+								
 								<!-- This is an invalid comment, delete it -->
 								<input type="radio" name="errorItemAction" value="deleteComment" />	<spring:message code="amrsmobileforms.resolveErrors.action.deleteComment"/> <br/>
 								
