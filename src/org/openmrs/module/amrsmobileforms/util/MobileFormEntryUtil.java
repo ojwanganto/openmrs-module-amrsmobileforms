@@ -2,6 +2,7 @@ package org.openmrs.module.amrsmobileforms.util;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -383,16 +384,21 @@ public class MobileFormEntryUtil {
     private static String formatGps(double coordinates, String type) {
         String location = Double.toString(coordinates);
         String degreeSign = "\u00B0";
+        
+      //set degree section DD
         String degree = location.substring(0, location.indexOf(".")) + degreeSign;
+        
+        //set the minutes part MM
         location = "0." + location.substring(location.indexOf(".") + 1);
         double temp = Double.valueOf(location) * 60;
         location = Double.toString(temp);
         String mins = location.substring(0, location.indexOf(".")) + "'";
-
+        
+        //set the seconds part SS.s
         location = "0." + location.substring(location.indexOf(".") + 1);
         temp = Double.valueOf(location) * 60;
-        location = Double.toString(temp);
-        String secs = location.substring(0, location.indexOf(".")) + '"';
+        String secs = roundToOneDecimalPlace(temp) + '"';
+        
         if (type.equalsIgnoreCase("lon")) {
             if (degree.startsWith("-")) {
                 degree = "W" + degree.replace("-", "") + mins + secs;
@@ -405,6 +411,12 @@ public class MobileFormEntryUtil {
                 degree = "N" + degree.replace("-", "") + mins + secs;
         }
         return degree;
+    }
+    
+    private static String roundToOneDecimalPlace(double dbl){
+    	DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.0" );
+		String formated = decimalFormat.format(dbl);
+		return formated.substring(0,formated.indexOf(".") ) + formated.substring(formated.indexOf(".") + 1);
     }
 	
 	/**
