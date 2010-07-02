@@ -5,11 +5,12 @@
 	<!-- Base Module Properties -->
 	<id>amrsmobileforms</id>
 	<name>AMRS Mobile Forms</name>
-	<version>1.0.2</version>
+	<version>1.0.21</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Samuel Mbugua</author>
 	<description>
 			Allows for submitting of xforms from mobile devices - Handles household data
+			This is a temporal fix for GPS format
 	</description>
 	<activator>@MODULE_PACKAGE@.MobileFormEntryActivator</activator>
 	

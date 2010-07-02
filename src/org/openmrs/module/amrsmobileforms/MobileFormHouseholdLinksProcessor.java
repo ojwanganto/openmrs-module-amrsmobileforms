@@ -68,7 +68,7 @@ public class MobileFormHouseholdLinksProcessor {
 				// form has no patient identifier : move to error
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.
-						createError(getFormName(filePath), "Error processing patient", 
+						createError(getFormName(filePath), "Error linking patient", 
 								"Patient has no identifier, or the identifier provided is invalid"));
 				return;
 			}
@@ -80,7 +80,7 @@ public class MobileFormHouseholdLinksProcessor {
 			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.
-						createError(getFormName(filePath), "Error processing patient", 
+						createError(getFormName(filePath), "Error linking patient", 
 								"Patient is not linked to household or household Id provided is invalid"));
 			}else {
 				Patient pat=MobileFormEntryUtil.getPatient(patientIdentifier);

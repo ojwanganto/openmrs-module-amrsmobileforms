@@ -24,7 +24,6 @@ import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryErrorModel;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
 import org.openmrs.module.amrsmobileforms.MobileFormQueue;
-import org.openmrs.module.amrsmobileforms.util.MobileFormEntryFileUploader;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 import org.openmrs.module.amrsmobileforms.util.XFormEditor;
 import org.openmrs.web.WebConstants;
@@ -187,22 +186,11 @@ public class ResolveErrorsController {
 				}
 			}
 			else if ("createPatient".equals(errorItemAction)) {
-				// process the form 
-				try {
-					MobileFormEntryFileUploader.submitXFormFile(filePath);
-					
-					// delete the mobileformentry error queue item
-					mobileService.deleteError(errorItem);
-					
-					//and delete from the file system
-					MobileFormEntryUtil.deleteFile(filePath);
-					
-				} catch (Exception e) {
-					log.debug("Error submitting to XForms", e);
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createPatient.error"); 
-					return "redirect:resolveErrors.list";
-				}
+				// put form in queue for normal processing
+				saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
 				
+				// delete the mobileformentry error queue item
+				mobileService.deleteError(errorItem);				
 			}
 			else if ("deleteError".equals(errorItemAction)) {
 				// delete the mobileformentry error queue item
