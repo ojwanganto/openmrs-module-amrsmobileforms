@@ -259,17 +259,17 @@ public class FixGPSController {
     	String secs=location.substring(0, location.indexOf(".")) + '"';
     	if (locatType.equalsIgnoreCase("lon")){
     		if (degree.startsWith("-")){
-    			degree="W " + degree.replace("-", "") + mins + secs;
+    			degree="W" + degree.replace("-", "") + mins + secs;
     		}
     		else
-    			degree="E " + degree.replace("-", "") + mins + secs;
+    			degree="E" + degree.replace("-", "") + mins + secs;
     	}
     	else {
     		if (degree.startsWith("-")){
-    			degree="S " + degree.replace("-", "") + mins + secs;
+    			degree="S" + degree.replace("-", "") + mins + secs;
     		}
     		else
-    			degree="N " + degree.replace("-", "") + mins + secs;
+    			degree="N" + degree.replace("-", "") + mins + secs;
     	}
     	return degree;
 	}
