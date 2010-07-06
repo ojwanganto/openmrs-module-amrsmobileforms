@@ -45,7 +45,6 @@ public class MobileFormEntryAdminExt extends AdministrationSectionExt {
 		map.put("module/amrsmobileforms/economicObject.form", "amrsmobileforms.economicObjects");
 		map.put("module/amrsmobileforms/resolveErrors.list", "amrsmobileforms.resolveErrors.title");
 		map.put("module/amrsmobileforms/syncLog.list", "amrsmobileforms.sync.title");
-		map.put("module/amrsmobileforms/fixGps.list", "Fix GPS Format Error (Temporary)");
 		return map;
 	}
 	
