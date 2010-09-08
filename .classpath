@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib-common/formentry-3.1.jar" sourcepath="/FormEntryModule"/>
 	<classpathentry kind="lib" path="metadata"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.1.jar"/>
-	<classpathentry kind="lib" path="lib-common/xforms-3.8.5.jar"/>
+	<classpathentry kind="lib" path="lib-common/xforms-3.8.5.jar" sourcepath="/home/thaiya/workspace/xforms"/>
 	<classpathentry kind="lib" path="lib-common/spring-webmvc.jar"/>
 	<classpathentry kind="lib" path="lib-common/spring-2.5.6.jar"/>
 	<classpathentry kind="output" path="build"/>
