@@ -5,7 +5,7 @@
 	<!-- Base Module Properties -->
 	<id>amrsmobileforms</id>
 	<name>AMRS Mobile Forms</name>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Samuel Mbugua</author>
 	<description>
@@ -17,7 +17,7 @@
 	<updateURL></updateURL>
 	<!-- /Base Module Properties -->
 	
-	<require_version>1.5.0.00</require_version>
+	<require_version>1.6.0.00</require_version>
 	<require_database_version>1.2.04</require_database_version>
 
 	<require_modules>

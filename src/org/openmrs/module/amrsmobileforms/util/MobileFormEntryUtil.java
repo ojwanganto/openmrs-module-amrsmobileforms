@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -538,17 +539,18 @@ public class MobileFormEntryUtil {
 	public static Integer getProviderId(String userName) {
 		
 		// assume its a normal user-name or systemId formatted with a dash
-		User provider = Context.getUserService().getUserByUsername(userName);
+		Person provider = Context.getUserService().getUserByUsername(userName);
 		if ( provider != null)
-			return provider.getUserId();
+			return provider.getPersonId();
 		
-		// next assume it is a internal providerId and try again
+		// next assume it is a internal providerId (Note this is a person_id 
+		// not a user_id) and try again
 		try {
-			provider = Context.getUserService().getUser(Integer.parseInt(userName));
+			provider = Context.getPersonService().getPerson(Integer.parseInt(userName));
 		}catch (NumberFormatException e) {e.printStackTrace();}
 		
-		if ( provider != null)
-			return provider.getUserId();
+		if ( provider != null && provider.isUser())
+			return provider.getPersonId();
 		
 		// now assume its a systemId without a dash: fix the dash and try again
 		if (userName != null && userName.trim() != "") {
@@ -556,7 +558,7 @@ public class MobileFormEntryUtil {
 				userName=userName.substring(0,userName.length()-1) + "-" + userName.substring(userName.length()-1);
 				provider = Context.getUserService().getUserByUsername(userName);
 				if ( provider != null)
-					return provider.getUserId();
+					return provider.getPersonId();
 			}
 		}
 		
@@ -578,7 +580,5 @@ public class MobileFormEntryUtil {
 		catch(Exception e){
 			log.error(e.getMessage(),e);
 		}
-
 	}
-
 }
