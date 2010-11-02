@@ -5,7 +5,7 @@
 	<classpathentry kind="src" path="web/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.4.0.02.5472.jar" sourcepath="/openmrs-1.4.x/test"/>
-	<classpathentry kind="lib" path="lib-common/openmrs-api-1.6.0.9944-dev.jar" sourcepath="/home/thaiya/workspace/OpenMRS"/>
+	<classpathentry kind="lib" path="lib-common/openmrs-api-1.6.0.9944-dev.jar" sourcepath="/OpenMRS"/>
 	<classpathentry kind="lib" path="lib-common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib-common/hibernate325-mod.jar" sourcepath="/openmrs-source/hibernate-3.2.5ga-lite.zip"/>
 	<classpathentry kind="lib" path="lib-common/servlet-api.jar"/>

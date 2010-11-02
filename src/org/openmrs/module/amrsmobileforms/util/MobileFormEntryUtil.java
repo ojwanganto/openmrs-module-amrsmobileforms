@@ -537,28 +537,30 @@ public class MobileFormEntryUtil {
 	 * @return
 	 */
 	public static Integer getProviderId(String userName) {
+		User userProvider;
+		Person personProvider;
 		
 		// assume its a normal user-name or systemId formatted with a dash
-		Person provider = Context.getUserService().getUserByUsername(userName);
-		if ( provider != null)
-			return provider.getPersonId();
+		userProvider = Context.getUserService().getUserByUsername(userName);
+		if ( userProvider != null)
+			return userProvider.getPersonId();
 		
 		// next assume it is a internal providerId (Note this is a person_id 
 		// not a user_id) and try again
 		try {
-			provider = Context.getPersonService().getPerson(Integer.parseInt(userName));
+			personProvider = Context.getPersonService().getPerson(Integer.parseInt(userName));
+			if ( personProvider != null)
+				return personProvider.getPersonId();
 		}catch (NumberFormatException e) {e.printStackTrace();}
 		
-		if ( provider != null && provider.isUser())
-			return provider.getPersonId();
 		
 		// now assume its a systemId without a dash: fix the dash and try again
 		if (userName != null && userName.trim() != "") {
 			if (userName.indexOf("-") == -1 && userName.length() > 1) {
 				userName=userName.substring(0,userName.length()-1) + "-" + userName.substring(userName.length()-1);
-				provider = Context.getUserService().getUserByUsername(userName);
-				if ( provider != null)
-					return provider.getPersonId();
+				userProvider = Context.getUserService().getUserByUsername(userName);
+				if ( userProvider != null)
+					return userProvider.getPersonId();
 			}
 		}
 		
