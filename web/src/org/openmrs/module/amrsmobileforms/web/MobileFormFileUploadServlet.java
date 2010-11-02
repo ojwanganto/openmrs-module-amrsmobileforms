@@ -48,7 +48,7 @@ public class MobileFormFileUploadServlet extends HttpServlet{
 	 * Receives multipart files and saves them as individual file items on the file system
 	 * directory specified by {@link MobileFormEntryUtil#getMobileFormsDropDir()} 
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void doGet(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
 
 		if (ServletFileUpload.isMultipartContent(request)) {
