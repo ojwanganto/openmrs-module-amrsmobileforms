@@ -349,7 +349,14 @@ public class ResolveErrorsController {
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
 					XFormEditor.editNode(filePath, 
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
+			}else {
+				//Patient has only one id
+				XFormEditor.editNode(filePath, 
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientIdentifier);
+				XFormEditor.editNode(filePath, 
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "8");
 			}
+				
 		}
 		catch (Throwable t) {
 			log.error("Error reversing nodes", t);
