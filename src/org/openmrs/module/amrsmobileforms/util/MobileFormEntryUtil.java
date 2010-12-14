@@ -543,7 +543,7 @@ public class MobileFormEntryUtil {
 		// assume its a normal user-name or systemId formatted with a dash
 		userProvider = Context.getUserService().getUserByUsername(userName);
 		if ( userProvider != null)
-			return userProvider.getPersonId();
+			return userProvider.getPerson().getPersonId();
 		
 		// next assume it is a internal providerId (Note this is a person_id 
 		// not a user_id) and try again
@@ -560,7 +560,7 @@ public class MobileFormEntryUtil {
 				userName=userName.substring(0,userName.length()-1) + "-" + userName.substring(userName.length()-1);
 				userProvider = Context.getUserService().getUserByUsername(userName);
 				if ( userProvider != null)
-					return userProvider.getPersonId();
+					return userProvider.getPerson().getPersonId();
 			}
 		}
 		

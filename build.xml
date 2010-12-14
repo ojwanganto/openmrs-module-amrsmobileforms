@@ -37,7 +37,7 @@
 			<fileset dir="lib-common">
 				<include name="**/*.jar"/>
 			</fileset>
-			<fileset dir="../OpenMRS/lib">
+			<fileset dir="../xforms/lib-common">
 				<include name="**/*.jar"/>
 			</fileset>
 		</path>
