@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!-- ********************************************************* -->
-<!-- ** MobileFormEntry Module								** -->
+<!-- ** AmrsMobileForms Module								** -->
 <!-- **														** -->
 <!-- ** @author Samuel Mbugua								** -->
-<!-- ** @version 1.0										** -->
+<!-- ** @version 1.0.3										** -->
 <!-- ********************************************************* -->
 <project name="AmrsMobileFormsModule" default="package-module">
 		
@@ -35,9 +35,6 @@
 				<include name="**/*.jar"/>
 			</fileset>
 			<fileset dir="lib-common">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="../xforms/lib-common">
 				<include name="**/*.jar"/>
 			</fileset>
 		</path>
