@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>amrsmobileforms</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3-HHM-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>AMRS Mobile Forms</name>
 	<description>Parent project for AMRS Mobile Forms</description>
