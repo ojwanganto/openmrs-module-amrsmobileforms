@@ -22,6 +22,12 @@
 		-->
 		
 		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>xforms</artifactId>
+			<type>jar</type>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
 			<type>jar</type>

@@ -36,21 +36,24 @@
 				<scope>compile</scope>
 			</dependency>
 
-			D         lib-common/formentry-3.1.jar
-			D         lib-common/openmrs-1.6.1.jar
-			D         lib-common/xforms-3.8.5.jar
-			D         lib-common/hibernate325-mod.jar
-			D         lib-common/spring-2.5.6.jar
-			D         lib-common/tests-openmrs-api-1.4.0.02.5472.jar
-			D         lib-common/servlet-api.jar
-			D         lib-common/commons-io-1.1.jar
-			D         lib-common/commons-logging-1.0.4.jar
-			D         lib-common/config-1.0.dtd
-			D         lib-common/web-openmrs-api-1.3.0.14.4802.jar
-			D         lib-common/spring-webmvc.jar
-
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>formentry</artifactId>
+				<version>4.5.9.3</version>
+				<type>pom</type>
+				<scope>provided</scope>
+			</dependency>
+			
 			-->
 			
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>xforms</artifactId>
+				<version>3.9.5</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+
 			<dependency>
 				<groupId>org.openmrs.api</groupId>
 				<artifactId>openmrs-api</artifactId>
@@ -76,7 +79,7 @@
 	</dependencyManagement>
 
 	<properties>
-		<openMRSVersion>1.5.0</openMRSVersion>
+		<openMRSVersion>1.6.1</openMRSVersion>
 	</properties>
 
 	<build>
