@@ -3,10 +3,10 @@
 <module configVersion="1.0">
 	
 	<!-- Base Module Properties -->
-	<id>amrsmobileforms</id>
-	<name>AMRS Mobile Forms</name>
-	<version>1.0.3</version>
-	<package>org.openmrs.module.@MODULE_ID@</package>
+	<id>@MODULE_ID@</id>
+	<name>@MODULE_NAME@</name>
+	<version>@MODULE_VERSION@</version>
+	<package>@MODULE_PACKAGE@</package>
 	<author>Samuel Mbugua</author>
 	<description>
 			Allows for submitting of xforms from mobile devices - Handles household data
@@ -131,12 +131,7 @@
 	<!-- /Internationalization -->
 	
 	<mappingFiles>
-		Household.hbm.xml
-		HouseholdMember.hbm.xml
-		Economic.hbm.xml
-		EconomicObject.hbm.xml
-		Survey.hbm.xml
-		MobileFormEntryError.hbm.xml
+		${omodHbmConfig}
 	</mappingFiles>
 
 	
