@@ -24,34 +24,41 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!--
-			Libraries from lib to add as dependencies with compile or runtime scope:
-			lib/commons-fileupload-1.2.1.jar
-				
-			Find matching dependencies in maven central repository.
-			<dependency>
-				<groupId>org.other.library</groupId>
-				<artifactId>library-name</artifactId>
-				<version>library.version</version>
-				<scope>compile</scope>
-			</dependency>
 
-			<dependency>
-				<groupId>org.openmrs.module</groupId>
-				<artifactId>formentry</artifactId>
-				<version>4.5.9.3</version>
-				<type>pom</type>
-				<scope>provided</scope>
-			</dependency>
-			
-			-->
-			
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>xforms</artifactId>
 				<version>3.9.5</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>household-api</artifactId>
+				<version>1.0.0</version>
 				<type>jar</type>
 				<scope>provided</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.1</version>
+				<scope>compile</scope>
+			</dependency>
+  
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>1.5.0</version>
+				<scope>provided</scope>
+			</dependency>
+	 
+			<dependency>
+				<groupId>com.jcraft</groupId>
+				<artifactId>jzlib</artifactId>
+				<version>1.1.1</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
@@ -61,6 +68,7 @@
 				<type>jar</type>
 				<scope>provided</scope>
 			</dependency>
+			
 			<dependency>
 				<groupId>org.openmrs.web</groupId>
 				<artifactId>openmrs-web</artifactId>
@@ -68,6 +76,7 @@
 				<type>jar</type>
 				<scope>provided</scope>
 			</dependency>
+			
 			<dependency>
 				<groupId>org.openmrs.test</groupId>
 				<artifactId>openmrs-test</artifactId>
@@ -75,6 +84,7 @@
 				<type>jar</type>
 				<scope>test</scope>
 			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 

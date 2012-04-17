@@ -21,10 +21,26 @@
 		
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
+			<artifactId>household-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
+	 
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
 			<artifactId>xforms</artifactId>
 			<type>jar</type>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jzlib</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
