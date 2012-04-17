@@ -22,6 +22,7 @@
 
 	<require_modules>
 		<require_module version="3.8.5">org.openmrs.module.xforms</require_module>
+		<require_module version="1.0.0">org.openmrs.module.household</require_module>
 	</require_modules>
 	
 	<!-- Extensions -->
@@ -96,8 +97,61 @@
 		<defaultValue>amrsmobileforms/archive/%Y/%M</defaultValue>
 		<description>Directory for storing successfully processed forms.</description>
 	</globalProperty>
-	
-		<!-- Servlets -->
+	<globalProperty>
+		<property>@MODULE_ID@.concept.adults</property>
+		<defaultValue></defaultValue>
+		<description>Concept used for household adults property.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.concept.children</property>
+		<defaultValue></defaultValue>
+		<description>Concept used for household children property.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.concept.eligibleAdults</property>
+		<defaultValue></defaultValue>
+		<description>Concept used for household eligible adults property.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.concept.eligibleChildren</property>
+		<defaultValue></defaultValue>
+		<description>Concept used for household eligible children property.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.concept.returnVisitDate</property>
+		<defaultValue></defaultValue>
+		<description>Concept used for household return visit date observations.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.defaultHouseholdDefinition</property>
+		<defaultValue></defaultValue>
+		<description>Household definition id to use when creating households from Mobile Form Entry submissions.</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@defaultHouseholdEncounterType</property>
+		<defaultValue></defaultValue>
+		<description>Household encounter type id to use when creating households from Mobile Form Entry submissions.</description>
+	</globalProperty>
+
+	<!-- DWR -->
+	<dwr>
+		<allow>
+			<create creator="new" javascript="DWRAMRSMobileFormsService">
+				<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRAMRSMobileFormsService"/>
+				<include method="saveEconomicConceptMap"/>
+			</create>
+			<convert converter="bean" match="@MODULE_PACKAGE@.EconomicConceptMap"/>
+		</allow>
+
+		<signatures>
+			<![CDATA[
+			import @MODULE_PACKAGE@.web.DWRAMRSMobileFormsService;
+				DWRAMRSMobileFormsService.saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId);
+			]]>
+		</signatures>	
+	</dwr>
+
+	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
 	<servlet>
 		<servlet-name>fileUpload</servlet-name>
@@ -134,5 +188,4 @@
 		${omodHbmConfig}
 	</mappingFiles>
 
-	
 </module>
