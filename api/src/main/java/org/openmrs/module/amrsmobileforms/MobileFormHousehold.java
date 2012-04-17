@@ -14,7 +14,7 @@ import org.openmrs.User;
  *  
  * @author  Samuel Mbugua
  */
-public class Household extends BaseOpenmrsObject implements Auditable {
+public class MobileFormHousehold extends BaseOpenmrsObject implements Auditable {
 	
 	private Integer householdId;
 	private String householdIdentifier;

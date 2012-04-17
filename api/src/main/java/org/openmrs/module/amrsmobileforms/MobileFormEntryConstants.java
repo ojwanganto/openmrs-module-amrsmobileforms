@@ -65,6 +65,22 @@ public class MobileFormEntryConstants {
 	/** Mobile-forms post processing directory. */
 	public final static String GP_MOBILE_FORMS_POST_PROCESS_DIR = "amrsmobileforms/post_process";
 	
+	// Concept global properties
+	public static final String GP_CONCEPT_ADULTS = "amrsmobileforms.concept.adults";
+	public static final String GP_CONCEPT_CHILDREN = "amrsmobileforms.concept.children";
+	public static final String GP_CONCEPT_ELIGIBLE_ADULTS = "amrsmobileforms.concept.eligibleAdults";
+	public static final String GP_CONCEPT_ELIGIBLE_CHILDREN = "amrsmobileforms.concept.eligibleChildren";
+	public static final String GP_CONCEPT_RETURN_VISIT_DATE = "amrsmobileforms.concept.returnVisitDate";
+
+	// Household-related default global properties
+	public static final String GP_DEFAULT_HOUSEHOLD_DEFINITION = "amrsmobileforms.defaultHouseholdDefinition";
+	public static final String GP_DEFAULT_HOUSEHOLD_ENCOUNTER_TYPE = "amrsmobileforms.defaultHouseholdEncounterType";
+	
+	// Post-processor defaults for creating identifiers and attributes
+	public static final Integer DEFAULT_HCT_IDENTIFIER_TYPE = 8;
+	public static final Integer DEFAULT_HCT_IDENTIFIER_LOCATION = 4;
+	public static final Integer DEFAULT_PHONENUMBER_ATTRIBUTE_TYPE = 10;
+	
 	/** The text/xml http content type. */
 	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
 	

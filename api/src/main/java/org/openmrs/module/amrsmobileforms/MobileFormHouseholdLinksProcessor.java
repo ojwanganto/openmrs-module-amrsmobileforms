@@ -84,7 +84,7 @@ public class MobileFormHouseholdLinksProcessor {
 								"Patient is not linked to household or household Id provided is invalid"));
 			}else {
 				Patient pat=MobileFormEntryUtil.getPatient(patientIdentifier);
-				Household household=mobileService.getHousehold(householdId);
+				MobileFormHousehold household=mobileService.getHousehold(householdId);
 				if (pat != null && household != null) {
 					if (MobileFormEntryUtil.isNewLink(pat.getId())) {
 						HouseholdMember householdMember=new HouseholdMember();
@@ -92,6 +92,9 @@ public class MobileFormHouseholdLinksProcessor {
 						householdMember.setHousehold(household);
 						mobileService.saveHouseholdMember(householdMember);
 					}
+					
+					// create a membership in MobileFormHousehold Module
+					// HouseholdModuleConverter.getInstance().addMembership(pat, household, false);
 				}
 				saveFormInPostProcessor(filePath);
 			}

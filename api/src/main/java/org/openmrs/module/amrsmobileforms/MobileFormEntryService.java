@@ -37,15 +37,15 @@ public interface MobileFormEntryService {
 	/**
 	 * Get a household object given a string household identifier
 	 * @param householdIdentifier
-	 * @return {@link Household}
+	 * @return {@link MobileFormHousehold}
 	 */
-	public Household getHousehold(String householdIdentifier);
+	public MobileFormHousehold getHousehold(String householdIdentifier);
 	
 	/**
 	 * Create or update a household in the database
 	 * @param household
 	 */
-	public void saveHousehold(Household household);
+	public void saveHousehold(MobileFormHousehold household);
 	
 	/**
 	 * Get a single household member object given a member identifier
@@ -64,7 +64,7 @@ public interface MobileFormEntryService {
 	 * Get all persons in a household
 	 * @param householdId
 	 */
-	public List<HouseholdMember> getAllMembersInHousehold(Household Household);
+	public List<HouseholdMember> getAllMembersInHousehold(MobileFormHousehold Household);
 	
 	//ECONOMIC RELATED METHODS
 	/**
@@ -150,4 +150,10 @@ public interface MobileFormEntryService {
 	 * @return List of sync log files
 	 */
 	public List<String> getAllSyncLogs();
+
+	public EconomicConceptMap getEconomicConceptMapFor(EconomicObject eo);
+
+	public EconomicConceptMap getEconomicConceptMap(Integer id);
+
+	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm);
 }

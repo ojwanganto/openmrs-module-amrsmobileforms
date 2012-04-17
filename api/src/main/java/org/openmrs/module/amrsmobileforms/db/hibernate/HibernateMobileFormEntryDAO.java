@@ -5,12 +5,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
-import org.openmrs.module.amrsmobileforms.Economic;
-import org.openmrs.module.amrsmobileforms.EconomicObject;
-import org.openmrs.module.amrsmobileforms.Household;
-import org.openmrs.module.amrsmobileforms.HouseholdMember;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
-import org.openmrs.module.amrsmobileforms.Survey;
+import org.openmrs.module.amrsmobileforms.*;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 
 /**
@@ -43,16 +38,16 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	/**
 	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getHousehold(java.lang.String)
 	 */
-	public Household getHousehold(String householdIdentifier) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Household.class);
-		Household household = (Household) criteria.add(Expression.like("householdIdentifier", householdIdentifier)).uniqueResult();
+	public MobileFormHousehold getHousehold(String householdIdentifier) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MobileFormHousehold.class);
+		MobileFormHousehold household = (MobileFormHousehold) criteria.add(Expression.like("householdIdentifier", householdIdentifier)).uniqueResult();
 		return household;	
 	}
 
 	/**
-	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#saveHousehold(org.openmrs.module.amrsmobileforms.Household)
+	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#saveHousehold(org.openmrs.module.amrsmobileforms.MobileFormHousehold)
 	 */
-	public void saveHousehold(Household household) {
+	public void saveHousehold(MobileFormHousehold household) {
 		sessionFactory.getCurrentSession().saveOrUpdate(household);
 	}
 
@@ -162,9 +157,26 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<HouseholdMember> getAllMembersInHousehold(Household household) {
+	public List<HouseholdMember> getAllMembersInHousehold(MobileFormHousehold household) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HouseholdMember.class);
 		criteria.add(Expression.eq("household", household));
 		return (List<HouseholdMember>) criteria.list();
+	}
+
+	public EconomicConceptMap getEconomicConceptMapFor(EconomicObject eo) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(EconomicConceptMap.class);
+		criteria.add(Expression.eq("economic", eo));
+		return (EconomicConceptMap) criteria.uniqueResult();
+	}
+
+	public EconomicConceptMap getEconomicConceptMap(Integer id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(EconomicConceptMap.class);
+		criteria.add(Expression.eq("economicConceptMapId", id));
+		return (EconomicConceptMap) criteria.uniqueResult();
+	}
+
+	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm) {
+		sessionFactory.getCurrentSession().saveOrUpdate(ecm);
+		return ecm;
 	}
 }

@@ -13,7 +13,7 @@ import org.openmrs.User;
  */
 public class Survey extends BaseOpenmrsObject implements Auditable {
 	private Integer householdSurveyId;
-	private Household household;
+	private MobileFormHousehold household;
 	private String surveyIdentifier;
 	private String providerId;
 	private String teamId;
@@ -41,13 +41,13 @@ public class Survey extends BaseOpenmrsObject implements Auditable {
 	/**
 	 * @return the household
 	 */
-	public Household getHousehold() {
+	public MobileFormHousehold getHousehold() {
 		return household;
 	}
 	/**
 	 * @param household the household to set
 	 */
-	public void setHousehold(Household household) {
+	public void setHousehold(MobileFormHousehold household) {
 		this.household = household;
 	}
 	/**

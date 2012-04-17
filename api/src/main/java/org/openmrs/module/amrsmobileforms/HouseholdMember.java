@@ -7,7 +7,7 @@ package org.openmrs.module.amrsmobileforms;
  */
 public class HouseholdMember {
 	private Integer householdMemberId;
-	private Household household;
+	private MobileFormHousehold household;
 	
 	/**
 	 * @return the householdMemberId
@@ -24,13 +24,13 @@ public class HouseholdMember {
 	/**
 	 * @return the household
 	 */
-	public Household getHousehold() {
+	public MobileFormHousehold getHousehold() {
 		return household;
 	}
 	/**
 	 * @param household the household to set
 	 */
-	public void setHousehold(Household household) {
+	public void setHousehold(MobileFormHousehold household) {
 		this.household = household;
 	}
 }

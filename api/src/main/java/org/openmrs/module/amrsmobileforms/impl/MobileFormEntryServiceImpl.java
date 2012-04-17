@@ -15,15 +15,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.amrsmobileforms.Economic;
-import org.openmrs.module.amrsmobileforms.EconomicObject;
-import org.openmrs.module.amrsmobileforms.Household;
-import org.openmrs.module.amrsmobileforms.HouseholdMember;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
-import org.openmrs.module.amrsmobileforms.MobileFormQueue;
-import org.openmrs.module.amrsmobileforms.Survey;
-import org.openmrs.module.amrsmobileforms.SyncLogModel;
+import org.openmrs.module.amrsmobileforms.*;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 
@@ -87,14 +79,14 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 	/* (non-Javadoc)
 	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#getHousehold(java.lang.String)
 	 */
-	public Household getHousehold(String householdIdentifier) {
+	public MobileFormHousehold getHousehold(String householdIdentifier) {
 		return dao.getHousehold(householdIdentifier);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#createHouseholdInDatabase(org.openmrs.module.amrsmobileforms.Household)
+	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#createHouseholdInDatabase(org.openmrs.module.amrsmobileforms.MobileFormHousehold)
 	 */
-	public void saveHousehold(Household household) {
+	public void saveHousehold(MobileFormHousehold household) {
 		dao.saveHousehold(household);
 	}
 
@@ -192,7 +184,7 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 	/* (non-Javadoc)
 	 * @see org.openmrs.module.amrsmobileforms.MobileFormEntryService#getAllMembersInHousehold(java.lang.Integer)
 	 */
-	public List<HouseholdMember> getAllMembersInHousehold(Household household) {
+	public List<HouseholdMember> getAllMembersInHousehold(MobileFormHousehold household) {
 		return dao.getAllMembersInHousehold(household);
 	}
 
@@ -314,5 +306,17 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 			}
 		}
 		return logFiles;
+	}
+
+	public EconomicConceptMap getEconomicConceptMapFor(EconomicObject eo) {
+		return dao.getEconomicConceptMapFor(eo);
+	}
+
+	public EconomicConceptMap getEconomicConceptMap(Integer id) {
+		return dao.getEconomicConceptMap(id);
+	}
+
+	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm) {
+		return dao.saveEconomicConceptMap(ecm);
 	}
 }

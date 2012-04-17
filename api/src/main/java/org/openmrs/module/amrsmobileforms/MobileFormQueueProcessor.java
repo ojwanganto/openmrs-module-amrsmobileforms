@@ -9,6 +9,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
@@ -70,8 +71,7 @@ public class MobileFormQueueProcessor {
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
 			
 			// check household identifier and gps were entered correctly
-			if (householdIdentifier == null || householdIdentifier.trim() == "" ||
-					householdGps == null || householdGps.trim() == ""){
+			if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)){
 				log.debug("Null household identifier or GPS");
 				saveFormInError(queue.getFileSystemUrl());
 				mfes.saveErrorInDatabase(MobileFormEntryUtil.
@@ -86,26 +86,31 @@ public class MobileFormQueueProcessor {
 			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier) && 
 					!MobileFormEntryUtil.isSameHousehold(householdIdentifier,householdGps)){
 				
+				log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
 				saveFormInError(queue.getFileSystemUrl());
 				mfes.saveErrorInDatabase(MobileFormEntryUtil.
 						createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
 								"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")"));
 			}else{
 				
-				//create household
-				log.debug("Creating a new household with id " + householdIdentifier);
-				Household household = MobileFormEntryUtil.getHousehold(mfes.getHousehold(householdIdentifier), doc, xp);
+				// get or create household
+				log.debug("Processing household with id " + householdIdentifier);
+				MobileFormHousehold household = MobileFormEntryUtil.getHousehold(mfes.getHousehold(householdIdentifier), doc, xp);
 				
-				//Add economic
-				for (Economic economic : MobileFormEntryUtil.getEconomic(doc, xp)) {
+				// add economics
+				for (Economic economic : MobileFormEntryUtil.getEconomic(doc, xp))
 					household.addEconomic(economic);
-				}
-				//Add Survey
+				
+				// add Survey
 				household.addSurvey(MobileFormEntryUtil.getSurvey(doc, xp));
-				//Save the household
+				
+				// save the household
 				mfes.saveHousehold(household);
 				
-				//queue form for splitting
+				// save the household in Household Module
+				HouseholdModuleConverter.getInstance().addHouseholdAndEncounter(household);
+				
+				// queue form for splitting
 				saveFormInPendingSplit(queue.getFileSystemUrl());
 			}
 		}
@@ -140,7 +145,7 @@ public class MobileFormQueueProcessor {
 		try {
 			mobileService= (MobileFormEntryService)Context.getService(MobileFormEntryService.class);
 		}catch (APIException e) {
-			log.debug("MobileFormEntryService not found");
+			log.debug("MobileFormEntryService not found", e);
 			return;
 		}
 		try {			
@@ -155,7 +160,7 @@ public class MobileFormQueueProcessor {
 			}
 		}
 		catch(Exception e){
-			log.error("Problem occured while processing Xforms queue", e);
+			log.error("Problem occured while processing AMRS Mobile Forms queue", e);
 		}
 		finally {
 			isRunning = false;
@@ -185,7 +190,7 @@ public class MobileFormQueueProcessor {
 	 * Archives a mobile form after successful processing
 	 */
 	private void saveFormInPendingSplit(String formPath){
-		String pendingSplitFilePath= MobileFormEntryUtil.getMobileFormsPendingSplitDir().getAbsolutePath() + getFormName(formPath);
+		String pendingSplitFilePath = MobileFormEntryUtil.getMobileFormsPendingSplitDir().getAbsolutePath() + getFormName(formPath);
 		
 		saveForm(formPath, pendingSplitFilePath);
 	}
@@ -195,7 +200,7 @@ public class MobileFormQueueProcessor {
 	 * @param formPath 
 	 */
 	private void saveFormInError(String formPath){
-		String errorFilePath= MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + getFormName(formPath);
+		String errorFilePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + getFormName(formPath);
 		saveForm(formPath, errorFilePath);
 	}
 	
@@ -226,7 +231,7 @@ public class MobileFormQueueProcessor {
 			try {
 				syncLogger= new SyncLogger();
 			}catch (APIException e) {
-				log.debug("SyncLogger not found");
+				log.debug("SyncLogger not found", e);
 				return null;
 			}
 		}

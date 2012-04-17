@@ -23,7 +23,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.Economic;
 import org.openmrs.module.amrsmobileforms.EconomicObject;
-import org.openmrs.module.amrsmobileforms.Household;
+import org.openmrs.module.amrsmobileforms.MobileFormHousehold;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
@@ -215,7 +215,7 @@ public class MobileFormEntryUtil {
 
 	public static boolean isSameHousehold(String identifier, String gpsLocation){
 		MobileFormEntryService mfes=(MobileFormEntryService) Context.getService(MobileFormEntryService.class);
-		Household household = mfes.getHousehold(identifier);
+		MobileFormHousehold household = mfes.getHousehold(identifier);
 		if (household.getGpsLocation().equals(getGPS(gpsLocation)))
 			return true;
 		return false;
@@ -247,14 +247,16 @@ public class MobileFormEntryUtil {
 		return mobileFormEntryError;
 	}
 	
-	public static Household getHousehold(Household household, Document doc, XPath xp) throws XPathExpressionException{
+	public static MobileFormHousehold getHousehold(MobileFormHousehold household, Document doc, XPath xp) throws XPathExpressionException{
     	Node householdMetaNode = (Node)xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
     	if (household == null)
-    		household=new Household();
+    		household=new MobileFormHousehold();
 		if (xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode)!= null)
 			setLocations(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode));
 		
 		//CREATE A HOUSEHOLD OBJECT
+		
+		org.openmrs.module.household.model.Household newHousehold = new org.openmrs.module.household.model.Household();
 		
 		//Set household identifier
 		household.setHouseholdIdentifier(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID , householdMetaNode));
