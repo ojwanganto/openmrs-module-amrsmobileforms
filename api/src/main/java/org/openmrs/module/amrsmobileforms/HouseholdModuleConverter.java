@@ -4,11 +4,7 @@
  */
 package org.openmrs.module.amrsmobileforms;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +14,6 @@ import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.household.model.*;
-import org.openmrs.module.household.model.Household;
 import org.openmrs.module.household.service.HouseholdService;
 
 /**
@@ -209,7 +204,7 @@ public class HouseholdModuleConverter {
 						return;
 					} else {
 						// need to discontinue this relationship so the new headship is established properly
-						// TODO fix this ...
+						// TODO figure out best options for EndDate and any other data
 						m.setEndDate(new Date());
 						getService().saveHouseholdMembership(m);
 					}

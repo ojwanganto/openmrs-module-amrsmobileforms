@@ -135,10 +135,13 @@ public class MobileFormPostProcessor {
 			// add this person as a member of its household in Household Module data model
 			HouseholdModuleConverter.getInstance().addMembership(pat, householdIdentifier, 
 					OpenmrsUtil.nullSafeEquals(relationshipToHead, RelationshipCodes.SELF));
-			
+
 			//For this person attempt to create a relationship.
 			if (StringUtils.hasText(relationshipToHead) && StringUtils.hasText(householdIdentifier)) {
 				canArchive = RelationshipBuider.createRelationship(pat, relationshipToHead, householdIdentifier);
+			} else {
+				throw new APIException("cannot process relationship due to missing data: relationshipToHead=" 
+						+ relationshipToHead + ", householdIdentifier=" + householdIdentifier);
 			}
 		} catch (Throwable t) {
 			log.error("Error Post Processing", t);
