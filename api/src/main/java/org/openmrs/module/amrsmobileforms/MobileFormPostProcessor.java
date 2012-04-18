@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
+import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,6 +16,7 @@ import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
@@ -129,6 +131,19 @@ public class MobileFormPostProcessor {
 				}
 			}
 			
+			// check address against household and add if needed
+			MobileFormHousehold mfh = getMobileService().getHousehold(householdIdentifier);
+			if (mfh != null) {
+				boolean found = false;
+				Iterator<PersonAddress> addresses = pat.getAddresses().iterator();
+				
+				while (addresses.hasNext() && !found)
+					found = matchingAddress(mfh, addresses.next());
+
+				if (!found)
+					pat.addAddress(createAddress(mfh));
+			}
+			
 			// save the patient
 			Context.getPersonService().savePerson(pat);
 
@@ -211,5 +226,57 @@ public class MobileFormPostProcessor {
 			}
 		}
 		return mobileService;
+	}
+
+	/**
+	 * checks to see if a person address matches the address on a given household.
+	 * 
+	 * @param mfh
+	 * @param address
+	 * @return 
+	 */
+	private boolean matchingAddress(MobileFormHousehold mfh, PersonAddress address) {
+		if (mfh == null || address == null)
+			return false;
+
+		boolean match = true;
+
+		match &= OpenmrsUtil.nullSafeEquals(address.getCityVillage(), mfh.getVillage());
+		match &= OpenmrsUtil.nullSafeEquals(address.getSubregion(), mfh.getSublocation());
+		match &= OpenmrsUtil.nullSafeEquals(address.getRegion(), mfh.getLocation());
+		match &= OpenmrsUtil.nullSafeEquals(address.getTownshipDivision(), mfh.getDivision());
+		match &= OpenmrsUtil.nullSafeEquals(address.getCountyDistrict(), mfh.getDistrict());
+		
+		// ignoring GPS for now ... 
+		
+		return match;
+	}
+
+	/**
+	 * creates a person address from a household.
+	 * 
+	 * @param mfh
+	 * @return 
+	 */
+	private PersonAddress createAddress(MobileFormHousehold mfh) {
+		PersonAddress pa = new PersonAddress();
+		
+		pa.setCityVillage(mfh.getVillage());
+		pa.setSubregion(mfh.getSublocation());
+		pa.setRegion(mfh.getLocation());
+		pa.setTownshipDivision(mfh.getDivision());
+		pa.setCountyDistrict(mfh.getDistrict());
+		
+		if (StringUtils.hasText(mfh.getGpsLocation())) {
+			String[] gps = mfh.getGpsLocation().split(" ");
+			if (gps.length == 2) {
+				pa.setLatitude(gps[0]);
+				pa.setLongitude(gps[1]);
+			}
+		}
+		
+		pa.setPreferred(true);
+		
+		return pa;
 	}
 }
