@@ -93,6 +93,8 @@ public class MobileFormPostProcessor {
 			curNode = (Node) xp.evaluate(MobileFormEntryConstants.OBS_NODE, doc, XPathConstants.NODE);
 			String relationshipToHead = xp.evaluate(MobileFormEntryConstants.OBS_RELATIONSHIP, curNode);
 
+			MobileFormHousehold mfh = getMobileService().getHousehold(householdIdentifier);
+			
 			Patient pat;
 
 			// First Ensure there is at least a patient identifier in the form
@@ -132,7 +134,6 @@ public class MobileFormPostProcessor {
 			}
 			
 			// check address against household and add if needed
-			MobileFormHousehold mfh = getMobileService().getHousehold(householdIdentifier);
 			if (mfh != null) {
 				boolean found = false;
 				Iterator<PersonAddress> addresses = pat.getAddresses().iterator();
@@ -146,7 +147,7 @@ public class MobileFormPostProcessor {
 			
 			// save the patient
 			Context.getPersonService().savePerson(pat);
-
+			
 			// add this person as a member of its household in Household Module data model
 			HouseholdModuleConverter.getInstance().addMembership(pat, householdIdentifier, 
 					OpenmrsUtil.nullSafeEquals(relationshipToHead, RelationshipCodes.SELF));
