@@ -4,7 +4,10 @@
  */
 package org.openmrs.module.amrsmobileforms;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +71,7 @@ public class HouseholdModuleConverter {
 	 * 
 	 * @param household 
 	 */
-	public void addHouseholdAndEncounter(MobileFormHousehold household) {
+	public void addHousehold(MobileFormHousehold household) {
 		
 		// look for existing MobileFormHousehold object
 		// TODO make this more intelligent? meh.
@@ -91,94 +94,92 @@ public class HouseholdModuleConverter {
 		newHousehold.setHouseholdDef(getDefaultHouseholdDefinition());
 		
 		// save the household
-		newHousehold = getService().saveHouseholdGroup(newHousehold);
+		getService().saveHouseholdGroup(newHousehold);
 		
 		// add the index patient as a household member
 		if (household.getHousehead() != null) {
 			addMembership(household.getHousehead(), household.getHouseholdIdentifier(), true);
 		}
+	}
+
+	public void addEncounter(MobileFormHousehold mfh, Survey survey) {
+		if (mfh == null || survey == null)
+			return;
+		
+		// get existing household from mfh
+		Household household = getService().getHouseholdGroupByIdentifier(mfh.getHouseholdIdentifier());
+		if (household == null) {
+			addHousehold(mfh);
+
+			// try again
+			household = getService().getHouseholdGroupByIdentifier(mfh.getHouseholdIdentifier());
+			if (household == null)
+				throw new APIException("could not find household " + mfh.getHouseholdIdentifier() + ", even immediately after creating it.");
+		}
 		
 		// create a new household encounter
 		HouseholdEncounter encounter = new HouseholdEncounter();
-		encounter.setHouseholdGroupId(newHousehold);
-		encounter.setCreator(household.getCreator());
-		encounter.setDateCreated(household.getDateCreated());
+		encounter.setHouseholdGroupId(household);
+		encounter.setCreator(mfh.getCreator());
+		encounter.setDateCreated(mfh.getDateCreated());
 		
-		// get the latest survey
-		Collection<Survey> surveys = household.getSurveys();
-		Survey survey = null;
-		for (Survey s: surveys) {
-			if (s != null && (survey == null || s.getDateCreated().after(survey.getDateCreated())))
-				survey = s;
-		}
-		
-		if (survey != null) {
-			// set the provider, if possible
-			User provider = Context.getUserService().getUserByUsername(survey.getProviderId());
-			if (provider != null)
-				encounter.setProvider(provider.getPerson());
-			else
-				log.warn("nooooooooo ... provider is nulllllllll.");
+		// set the provider, if possible
+		User provider = Context.getUserService().getUserByUsername(survey.getProviderId());
+		if (provider != null)
+			encounter.setProvider(provider.getPerson());
+		else
+			log.warn("nooooooooo ... provider is null!!!!!!!1");
+
+		// also use survey for creator and date created
+		encounter.setCreator(survey.getCreator());
+		encounter.setDateCreated(survey.getDateCreated());
+
+		// use the survey's "end time" as the encounter datetime
+		encounter.setHouseholdEncounterDatetime(survey.getEndTime());
 			
-			// also use survey for creator and date created
-			encounter.setCreator(survey.getCreator());
-			encounter.setDateCreated(survey.getDateCreated());
-			
-			// use the survey's "end time" as the encounter datetime
-			encounter.setHouseholdEncounterDatetime(survey.getEndTime());
-			
-		} else {
-			// fill in some defaults since no survey exists (weird)
-			log.warn("could not find a survey, using defaults for household encounter provider and datetime.");
-			encounter.setProvider(Context.getAuthenticatedUser().getPerson());
-			encounter.setHouseholdEncounterDatetime(new Date());
-		}
-		
 		// use the built-in default household encounter type
 		encounter.setHouseholdEncounterType(getDefaultHouseholdEncounterType());
 
 		// set the encounter location
-		encounter.setHouseholdLocation(buildHouseholdLocation(household));
+		encounter.setHouseholdLocation(buildHouseholdLocation(mfh));
 		
 		// create household observations for ...
 		
 		// -- number of adults
 		addNumericObservation(encounter, 
 				getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_ADULTS)), 
-				household.getAdults());
+				mfh.getAdults());
 
 		// -- number of children
 		addNumericObservation(encounter, 
 				getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_CHILDREN)), 
-				household.getChildren());
+				mfh.getChildren());
 
 		// -- number of eligible adults
 		addNumericObservation(encounter, 
 				getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_ELIGIBLE_ADULTS)), 
-				household.getAdultsEligible());
+				mfh.getAdultsEligible());
 
 		// -- number of eligible children
 		addNumericObservation(encounter, 
 				getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_ELIGIBLE_CHILDREN)), 
-				household.getChildrenEligible());
+				mfh.getChildrenEligible());
 
 		// -- survey's return visit date
-		if (survey != null) {
-			Date returnVisitDate= survey.getReturnDate();
-			if (returnVisitDate != null)
-				addDateObservation(encounter, 
-						getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_RETURN_VISIT_DATE)), 
-						returnVisitDate);
-		}
+		Date returnVisitDate = survey.getReturnDate();
+		if (returnVisitDate != null)
+			addDateObservation(encounter, 
+					getCachedConcept(getGP(MobileFormEntryConstants.GP_CONCEPT_RETURN_VISIT_DATE)), 
+					returnVisitDate);
 		
 		// -- all economics
-		for (Economic economic: household.getEconomics())
+		for (Economic economic: mfh.getEconomics())
 			addEconomicObservation(encounter, economic);
 		
 		// save the household encounter
 		getService().saveHouseholdEncounter(encounter);
 	}
-
+	
 	/**
 	 * creates a membership of the given patient to the household
 	 * 

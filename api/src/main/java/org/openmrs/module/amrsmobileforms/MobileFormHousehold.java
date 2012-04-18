@@ -3,7 +3,6 @@ package org.openmrs.module.amrsmobileforms;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-
 import org.openmrs.Auditable;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.Person;
@@ -274,8 +273,12 @@ public class MobileFormHousehold extends BaseOpenmrsObject implements Auditable 
 	}
 	
 	public void addSurvey(Survey survey) {
-		if (surveys==null)
-			this.surveys=new HashSet<Survey>();
+		if (survey == null)
+			return;
+		
+		if (surveys == null)
+			this.surveys = new HashSet<Survey>();
+		
 		survey.setHousehold(this);
 		surveys.add(survey);
 	}

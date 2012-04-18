@@ -1,13 +1,11 @@
 package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -102,13 +100,15 @@ public class MobileFormQueueProcessor {
 					household.addEconomic(economic);
 				
 				// add Survey
-				household.addSurvey(MobileFormEntryUtil.getSurvey(doc, xp));
+				Survey survey = MobileFormEntryUtil.getSurvey(doc, xp);
+				household.addSurvey(survey);
 				
 				// save the household
 				mfes.saveHousehold(household);
 				
-				// save the household in Household Module
-				HouseholdModuleConverter.getInstance().addHouseholdAndEncounter(household);
+				// save the household and encounter in Household Module
+				HouseholdModuleConverter.getInstance().addHousehold(household);
+				HouseholdModuleConverter.getInstance().addEncounter(household, survey);
 				
 				// queue form for splitting
 				saveFormInPendingSplit(queue.getFileSystemUrl());

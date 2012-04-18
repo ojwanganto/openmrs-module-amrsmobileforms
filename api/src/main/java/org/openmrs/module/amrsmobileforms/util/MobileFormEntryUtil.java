@@ -297,6 +297,7 @@ public class MobileFormEntryUtil {
 		lstEconomic.add(createEconomic(MobileFormEntryConstants.ECONOMIC_CHILDREN_IN_HOUSEHOLD, xp.evaluate(MobileFormEntryConstants.ECONOMIC_CHILDREN_IN_HOUSEHOLD, economicNode),mfes));
 		lstEconomic.add(createEconomic(MobileFormEntryConstants.ECONOMIC_CHILDREN_IN_SCHOOL, xp.evaluate(MobileFormEntryConstants.ECONOMIC_CHILDREN_IN_SCHOOL, economicNode),mfes));
 		lstEconomic.add(createEconomic(MobileFormEntryConstants.ECONOMIC_BEDNET_VOUCHER, xp.evaluate(MobileFormEntryConstants.ECONOMIC_BEDNET_VOUCHER, economicNode),mfes));
+		
     	return lstEconomic;
 	}
 
@@ -311,13 +312,16 @@ public class MobileFormEntryUtil {
 				economic.setValueText(objectValue);
 		}
 		
-		
 		return economic;
 	}
 	
 	public static Survey getSurvey(Document doc, XPath xp) throws XPathExpressionException{
 		Survey survey=new Survey();
 		Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+		if (surveyNode == null || !surveyNode.hasChildNodes()) {
+			log.warn("empty or missing survey node; returning null survey.");
+			return null;
+		}
 		
 		//CREATE SURVEY
 		survey.setSurveyIdentifier(xp.evaluate(MobileFormEntryConstants.SURVEY_SURVEY_ID, surveyNode));
