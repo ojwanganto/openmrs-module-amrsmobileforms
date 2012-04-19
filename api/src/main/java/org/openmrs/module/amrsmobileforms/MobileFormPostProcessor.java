@@ -110,10 +110,8 @@ public class MobileFormPostProcessor {
 			//Check ID and add new HCT ID
 			if (StringUtils.hasText(hctID)) {
 				try {
-					PatientIdentifierType patIdType = Context.getPatientService().getPatientIdentifierType(
-							MobileFormEntryConstants.DEFAULT_HCT_IDENTIFIER_TYPE);
-					Location loc = Context.getLocationService().getLocation(
-							MobileFormEntryConstants.DEFAULT_HCT_IDENTIFIER_LOCATION);
+					PatientIdentifierType patIdType = getHCTPatientIdentifier();
+					Location loc = getHCTIdentifierLocation();
 					PatientIdentifier iden = new PatientIdentifier(hctID, patIdType, loc);
 					pat.addIdentifier(iden);
 				} catch(Exception ex) {
@@ -124,8 +122,7 @@ public class MobileFormPostProcessor {
 			//Check Phone number and add it
 			if (StringUtils.hasText(phoneNumber)) {
 				try {
-					PersonAttributeType perAttType = Context.getPersonService().getPersonAttributeType(
-							MobileFormEntryConstants.DEFAULT_PHONENUMBER_ATTRIBUTE_TYPE);
+					PersonAttributeType perAttType = getPhoneNumberAttributeType();
 					PersonAttribute personAttribute = new PersonAttribute(perAttType, phoneNumber);
 					pat.addAttribute(personAttribute);
 				} catch(Exception ex) {
@@ -280,4 +277,49 @@ public class MobileFormPostProcessor {
 		
 		return pa;
 	}
+
+	/**
+	 * gets the default HCT Patient Identifier from a global property.
+	 * 
+	 * @return 
+	 */
+	private PatientIdentifierType getHCTPatientIdentifier() {
+		return Context.getPatientService().getPatientIdentifierType(
+				getNumericGP(MobileFormEntryConstants.GP_HCT_IDENTIFIER_TYPE));
+	}
+
+	/**
+	 * gets the default HCT Identifier Location from a global property.
+	 * 
+	 * @return 
+	 */
+	private Location getHCTIdentifierLocation() {
+		return Context.getLocationService().getLocation(
+				getNumericGP(MobileFormEntryConstants.GP_HCT_IDENTIFIER_LOCATION));
+	}
+
+	/**
+	 * gets the default Phone Number Person Attribute Type from a global property.
+	 * 
+	 * @return 
+	 */
+	private PersonAttributeType getPhoneNumberAttributeType() {
+		return Context.getPersonService().getPersonAttributeType(
+				getNumericGP(MobileFormEntryConstants.GP_PHONENUMBER_ATTRIBUTE_TYPE));
+	}
+
+	/**
+	 * gets a numeric global property value.
+	 * 
+	 * @param property
+	 * @return 
+	 */
+	private Integer getNumericGP(String property) {
+		try {
+			return Integer.parseInt(Context.getAdministrationService().getGlobalProperty(property));
+		} catch (NumberFormatException ex) {
+			throw new APIException("cannot interpret " + property + " value as a numeric.", ex);
+		}
+	}
+
 }

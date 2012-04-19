@@ -77,9 +77,9 @@ public class MobileFormEntryConstants {
 	public static final String GP_DEFAULT_HOUSEHOLD_ENCOUNTER_TYPE = "amrsmobileforms.defaultHouseholdEncounterType";
 	
 	// Post-processor defaults for creating identifiers and attributes
-	public static final Integer DEFAULT_HCT_IDENTIFIER_TYPE = 8;
-	public static final Integer DEFAULT_HCT_IDENTIFIER_LOCATION = 4;
-	public static final Integer DEFAULT_PHONENUMBER_ATTRIBUTE_TYPE = 10;
+	public static final String GP_HCT_IDENTIFIER_TYPE = "amrsmobileforms.hctIdentifierType";
+	public static final String GP_HCT_IDENTIFIER_LOCATION = "amrsmobileforms.hctIdentifierLocation";
+	public static final String GP_PHONENUMBER_ATTRIBUTE_TYPE = "amrsmobileforms.phonenumberAttributeType";
 	
 	/** The text/xml http content type. */
 	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";

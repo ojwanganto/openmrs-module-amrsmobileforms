@@ -118,6 +118,7 @@
 						<span class="saved">saved</span>
 					</form>
 				</td>
+			</tr>
 			<tr>
 				<td>Default Household Encounter Type</td>
 				<td id="encounterType">
