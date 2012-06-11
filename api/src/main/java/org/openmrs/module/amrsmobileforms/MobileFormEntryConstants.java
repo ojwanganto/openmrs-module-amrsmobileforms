@@ -78,7 +78,7 @@ public class MobileFormEntryConstants {
 	
 	// Post-processor defaults for creating identifiers and attributes
 	public static final String GP_HCT_IDENTIFIER_TYPE = "amrsmobileforms.hctIdentifierType";
-	public static final String GP_HCT_IDENTIFIER_LOCATION = "amrsmobileforms.hctIdentifierLocation";
+	public static final String GP_HCT_FORM_OVERRIDE = "amrsmobileforms.hctFormOverride";
 	public static final String GP_PHONENUMBER_ATTRIBUTE_TYPE = "amrsmobileforms.phonenumberAttributeType";
 	
 	/** The text/xml http content type. */

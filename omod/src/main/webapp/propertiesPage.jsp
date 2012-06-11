@@ -56,6 +56,24 @@
 				</td>
 			</tr>
 			<tr>
+				<td>HCT Form Override</td>
+				<td id="hctFormOverride">
+					<form>
+						<input type="hidden" name="property" value="amrsmobileforms.hctFormOverride"/>
+						<select name="value" onchange="enableSaveFor('hctFormOverride')">
+							<option value=""></option>
+							<c:forEach items="${forms}" var="form">
+								<option value="${form.id}" 
+									<c:if test="${form.id == hctFormOverride}">selected</c:if>
+									>${form.name}</option>
+							</c:forEach>
+						</select>
+						<input type="submit" name="save" onclick="return saveGPFor('hctFormOverride')" value="save"/>
+						<span class="saved">saved</span>
+					</form>
+				</td>
+			</tr>
+			<tr>
 				<td>Phone Number Attribute Type</td>
 				<td id="phonenumberAttributeType">
 					<form>

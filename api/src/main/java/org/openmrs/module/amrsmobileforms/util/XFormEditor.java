@@ -24,7 +24,10 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
+import org.openmrs.util.OpenmrsUtil;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -251,6 +254,12 @@ public class XFormEditor {
 			Node attribute = attributes.item(i);
 			rootElement.setAttribute(attribute.getNodeName(), attribute.getNodeValue());
 		}
+
+		// override the form id if it is set
+		String formOverride = getHCTFormOverride();
+		if (StringUtils.hasText(formOverride))
+			rootElement.setAttribute("id", formOverride);
+
 		newXMLDocument.appendChild(rootElement);
 		return rootElement;
 	}
@@ -350,5 +359,14 @@ public class XFormEditor {
 		filename.append((int) (Math.random() * 10000));
 		
 		return filename.toString();
+	}
+
+	/**
+	 * shortcut for getting the HCT Form Override global property.
+	 * 
+	 * @return 
+	 */
+	private static String getHCTFormOverride() {
+		return Context.getAdministrationService().getGlobalProperty(MobileFormEntryConstants.GP_HCT_FORM_OVERRIDE);
 	}
 }
