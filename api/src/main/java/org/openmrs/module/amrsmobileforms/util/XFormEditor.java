@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -226,8 +227,11 @@ public class XFormEditor {
 				writeDocument(individualProperties.item(i),root);
 			}
 			
+			//insert <catchment_area> tag to patient
+			insertCatchmentArea(root);
+			
 			//save the individual document
-			String targetFileName=MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() +
+			String targetFileName = MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() +
 			"/" + generateFileName(new Date()) + ".xml";
 			saveXMLDocument(newXMLDocument,targetFileName);
 		}
@@ -239,10 +243,10 @@ public class XFormEditor {
 	 */
 	private static Element createRootElement() throws ParserConfigurationException {
 		NodeList nodeList = document.getElementsByTagName(FORMROOTELEMENT);
-		Node formNode= nodeList.item(0);
+		Node formNode = nodeList.item(0);
 		NamedNodeMap attributes = formNode.getAttributes();
 		
-		Element rootElement=newXMLDocument.createElement(formNode.getNodeName()); 
+		Element rootElement = newXMLDocument.createElement(formNode.getNodeName()); 
 		for (int i = 0; i < attributes.getLength(); i++) {
 			Node attribute = attributes.item(i);
 			rootElement.setAttribute(attribute.getNodeName(), attribute.getNodeValue());
@@ -257,16 +261,30 @@ public class XFormEditor {
 	 */
 	private static void addHeaderNode(Element root) throws ParserConfigurationException {
 		NodeList nodeList = document.getElementsByTagName("header");
-		Node headerNode= nodeList.item(0);
-				
+		Node headerNode = nodeList.item(0);
+		
 		Element headerElement = newXMLDocument.createElement(headerNode.getNodeName());
 		root.appendChild(headerElement);
 		NodeList headerNodeList = headerNode.getChildNodes();
 		for (int i = 0; i < headerNodeList.getLength(); i++) {
-			writeDocument(headerNodeList.item(i),headerElement);
+			writeDocument(headerNodeList.item(i), headerElement);
 		}
 	}
 
+	/**
+	 * Adds /form/household/meta_data/catchment_area to patient
+	 * 
+	 * @param root 
+	 */
+	private static void insertCatchmentArea(Element root) {
+		NodeList sourceNodes = document.getElementsByTagName("catchment_area");
+		Node catchmentNode = sourceNodes.item(0);
+		
+		NodeList patientNodes = root.getElementsByTagName("patient");
+		Node patient = patientNodes.item(0);
+		
+		writeDocument(catchmentNode, (Element) patient);
+	}
 	
 	/**
 	 * Saves XML Document into XML file.

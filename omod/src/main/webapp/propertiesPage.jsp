@@ -56,24 +56,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td>HCT Identifier Location</td>
-				<td id="hctIdentifierLocation">
-					<form>
-						<input type="hidden" name="property" value="amrsmobileforms.hctIdentifierLocation"/>
-						<select name="value" onchange="enableSaveFor('hctIdentifierLocation')">
-							<option value=""></option>
-							<c:forEach items="${locations}" var="location">
-								<option value="${location.id}" 
-									<c:if test="${location.id == hctIdentifierLocation}">selected</c:if>
-									>${location.name}</option>
-							</c:forEach>
-						</select>
-						<input type="submit" name="save" onclick="return saveGPFor('hctIdentifierLocation')" value="save"/>
-						<span class="saved">saved</span>
-					</form>
-				</td>
-			</tr>
-			<tr>
 				<td>Phone Number Attribute Type</td>
 				<td id="phonenumberAttributeType">
 					<form>

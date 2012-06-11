@@ -147,6 +147,7 @@ public class MobileFormEntryConstants {
 	public final static String ESTIMATED_AGE = "approximate_age";
 	public final static String PATIENT_BIRTHDATE = "patient.birthdate";
 	public final static String PATIENT_PHONE = "patient.contact_phone_number";
+	public final static String PATIENT_CATCHMENT_AREA = "catchment_area";
 	
 	public final static String ENCOUNTER_NODE = "/form/encounter";
 	public final static String ENCOUNTER_PROVIDER = "encounter.provider_id";

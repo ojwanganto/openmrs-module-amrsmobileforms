@@ -26,13 +26,10 @@ public class PropertiesPageController {
 		map.put("systemVars", mfs.getSystemVariables());
 		
 		map.put("identifierTypes", Context.getPatientService().getAllPatientIdentifierTypes());
-		map.put("locations", Context.getLocationService().getAllLocations());
 		map.put("attributeTypes", Context.getPersonService().getAllPersonAttributeTypes());
 		
 		map.put("hctIdentifierType", Context.getAdministrationService()
 				.getGlobalProperty(MobileFormEntryConstants.GP_HCT_IDENTIFIER_TYPE));
-		map.put("hctIdentifierLocation", Context.getAdministrationService()
-				.getGlobalProperty(MobileFormEntryConstants.GP_HCT_IDENTIFIER_LOCATION));
 		map.put("phonenumberAttributeType", Context.getAdministrationService()
 				.getGlobalProperty(MobileFormEntryConstants.GP_PHONENUMBER_ATTRIBUTE_TYPE));
 		

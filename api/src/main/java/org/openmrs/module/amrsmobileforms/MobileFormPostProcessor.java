@@ -88,6 +88,7 @@ public class MobileFormPostProcessor {
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode);
 			String hctID = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
 			String householdIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
+			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
 			String phoneNumber = xp.evaluate(MobileFormEntryConstants.PATIENT_PHONE, curNode);
 
 			curNode = (Node) xp.evaluate(MobileFormEntryConstants.OBS_NODE, doc, XPathConstants.NODE);
@@ -111,7 +112,7 @@ public class MobileFormPostProcessor {
 			if (StringUtils.hasText(hctID)) {
 				try {
 					PatientIdentifierType patIdType = getHCTPatientIdentifier();
-					Location loc = getHCTIdentifierLocation();
+					Location loc = getHCTIdentifierLocation(householdLocation);
 					PatientIdentifier iden = new PatientIdentifier(hctID, patIdType, loc);
 					pat.addIdentifier(iden);
 				} catch(Exception ex) {
@@ -293,9 +294,15 @@ public class MobileFormPostProcessor {
 	 * 
 	 * @return 
 	 */
-	private Location getHCTIdentifierLocation() {
-		return Context.getLocationService().getLocation(
-				getNumericGP(MobileFormEntryConstants.GP_HCT_IDENTIFIER_LOCATION));
+	private Location getHCTIdentifierLocation(String location) {
+		Integer locationId = null;
+		try {
+			locationId = Integer.parseInt(location);
+		} catch (NumberFormatException ex) {
+			throw new APIException("Cannot find location " + location, ex);
+		}
+		
+		return Context.getLocationService().getLocation(locationId);
 	}
 
 	/**

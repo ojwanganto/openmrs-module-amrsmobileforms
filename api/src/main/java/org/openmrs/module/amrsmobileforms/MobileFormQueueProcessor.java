@@ -64,8 +64,8 @@ public class MobileFormQueueProcessor {
 			XPathFactory xpf = getXPathFactory();
 			XPath xp = xpf.newXPath();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
-			Node curNode=(Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
-			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID , curNode); 
+			Node curNode = (Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
+			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode); 
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
 			
 			// check household identifier and gps were entered correctly
@@ -89,7 +89,7 @@ public class MobileFormQueueProcessor {
 				mfes.saveErrorInDatabase(MobileFormEntryUtil.
 						createError(getFormName(queue.getFileSystemUrl()), "Error processing household", 
 								"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")"));
-			}else{
+			} else {
 				
 				// get or create household
 				log.debug("Processing household with id " + householdIdentifier);
