@@ -136,9 +136,14 @@ public class MobileFormPostProcessor {
 				boolean found = false;
 				Iterator<PersonAddress> addresses = pat.getAddresses().iterator();
 				
-				while (addresses.hasNext() && !found)
-					found = matchingAddress(mfh, addresses.next());
-
+				while (addresses.hasNext()) {
+					PersonAddress address = addresses.next();
+					if (address.isBlank())
+						pat.removeAddress(address);
+					else
+						found = found || matchingAddress(mfh, address);
+				}
+					
 				if (!found)
 					pat.addAddress(createAddress(mfh));
 			}
