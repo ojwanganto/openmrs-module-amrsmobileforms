@@ -138,11 +138,6 @@
 		<description>HCT patient identifier type id to use when creating HCT patient identifiers from Mobile Form Entry submissions.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.hctFormOverride</property>
-		<defaultValue></defaultValue>
-		<description>AMPATH form to use for all HCT encounters.</description>
-	</globalProperty>
-	<globalProperty>
 		<property>@MODULE_ID@.phonenumberAttributeType</property>
 		<defaultValue>10</defaultValue>
 		<description>Phone number person attribute type id to use when creating phone number person attributes from Mobile Form Entry submissions.</description>

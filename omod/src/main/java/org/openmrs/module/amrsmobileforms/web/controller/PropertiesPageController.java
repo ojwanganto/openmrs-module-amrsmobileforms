@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Controller for properties page jsp
+ * Controllerf for properties page jsp
  * 
  * @author Samuel Mbugua
  */
@@ -26,13 +26,10 @@ public class PropertiesPageController {
 		map.put("systemVars", mfs.getSystemVariables());
 		
 		map.put("identifierTypes", Context.getPatientService().getAllPatientIdentifierTypes());
-		map.put("forms", Context.getFormService().getAllForms());
 		map.put("attributeTypes", Context.getPersonService().getAllPersonAttributeTypes());
 		
 		map.put("hctIdentifierType", Context.getAdministrationService()
 				.getGlobalProperty(MobileFormEntryConstants.GP_HCT_IDENTIFIER_TYPE));
-		map.put("hctFormOverride", Context.getAdministrationService()
-				.getGlobalProperty(MobileFormEntryConstants.GP_HCT_FORM_OVERRIDE));
 		map.put("phonenumberAttributeType", Context.getAdministrationService()
 				.getGlobalProperty(MobileFormEntryConstants.GP_PHONENUMBER_ATTRIBUTE_TYPE));
 		
