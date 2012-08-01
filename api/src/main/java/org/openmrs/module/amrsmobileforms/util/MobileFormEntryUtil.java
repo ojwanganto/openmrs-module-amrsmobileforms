@@ -254,10 +254,6 @@ public class MobileFormEntryUtil {
 		if (xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode)!= null)
 			setLocations(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_VILLAGE , householdMetaNode));
 		
-		//CREATE A HOUSEHOLD OBJECT
-		
-		org.openmrs.module.household.model.Household newHousehold = new org.openmrs.module.household.model.Household();
-		
 		//Set household identifier
 		household.setHouseholdIdentifier(xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID , householdMetaNode));
 		
@@ -378,8 +374,12 @@ public class MobileFormEntryUtil {
 	}
 	
 	private static String getGPS(String s) {
-        String[] sa = s.split(" ");
-        return formatGps(Double.parseDouble(sa[0]),"lat") + " " + formatGps(Double.parseDouble(sa[1]),"lon");
+		// commented out because we want to retain the more precise values
+		// from the mobile device; this code may be used elsewhere for exporting
+		// GPS to a Garmin eTrex device.
+        // String[] sa = s.split(" ");
+        // return formatGps(Double.parseDouble(sa[0]),"lat") + " " + formatGps(Double.parseDouble(sa[1]),"lon");
+		return s;
     }
 	
     /**
