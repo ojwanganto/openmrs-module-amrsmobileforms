@@ -123,13 +123,23 @@ public class HouseholdModuleConverter {
 		encounter.setCreator(mfh.getCreator());
 		encounter.setDateCreated(mfh.getDateCreated());
 		
-		// set the provider, if possible
-		User provider = Context.getUserService().getUserByUsername(survey.getProviderId());
-		if (provider != null)
-			encounter.setProvider(provider.getPerson());
+		// get the provider (including retired/voided ones), if possible
+		User provider = null;
+		List<User> possibleProviders = Context.getUserService().getUsers(survey.getProviderId(), null, true);
+		if (possibleProviders == null || possibleProviders.isEmpty())
+			throw new APIException("no provider found for " + survey.getProviderId());
+		else if (possibleProviders.size() > 1)
+			throw new APIException("multiple (" + possibleProviders.size() + ") providers found for " + survey.getProviderId());
 		else
-			log.warn("nooooooooo ... provider is null!!!!!!!1");
+			provider = possibleProviders.get(0);
 
+		// double check provider's existence
+		if (provider == null)
+			throw new APIException("null provider found for " + survey.getProviderId());
+		
+		// set provider on the encounter
+		encounter.setProvider(provider.getPerson());
+		
 		// also use survey for creator and date created
 		encounter.setCreator(survey.getCreator());
 		encounter.setDateCreated(survey.getDateCreated());
