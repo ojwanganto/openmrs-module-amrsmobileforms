@@ -22,7 +22,7 @@
 	/* error table */
 	#errors { margin: 1em; }
 	#errors table { width: 100%; }
-	#tools { display: none; margin: 1em; }
+	#tools { margin: 1em; }
 	.centered { text-align: center; }
 
 	/* datatable stuff */
@@ -50,13 +50,22 @@
 				{ aTargets: ["_all"], bSortable: false },
 				{
 					aTargets: [0],
+					sClass: "centered",
+					mData: null,
+				    mRender: function(data, type, full) {
+							var id = full.id;
+							return '<input name="errorIds" type="checkbox" value="' + id + '"/>';
+						}
+				},
+				{
+					aTargets: [1],
+					mData: "id",
 					sName: "id",
 					sClass: "centered",
-				    fnRender: function(oObj) {
-							var id = oObj.aData[0];
+				    mRender: function(data, type, full) {
+							var id = full.id;
 							var out = "";
-							// var out = '<input name="errorIds" type="checkbox" value="' + id + '"/>';
-							if (oObj.aData[4]) {
+							if (full.comment) {
 								out += '<button class="action resolve" errorId="' + id + '">Resolve</button>';
 							} else {
 								out += '<button class="action comment" errorId="' + id + '">Comment</button>';
@@ -64,16 +73,24 @@
 							return out;
 						}
 				},
-				{
-					aTargets: [-1],
-					sName: "comment",
-					sClass: "centered"
-				}
+				{ aTargets: [2], mData: "error" },
+				{ aTargets: [3], mData: "errorDetails" },
+				{ aTargets: [4], mData: "formName" },
+				{ aTargets: [5], mData: "comment", sClass: "centered" }
 			],
 			bProcessing: true,
 			bServerSide: true,
 			bStateSave: false,
-			// fnDrawCallback: function(oSettings){ $j("span.numDisplayed").html(oSettings.fnRecordsDisplay()); },
+			fnDrawCallback: function(oSettings){
+				if ($j("span.numDisplayed").html() == oSettings.fnRecordsDisplay()) {
+					$j("input[name=errorIds]").attr("checked", "checked");
+				} else {
+					$j("span.numDisplayed").html(oSettings.fnRecordsDisplay());
+					$j("#selectAll").removeAttr("checked");
+					$j("input[name=errorIds]").removeAttr("checked");
+					updateNumSelected(0);
+				}
+			},
 			sAjaxSource: "<openmrs:contextPath/>/module/amrsmobileforms/errorList.json"
 		});
 
@@ -81,6 +98,7 @@
 		$j("button.comment").live("click", function(){ document.location = "resolveErrorComment.form?errorId=" + $j(this).attr("errorId"); return false; });
 		$j("button.resolve").live("click", function(){ document.location = "resolveError.form?errorId=" + $j(this).attr("errorId"); return false; });
 
+		// click event for selectAll checkbox
 		$j("#selectAll").click(function(){
 			if ($j(this).is(":checked")) {
 				$j("input[name=errorIds]").attr("checked", "checked");
@@ -91,10 +109,28 @@
 			}
 		});
 
+		// click event for individual checkboxes
 		$j("input[name=errorIds]").live("click", function(){ updateNumSelected(); });
+
+		// click event for reprocessAll button
+		$j("#reprocessAll").click(function(){
+			var url = "reprocessBatch.htm";
+			// TODO use formdata or jquery to manipulate errorIds into something cool
+			var params = [];
+			$j("input[name=errorIds]:checked").each(function(){
+				params.push("errorIds=" + $j(this).val());
+			});
+			if ($j("#selectAll").is(":checked")) {
+				params.push("all=1");
+			}
+			params.push("query=" + $j("div.dataTables_filter input").val());
+			document.location = url + "?" + params.join("&");
+		});
 	});
 
-
+	/**
+	 * updates the numSelected element with a specified amount, with some after-effects
+	 **/
 	function updateNumSelected(amount){
 		var numSelected = (typeof amount === "undefined") ? $j("input[name=errorIds]:checked").length : amount;
 
@@ -105,7 +141,7 @@
 		else
 			$j("#reprocessAll").attr("disabled", "disabled");
 
-		if (numSelected != $j("#numDisplayed").html())
+		if (numSelected != $j("span.numDisplayed").html())
 			$j("#selectAll").removeAttr("checked");
 	}
 
@@ -123,6 +159,7 @@
 				<table id="errorTable" cellpadding="8" cellspacing="0">
 					<thead>
 						<tr>
+							<th>Select</th>
 							<th>Action</th>
 							<th>Error</th>
 							<th>Error Details</th>

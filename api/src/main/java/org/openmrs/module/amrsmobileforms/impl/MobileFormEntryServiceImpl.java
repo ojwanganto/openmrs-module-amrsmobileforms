@@ -328,7 +328,7 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 		return dao.saveEconomicConceptMap(ecm);
 	}
 
-	public List<MobileFormEntryError> getErrorBatch(int start, int length, String query) {
+	public List<MobileFormEntryError> getErrorBatch(Integer start, Integer length, String query) {
 		return dao.getErrorBatch(start, length, query);
 	}
 

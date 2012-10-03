@@ -360,6 +360,40 @@ public class ResolveErrorsController {
 	}
 
 	/**
+	 * Controller for reprocessing errors from list page
+	 */
+	@RequestMapping(value = "/module/amrsmobileforms/reprocessBatch")
+	public String reprocessBatch(
+		@RequestParam(value="errorIds", required=false) List<Integer> errorIds,
+		@RequestParam(value="all", required=false) Boolean all,
+		@RequestParam(value="query", required=false) String query,
+		HttpSession httpSession) {
+
+		// give up quickly if nothing is specified
+		if (errorIds == null && all == null && query == null) {
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Nothing specified for reprocessing.");
+			return "redirect:resolveErrors.list";
+		}
+
+		List<MobileFormEntryError> errors;
+		MobileFormEntryService mfs = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
+		// look first at the "all" indicator
+		if (all != null) {
+			// build list from all matching query (ignoring selected ids)
+			errors = mfs.getErrorBatch(0, null, query);
+		} else {
+			// build list from ids
+			errors = new ArrayList<MobileFormEntryError>();
+			for(Integer id: errorIds) {
+				errors.add(mfs.getErrorById(id));
+			}
+		}
+
+		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Found this many errors: " + errors.size());
+		return "redirect:resolveErrors.list";
+	}
+
+	/**
 	 * return a batch of errors according to request
 	 *
 	 * @param iDisplayStart start index for search
@@ -385,7 +419,7 @@ public class ResolveErrorsController {
 		// form the results dataset
 		List<Object> results = new ArrayList<Object>();
 		for (MobileFormEntryError error : errors) {
-			results.add(generateTableRow(error));
+			results.add(generateObjectMap(error));
 		}
 
 		// build the response
@@ -405,15 +439,16 @@ public class ResolveErrorsController {
 	 * @param error MobileFormEntryError object
 	 * @return object array for use with datatables
 	 */
-	private Object[] generateTableRow(MobileFormEntryError error) {
+	private Map<String, Object> generateObjectMap(MobileFormEntryError error) {
 		// try to stick to basic types; String, Integer, etc (not Date)
 		// JSP expects: [id, error, details, form name, comment]
-		return new Object[]{
-				error.getId().toString(),
-				error.getError(),
-				error.getErrorDetails(),
-				error.getFormName(),
-				error.getComment()
-			};
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("id", error.getId());
+		result.put("error", error.getError());
+		result.put("errorDetails", error.getErrorDetails());
+		result.put("formName", error.getFormName());
+		result.put("comment", error.getComment());
+		return result;
 	}
+
 }

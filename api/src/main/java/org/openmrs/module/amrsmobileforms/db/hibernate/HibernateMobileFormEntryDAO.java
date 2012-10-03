@@ -203,11 +203,13 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 		return crit;
 	}
 
-	public List<MobileFormEntryError> getErrorBatch(int start, int length, String query) {
+	public List<MobileFormEntryError> getErrorBatch(Integer start, Integer length, String query) {
 		Criteria crit = getErrorCriteria(query);
 
 		crit.setFirstResult(start);
-		crit.setMaxResults(length);
+		if (length != null) {
+			crit.setMaxResults(length);
+		}
 		crit.addOrder(Order.asc("dateCreated"));
 
 		return crit.list();

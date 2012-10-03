@@ -157,7 +157,7 @@ public interface MobileFormEntryService {
 
 	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm);
 
-	public List<MobileFormEntryError> getErrorBatch(int start, int length, String query);
+	public List<MobileFormEntryError> getErrorBatch(Integer start, Integer length, String query);
 
 	public Number countErrors(String query);
 }
