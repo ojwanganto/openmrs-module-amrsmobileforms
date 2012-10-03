@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -257,14 +258,14 @@ public class ResolveErrorsController {
 	}
 
 	private static String getFormType(String formName) {
-		if (formName == null || formName.trim() == "") {
+		if (StringUtils.isEmpty(formName)) {
 			return null;
 		}
-		if (formName.startsWith("/HCT")) {
+		// TODO make this more secure ... not all forms will have "HCT" in the name.
+		if (formName.contains("HCT")) {
 			return "household";
-		} else {
-			return "patient";
 		}
+		return "patient";
 	}
 
 	/**
