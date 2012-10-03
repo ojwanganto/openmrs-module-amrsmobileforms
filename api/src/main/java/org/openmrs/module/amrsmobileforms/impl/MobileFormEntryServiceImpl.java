@@ -12,10 +12,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.amrsmobileforms.*;
+import org.openmrs.module.amrsmobileforms.Economic;
+import org.openmrs.module.amrsmobileforms.EconomicConceptMap;
+import org.openmrs.module.amrsmobileforms.EconomicObject;
+import org.openmrs.module.amrsmobileforms.HouseholdMember;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import org.openmrs.module.amrsmobileforms.MobileFormHousehold;
+import org.openmrs.module.amrsmobileforms.MobileFormQueue;
+import org.openmrs.module.amrsmobileforms.Survey;
+import org.openmrs.module.amrsmobileforms.SyncLogModel;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 
@@ -318,5 +326,13 @@ public class MobileFormEntryServiceImpl implements MobileFormEntryService {
 
 	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm) {
 		return dao.saveEconomicConceptMap(ecm);
+	}
+
+	public List<MobileFormEntryError> getErrorBatch(int start, int length, String query) {
+		return dao.getErrorBatch(start, length, query);
+	}
+
+	public Number countErrors(String query) {
+		return dao.countErrors(query);
 	}
 }

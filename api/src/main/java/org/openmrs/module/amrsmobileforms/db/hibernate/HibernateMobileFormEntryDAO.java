@@ -1,11 +1,20 @@
 package org.openmrs.module.amrsmobileforms.db.hibernate;
 
 import java.util.List;
-
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
-import org.openmrs.module.amrsmobileforms.*;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.openmrs.module.amrsmobileforms.Economic;
+import org.openmrs.module.amrsmobileforms.EconomicConceptMap;
+import org.openmrs.module.amrsmobileforms.EconomicObject;
+import org.openmrs.module.amrsmobileforms.HouseholdMember;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
+import org.openmrs.module.amrsmobileforms.MobileFormHousehold;
+import org.openmrs.module.amrsmobileforms.Survey;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 
 /**
@@ -178,5 +187,35 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm) {
 		sessionFactory.getCurrentSession().saveOrUpdate(ecm);
 		return ecm;
+	}
+
+	private Criteria getErrorCriteria(String query) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(MobileFormEntryError.class);
+
+		if (query != null && !query.isEmpty()) {
+			crit.add(Restrictions.or(
+				Restrictions.like("error", query, MatchMode.ANYWHERE),
+				Restrictions.or(
+					Restrictions.like("errorDetails", query, MatchMode.ANYWHERE),
+					Restrictions.like("formName", query, MatchMode.ANYWHERE))));
+		}
+
+		return crit;
+	}
+
+	public List<MobileFormEntryError> getErrorBatch(int start, int length, String query) {
+		Criteria crit = getErrorCriteria(query);
+
+		crit.setFirstResult(start);
+		crit.setMaxResults(length);
+		crit.addOrder(Order.asc("dateCreated"));
+
+		return crit.list();
+	}
+
+	public Number countErrors(String query) {
+		Criteria crit = getErrorCriteria(query);
+		crit.setProjection(Projections.rowCount());
+		return (Number) crit.uniqueResult();
 	}
 }
