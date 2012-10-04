@@ -31,6 +31,7 @@ import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
 import org.openmrs.module.amrsmobileforms.MobileFormQueue;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 import org.openmrs.module.amrsmobileforms.util.XFormEditor;
+import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -127,9 +128,7 @@ public class ResolveErrorsController {
 					if (XFormEditor.editNode(filePath,
 						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
-						// delete the mobileformentry error queue item
-						mobileService.deleteError(errorItem);
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 					}
 				}
 			} else if ("assignBirthdate".equals(errorItemAction)) {
@@ -140,9 +139,7 @@ public class ResolveErrorsController {
 						if (XFormEditor.editNode(filePath,
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate)) {
 							// put form in queue for normal processing
-							saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
-							// delete the mobileformentry error queue item
-							mobileService.deleteError(errorItem);
+							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 						}
 					} catch (ParseException e) {
 						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Invalid date entered");
@@ -156,12 +153,8 @@ public class ResolveErrorsController {
 			} else if ("newIdentifier".equals(errorItemAction)) {
 				if (patientIdentifier != null && patientIdentifier.trim() != "") {
 					if (reverseNodes(filePath, patientIdentifier)) {
-
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
-
-						// delete the mobileformentry error queue item
-						mobileService.deleteError(errorItem);
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 					}
 				} else {
 					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
@@ -173,9 +166,7 @@ public class ResolveErrorsController {
 					if (XFormEditor.editNode(filePath,
 						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
 						// put form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
-						// delete the mobileformentry error queue item
-						mobileService.deleteError(errorItem);
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 					}
 				} else {
 					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
@@ -183,14 +174,10 @@ public class ResolveErrorsController {
 				}
 			} else if ("createPatient".equals(errorItemAction)) {
 				// put form in queue for normal processing
-				saveForm(filePath, MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath() + errorItem.getFormName());
-
-				// delete the mobileformentry error queue item
-				mobileService.deleteError(errorItem);
+				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 			} else if ("deleteError".equals(errorItemAction)) {
 				// delete the mobileformentry error queue item
 				mobileService.deleteError(errorItem);
-
 				//and delete from the file system
 				MobileFormEntryUtil.deleteFile(filePath);
 
@@ -214,9 +201,7 @@ public class ResolveErrorsController {
 						MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_INDIVIDUALS_PREFIX,
 						"patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
 						// drop form in queue for normal processing
-						saveForm(filePath, MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath() + errorItem.getFormName());
-						// delete the mobileformentry error queue item
-						mobileService.deleteError(errorItem);
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
 					} else {
 						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
 						return "redirect:resolveErrors.list";
@@ -389,8 +374,49 @@ public class ResolveErrorsController {
 			}
 		}
 
-		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Found this many errors: " + errors.size());
+		// reprocess each error -- placing into initial drop directory for now
+		// TODO see if there's some way to decide where this file should go if not always the drop dir
+		Integer countHouseholds = 0;
+		Integer countPatients = 0;
+		for (MobileFormEntryError error: errors) {
+			if (OpenmrsUtil.nullSafeEquals(getFormType(error.getFormName()), "household")) {
+				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), error);
+				countHouseholds++;
+			} else {
+				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), error);
+				countPatients++;
+			}
+		}
+
+		// send a message back
+		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, 
+			"Sent " + errors.size() + " form" + (errors.size() == 1 ? "" : "s")
+				+ " back for reprocessing: "
+				+ countHouseholds + " household" + (countHouseholds == 1 ? "" : "s") + ", "
+				+ countPatients + " patient" + (countPatients == 1 ? "" : "s") + ".");
 		return "redirect:resolveErrors.list";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private MobileFormEntryService getMobileFormEntryService(){
+		return Context.getService(MobileFormEntryService.class);
+	}
+
+	/**
+	 *
+	 * @param destination
+	 * @param error
+	 */
+	private void moveAndDeleteError(String destination, MobileFormEntryError error) {
+		// find error location
+		String filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + error.getFormName();
+		// put form in queue for normal processing
+		saveForm(filePath, destination + error.getFormName());
+		// delete the mobileformentry error queue item
+		getMobileFormEntryService().deleteError(error);
 	}
 
 	/**

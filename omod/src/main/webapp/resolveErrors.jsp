@@ -82,7 +82,7 @@
 			bServerSide: true,
 			bStateSave: false,
 			fnDrawCallback: function(oSettings){
-				if ($j("span.numDisplayed").html() == oSettings.fnRecordsDisplay()) {
+				if ($j("span.numSelected").html() == oSettings.fnRecordsDisplay()) {
 					$j("input[name=errorIds]").attr("checked", "checked");
 				} else {
 					$j("span.numDisplayed").html(oSettings.fnRecordsDisplay());
