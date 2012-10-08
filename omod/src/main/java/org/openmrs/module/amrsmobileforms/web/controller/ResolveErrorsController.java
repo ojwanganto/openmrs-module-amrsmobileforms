@@ -132,18 +132,22 @@ public class ResolveErrorsController {
 					}
 				}
 			} else if ("assignBirthdate".equals(errorItemAction)) {
-				if (birthDate != null && birthDate.trim() != "") {
-					DateFormat df = new SimpleDateFormat();
+				// format provided birthdate and insert into patient data like so:
+				// <patient.birthdate openmrs_table="patient" openmrs_attribute="birthdate">2009-12-25</patient.birthdate>
+				if (StringUtils.isNotEmpty(birthDate)) {
+					DateFormat reader = DateFormat.getDateInstance(DateFormat.SHORT, Context.getLocale());
+					DateFormat writer = new SimpleDateFormat("yyyy-MM-dd");
 					try {
-						birthDate = (String) df.parseObject(birthDate);
+						String formattedDate = writer.format(reader.parse(birthDate));
 						if (XFormEditor.editNode(filePath,
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate)) {
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, formattedDate)) {
 							// put form in queue for normal processing
 							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 						}
 					} catch (ParseException e) {
-						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Invalid date entered");
-						e.printStackTrace();
+						String error = "Birthdate was not assigned, Invalid date entered: " + birthDate;
+						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, error);
+						log.error(error, e);
 						return "redirect:resolveErrors.list";
 					}
 				} else {
