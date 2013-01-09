@@ -22,6 +22,11 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Encounter;
+import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import org.openmrs.module.amrsmobileforms.Survey;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -234,6 +239,31 @@ public class XFormEditor {
 		}
 	}
 
+	public static void wrapFormWithMobileMetadata(Document doc, Encounter encounter) throws ParserConfigurationException {
+			document = doc;
+			
+			// get the latest survey for this patient
+			Patient p = encounter.getPatient();
+			MobileFormEntryService mfes = Context.getService(MobileFormEntryService.class);
+			
+			//Create a new document
+			createNewXmlDoc();
+
+			//add root element
+			Element root = createRootElement();
+
+			//add header information 
+			addHeaderNode(root);
+			
+			// create household nodes
+			addMetaNode(root, new Survey());
+			addSurveyNode(root);
+			addHouseholdNode(root);
+
+			// update the doc as the new document
+			doc = newXMLDocument;
+	}
+	
 	/**
 	 * Creates a root element for the new xml document
 	 *
@@ -354,4 +384,70 @@ public class XFormEditor {
 
 		return filename.toString();
 	}
+
+	private static void addMetaNode(Element root, Survey survey) {
+		Element meta = newXMLDocument.createElement("meta");
+		
+		Element startTime = newXMLDocument.createElement("start_time");
+		startTime.setNodeValue(survey.getStartTime().toString());
+		meta.appendChild(startTime);
+		
+		Element endTime = newXMLDocument.createElement("end_time");
+		endTime.setNodeValue(survey.getEndTime().toString());
+		meta.appendChild(endTime);
+
+		Element device = newXMLDocument.createElement("device_id");
+		device.setNodeValue(survey.getDeviceId());
+		meta.appendChild(device);
+		
+		Element subscriber = newXMLDocument.createElement("subscriber_id");
+		subscriber.setNodeValue(survey.getSubscriberId());
+		meta.appendChild(subscriber);
+
+		root.appendChild(meta);
+	}
+
+	private static void addSurveyNode(Element root) {
+//  <survey>
+//    <provider_id>1156-9</provider_id>
+//    <team_id>team1</team_id>
+//    <survey_id />
+//    <allowed_in>accepted</allowed_in>
+//  </survey>
+	}
+
+	private static void addHouseholdNode(Element root) {
+//  <household>
+//    <meta_data>
+//      <household_id>19433069</household_id>
+//      <gps_location openmrs_attribute="latitude" openmrs_table="person_address">0.15318095684051514 34.039995074272156</gps_location>
+//      <village openmrs_attribute="city_village" openmrs_table="person_address">MADINDA,BUDALANGI,BUNYALA EAST,BUDALANGI,BUNYALA DISTRICT</village>
+//      <location openmrs_attribute="region" openmrs_table="person_address" />
+//      <catchment_area>20.0</catchment_area>
+//      <sublocation openmrs_attribute="sub_region" openmrs_table="person_address" />
+//      <district openmrs_attribute="county_district" openmrs_table="person_address" />
+//      <division openmrs_attribute="township_division" openmrs_table="person_address" />
+//      <household_adults>2</household_adults>
+//      <children_under13>0</children_under13>
+//      <total_household>2</total_household>
+//      <eligible_adults>2</eligible_adults>
+//      <total_eligible>2</total_eligible>
+//    </meta_data>
+//    <economics>
+//      <bednets_owned>2</bednets_owned>
+//      <bednets_given>0</bednets_given>
+//      <land_owned>2.0</land_owned>
+//      <cows_owned>4</cows_owned>
+//      <goats_owned>0</goats_owned>
+//      <sheep_owned>0</sheep_owned>
+//      <children_in_household>0</children_in_household>
+//      <economic_questions_group />
+//      <bednet_questions_group />
+//    </economics>
+//    <conduct_survey_group />
+//    <individuals>
+//      <individual>
+
+	}
+	
 }

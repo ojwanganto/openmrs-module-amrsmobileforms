@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
+import org.openmrs.Encounter;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -156,6 +157,8 @@ public interface MobileFormEntryService {
 	public EconomicConceptMap getEconomicConceptMap(Integer id);
 
 	public EconomicConceptMap saveEconomicConceptMap(EconomicConceptMap ecm);
+	
+	public String renderExportForEncounter(Encounter encounter);
 
 	public List<MobileFormEntryError> getErrorBatch(Integer start, Integer length, String query);
 
