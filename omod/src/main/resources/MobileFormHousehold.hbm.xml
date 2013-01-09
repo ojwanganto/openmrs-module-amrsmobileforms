@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="@MODULE_PACKAGE@">
 
-	<class name="Household" table="mobileformentry_household">
+	<class name="MobileFormHousehold" table="mobileformentry_household">
 
 		<id name="householdId" type="int" column="household_id" 
 			unsaved-value="0">

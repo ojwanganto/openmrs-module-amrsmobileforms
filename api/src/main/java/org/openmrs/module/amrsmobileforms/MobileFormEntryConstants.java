@@ -65,6 +65,21 @@ public class MobileFormEntryConstants {
 	/** Mobile-forms post processing directory. */
 	public final static String GP_MOBILE_FORMS_POST_PROCESS_DIR = "amrsmobileforms/post_process";
 	
+	// Concept global properties
+	public static final String GP_CONCEPT_ADULTS = "amrsmobileforms.concept.adults";
+	public static final String GP_CONCEPT_CHILDREN = "amrsmobileforms.concept.children";
+	public static final String GP_CONCEPT_ELIGIBLE_ADULTS = "amrsmobileforms.concept.eligibleAdults";
+	public static final String GP_CONCEPT_ELIGIBLE_CHILDREN = "amrsmobileforms.concept.eligibleChildren";
+	public static final String GP_CONCEPT_RETURN_VISIT_DATE = "amrsmobileforms.concept.returnVisitDate";
+
+	// Household-related default global properties
+	public static final String GP_DEFAULT_HOUSEHOLD_DEFINITION = "amrsmobileforms.defaultHouseholdDefinition";
+	public static final String GP_DEFAULT_HOUSEHOLD_ENCOUNTER_TYPE = "amrsmobileforms.defaultHouseholdEncounterType";
+	
+	// Post-processor defaults for creating identifiers and attributes
+	public static final String GP_HCT_IDENTIFIER_TYPE = "amrsmobileforms.hctIdentifierType";
+	public static final String GP_PHONENUMBER_ATTRIBUTE_TYPE = "amrsmobileforms.phonenumberAttributeType";
+	
 	/** The text/xml http content type. */
 	public final static String HTTP_HEADER_CONTENT_TYPE_XML = "text/xml; charset=utf-8";
 	
@@ -131,6 +146,7 @@ public class MobileFormEntryConstants {
 	public final static String ESTIMATED_AGE = "approximate_age";
 	public final static String PATIENT_BIRTHDATE = "patient.birthdate";
 	public final static String PATIENT_PHONE = "patient.contact_phone_number";
+	public final static String PATIENT_CATCHMENT_AREA = "catchment_area";
 	
 	public final static String ENCOUNTER_NODE = "/form/encounter";
 	public final static String ENCOUNTER_PROVIDER = "encounter.provider_id";

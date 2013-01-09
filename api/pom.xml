@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>amrsmobileforms</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.3-HHM-SNAPSHOT</version>
 	</parent>
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>amrsmobileforms-api</artifactId>
@@ -13,35 +13,50 @@
 	<description>API project for AMRS Mobile Forms</description>
 
 	<dependencies>
-		<!-- 
-		Add other dependencies from lib:
+		
 		<dependency>
-			<groupId>org.other.library</groupId>
-			<artifactId>library-name</artifactId>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>household-api</artifactId>
 		</dependency>
-		-->
 		
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>xforms</artifactId>
+		</dependency>
+
+		<!-- OpenMRS dependencies -->
+
+		<dependency>
+			<groupId>org.openmrs.api</groupId>
+			<artifactId>openmrs-api</artifactId>
 			<type>jar</type>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
-			<type>jar</type>
+			<type>test-jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
 			<artifactId>openmrs-web</artifactId>
 			<type>jar</type>
+			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.web</groupId>
+			<artifactId>openmrs-web</artifactId>
+			<type>test-jar</type>
+		</dependency>
+
 		<dependency>
 			<groupId>org.openmrs.test</groupId>
 			<artifactId>openmrs-test</artifactId>
-			<type>jar</type>
+			<type>pom</type>
 		</dependency>
+		
 	</dependencies>
 
 </project>

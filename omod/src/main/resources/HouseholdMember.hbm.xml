@@ -9,7 +9,7 @@
 
 		<id name="householdMemberId" type="int" column="household_member_id"/>
 		
-		<many-to-one name="household" class="Household" not-null="true">
+		<many-to-one name="household" class="MobileFormHousehold" not-null="true">
 			<column name="household_id" />
 		</many-to-one>
 	</class>

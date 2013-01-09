@@ -27,6 +27,14 @@
 		</li>
 	</openmrs:hasPrivilege>
 	
+	<openmrs:hasPrivilege privilege="Manage Economic Objects">
+		<li <c:if test='<%= request.getRequestURI().contains("amrsmobileforms/householdMappings") %>'>class="active"</c:if>>
+			<a href="${pageContext.request.contextPath}/module/amrsmobileforms/householdMappings.list">
+				<spring:message code="amrsmobileforms.householdMappings"/>
+			</a>
+		</li>
+	</openmrs:hasPrivilege>
+	
 	<openmrs:hasPrivilege privilege="View Mobile Form Errors">
 		<li <c:if test='<%= request.getRequestURI().contains("amrsmobileforms/resolveError") %>'>class="active"</c:if>>
 			<a href="${pageContext.request.contextPath}/module/amrsmobileforms/resolveErrors.list">

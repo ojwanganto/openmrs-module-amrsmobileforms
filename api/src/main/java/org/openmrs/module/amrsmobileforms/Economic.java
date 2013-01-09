@@ -13,7 +13,7 @@ import org.openmrs.User;
  */
 public class Economic extends BaseOpenmrsObject implements Auditable{
 	private Integer economicId;
-	private Household household;
+	private MobileFormHousehold household;
 	private EconomicObject valueQuestion;
 	private Double valueNumeric;
 	private String valueText;
@@ -35,13 +35,13 @@ public class Economic extends BaseOpenmrsObject implements Auditable{
 	/**
 	 * @return the householdId
 	 */
-	public Household getHousehold() {
+	public MobileFormHousehold getHousehold() {
 		return household;
 	}
 	/**
 	 * @param householdId the householdId to set
 	 */
-	public void setHousehold(Household household) {
+	public void setHousehold(MobileFormHousehold household) {
 		this.household = household;
 	}
 	/**

@@ -41,7 +41,7 @@
 							<td><b><spring:message code="amrsmobileforms.commentOnError.title" />: </b>${queueItem.comment}</td>
 						</tr>
 						<tr class="<c:choose><c:when test="${queueItemStatus.index % 2 == 0}">evenRow</c:when><c:otherwise>oddRow</c:otherwise></c:choose>">
-							<td colspan="2">
+							<td>
 								<!-- Info about the patient and encounter -->
 								<spring:message code="amrsmobileforms.commentOnError.commentor" />: 
 								<span >
@@ -67,48 +67,60 @@
 						<tr class="secondRow <c:choose><c:when test="${queueItemStatus.index % 2 == 0}">evenRow</c:when><c:otherwise>oddRow</c:otherwise></c:choose>">
 							<td>
 								<input type="hidden" name="amrsmobileformsErrorId" value="${queueItem.mobileFormEntryErrorId}"/>
+								
 								<!-- Pick a provider -->
 								<input type="radio" name="errorItemAction" value="linkProvider"/> <spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>:
 								<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
-								
+								<br />
+
 								<!-- Have the machinery create a new patient -->
-								<input type="radio" name="errorItemAction" value="createPatient" /> <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/> <br/>
+								<input type="radio" name="errorItemAction" value="createPatient" /> <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/>
+								<br/>
 								
 								<!-- Assign a new patient identifier-->
 								<input type="radio" name="errorItemAction" value="newIdentifier" /> <spring:message code="amrsmobileforms.resolveErrors.action.newIdentifier"/>:
-								<input type="text" name="patientIdentifier"/><br/>
+								<input type="text" name="patientIdentifier"/>
+								<br/>
 								
 								<!-- Assign a birth date to patient -->
 								<input type="radio" name="errorItemAction" value="assignBirthdate" /> <spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
-								<input type="text" name="birthDate" onClick="showCalendar(this)"/><br/>
+								<input type="text" name="birthDate" onClick="showCalendar(this)"/>
+								<br/>
 								
 								<!-- Link patient to household -->
 								<input type="radio" name="errorItemAction" value="linkHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.createLink"/>:
-								<input type="text" name="householdId"/><br/>
-							</td>
-							<td >
+								<input type="text" name="householdId"/>
+								<br/>
+
 								<input type="radio" name="errorItemAction" value="newHousehold" />	<spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
-								<input type="text" name="householdIdentifier"/><br/>
+								<input type="text" name="householdIdentifier"/>
+								<br/>
 								
 								<!-- This is an invalid comment, delete it -->
-								<input type="radio" name="errorItemAction" value="deleteComment" />	<spring:message code="amrsmobileforms.resolveErrors.action.deleteComment"/> <br/>
+								<input type="radio" name="errorItemAction" value="deleteComment" />	<spring:message code="amrsmobileforms.resolveErrors.action.deleteComment"/>
+								<br/>
 								
 								<!-- This is an invalid error, delete it -->
-								<input type="radio" name="errorItemAction" value="deleteError" /> <spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/> <br/>
+								<input type="radio" name="errorItemAction" value="deleteError" /> <spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
+								<br/>
 
 								<!-- I don't want to do anything to this one now -->
-								<input type="radio" name="errorItemAction" value="noChange" checked="checked"/> <spring:message code="amrsmobileforms.resolveErrors.action.noChange"/> <br/>
+								<input type="radio" name="errorItemAction" value="noChange" checked="checked"/> <spring:message code="amrsmobileforms.resolveErrors.action.noChange"/>
+								<br/>
 							</td>
 						</tr>
 						<tr>
-							<td><a href="#View Form [+]" onclick="return toggleLayer('xmlForm', this, '<spring:message code="amrsmobileforms.viewForm"/>', '<spring:message code="amrsmobileforms.hideForm"/>')"><spring:message code="amrsmobileforms.viewForm"/></a></td>
 							<td>
-								<br/><input type="submit" name="action" value='<spring:message code="general.submit" />' />
+								<a href="#View Form [+]" onclick="return toggleLayer('xmlForm', this, '<spring:message code="amrsmobileforms.viewForm"/>', '<spring:message code="amrsmobileforms.hideForm"/>')"><spring:message code="amrsmobileforms.viewForm"/></a>
+								<br/>
+								<input type="submit" name="action" value='<spring:message code="general.submit" />' />
 							</td>
 						</tr>
 						<tbody id="xmlForm" style="display: none">
 							<tr>
-								<td colspan="2"><textarea readonly="true" rows="20" cols="160">${queueItem.formName}</textarea></td>
+								<td>
+									<textarea readonly="true" rows="20" cols="160">${queueItem.formName}</textarea>
+								</td>
 							</tr>
 						</tbody>
 					</c:forEach>

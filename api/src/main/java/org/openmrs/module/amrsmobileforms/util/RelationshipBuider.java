@@ -9,7 +9,7 @@ import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsmobileforms.Household;
+import org.openmrs.module.amrsmobileforms.MobileFormHousehold;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
 
 /**
@@ -129,7 +129,7 @@ public class RelationshipBuider {
 	}
 	
 	private static void createHouseHead(String householdIdentifier, Person person) {
-		Household household = mfes.getHousehold(householdIdentifier);
+		MobileFormHousehold household = mfes.getHousehold(householdIdentifier);
 		if (household != null && household.getHousehead() == null){
 			household.setHousehead(person);
 			mfes.saveHousehold(household);

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>amrsmobileforms</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.3-HHM-SNAPSHOT</version>
 	</parent>
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>amrsmobileforms-omod</artifactId>
@@ -21,25 +21,58 @@
 		
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
+			<artifactId>household-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
+	 
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
 			<artifactId>xforms</artifactId>
 			<type>jar</type>
 		</dependency>
 		
 		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jzlib</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- OpenMRS dependencies -->
+
+		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
 			<type>jar</type>
 		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.api</groupId>
+			<artifactId>openmrs-api</artifactId>
+			<type>test-jar</type>
+		</dependency>
+
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
 			<artifactId>openmrs-web</artifactId>
 			<type>jar</type>
 		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.web</groupId>
+			<artifactId>openmrs-web</artifactId>
+			<type>test-jar</type>
+		</dependency>
+
 		<dependency>
 			<groupId>org.openmrs.test</groupId>
 			<artifactId>openmrs-test</artifactId>
-			<type>jar</type>
+			<type>pom</type>
 		</dependency>
+
 	</dependencies>
 
 	<build>
