@@ -4,6 +4,7 @@
  */
 package org.openmrs.module.amrsmobileforms.web;
 
+import org.openmrs.Encounter;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.EconomicConceptMap;
 import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
@@ -28,5 +29,11 @@ public class DWRAMRSMobileFormsService {
 		ecm.setConcept(Context.getConceptService().getConcept(conceptId));
 
 		return service.saveEconomicConceptMap(ecm);
+	}
+	
+	public String renderExportForEncounter(Integer encounterId) {
+		MobileFormEntryService service = Context.getService(MobileFormEntryService.class);
+		Encounter enc = Context.getEncounterService().getEncounter(encounterId);
+		return service.renderExportForEncounter(enc);
 	}
 }

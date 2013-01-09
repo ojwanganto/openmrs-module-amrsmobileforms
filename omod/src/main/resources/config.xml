@@ -149,6 +149,7 @@
 			<create creator="new" javascript="DWRAMRSMobileFormsService">
 				<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRAMRSMobileFormsService"/>
 				<include method="saveEconomicConceptMap"/>
+				<include method="renderExportForEncounter"/>
 			</create>
 			<convert converter="bean" match="@MODULE_PACKAGE@.EconomicConceptMap"/>
 		</allow>
@@ -157,6 +158,7 @@
 			<![CDATA[
 			import @MODULE_PACKAGE@.web.DWRAMRSMobileFormsService;
 				DWRAMRSMobileFormsService.saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId);
+				DWRAMRSMobileFormsService.renderExportForEncounter(Integer encounterId);
 			]]>
 		</signatures>	
 	</dwr>
