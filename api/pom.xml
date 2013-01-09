@@ -13,8 +13,23 @@
 	<description>API project for AMRS Mobile Forms</description>
 
 	<dependencies>
-		
+	
 		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>  
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.kxml</groupId>
+			<artifactId>kxml2</artifactId>
+		</dependency>
+
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jzlib</artifactId>
+        </dependency>
+
+        <dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>household-api</artifactId>
 		</dependency>
