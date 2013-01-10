@@ -260,7 +260,7 @@ public class ResolveErrorsController {
 	/**
 	 * Converts an xml file specified by <b>formPath</b> to a string
 	 *
-	 * @param formPath
+	 * @param formName
 	 * @param mfs
 	 * @return String representation of the file
 	 */
@@ -274,7 +274,7 @@ public class ResolveErrorsController {
 	/**
 	 * Takes in Mobile Queue and returns an absolute Path
 	 *
-	 * @param formPath
+	 * @param formName
 	 * @param mfs
 	 * @return String absolute path of the file
 	 */

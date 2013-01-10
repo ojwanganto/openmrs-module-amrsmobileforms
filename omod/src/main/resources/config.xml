@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd">
-<module configVersion="1.0">
 	
-	<!-- Base Module Properties -->
-	<id>@MODULE_ID@</id>
-	<name>@MODULE_NAME@</name>
-	<version>@MODULE_VERSION@</version>
-	<package>@MODULE_PACKAGE@</package>
+<module configVersion="1.2">
+	
+	<!-- Module Properties -->
+	<id>${project.parent.artifactId}</id>
+	<name>${project.parent.name}</name>
+	<version>${project.parent.version}</version>
+	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
 	<author>Samuel Mbugua</author>
 	<description>
-			Allows for submitting of xforms from mobile devices - Handles household data
+		${project.parent.description}
 	</description>
-	<activator>@MODULE_PACKAGE@.MobileFormEntryActivator</activator>
-	
-	<!-- None so far -->
-	<updateURL></updateURL>
-	<!-- /Base Module Properties -->
-	
-	<require_version>1.6.0.00</require_version>
-	<require_database_version>1.2.04</require_database_version>
+	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
+	<require_version>${openMRSVersion}</require_version>
+	<!-- / Module Properties -->
+
+
+	<!-- Module Activator -->
+	<activator>${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryActivator</activator>
 
 	<require_modules>
 		<require_module version="3.8.5">org.openmrs.module.xforms</require_module>
@@ -28,9 +27,19 @@
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>@MODULE_PACKAGE@.extension.html.MobileFormEntryAdminExt</class>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.MobileFormEntryAdminExt</class>
 	</extension>
-	<!-- /Extensions -->
+
+	<!-- Maps hibernate files, if present -->
+	<mappingFiles>
+        Economic.hbm.xml
+        EconomicConceptMap.hbm.xml
+        EconomicObject.hbm.xml
+        HouseholdMember.hbm.xml
+        MobileFormEntryError.hbm.xml
+        MobileFormHousehold.hbm.xml
+        Survey.hbm.xml
+    </mappingFiles>
 	
 	<!-- Required Privileges -->
     <privilege>
@@ -73,72 +82,72 @@
 	
 	<!-- Any required properties goes here-->
 	<globalProperty>
-		<property>@MODULE_ID@.resources_dir</property>
+		<property>${project.parent.artifactId}.resources_dir</property>
 		<defaultValue>amrsmobileforms/resources</defaultValue>
 		<description>Directory for storing xforms to be filled in and other special files.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.drop_dir</property>
+		<property>${project.parent.artifactId}.drop_dir</property>
 		<defaultValue>amrsmobileforms/drop_dir</defaultValue>
 		<description>Directory where mobile devices drop forms.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.queue_dir</property>
+		<property>${project.parent.artifactId}.queue_dir</property>
 		<defaultValue>amrsmobileforms/queue</defaultValue>
 		<description>Directory for queuing mobile forms before they are processed.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.error_dir</property>
+		<property>${project.parent.artifactId}.error_dir</property>
 		<defaultValue>amrsmobileforms/error</defaultValue>
 		<description>Directory for keeping erred forms during processing</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.archive_dir</property>
+		<property>${project.parent.artifactId}.archive_dir</property>
 		<defaultValue>amrsmobileforms/archive/%Y/%M</defaultValue>
 		<description>Directory for storing successfully processed forms.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.concept.adults</property>
+		<property>${project.parent.artifactId}.concept.adults</property>
 		<defaultValue></defaultValue>
 		<description>Concept used for household adults property.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.concept.children</property>
+		<property>${project.parent.artifactId}.concept.children</property>
 		<defaultValue></defaultValue>
 		<description>Concept used for household children property.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.concept.eligibleAdults</property>
+		<property>${project.parent.artifactId}.concept.eligibleAdults</property>
 		<defaultValue></defaultValue>
 		<description>Concept used for household eligible adults property.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.concept.eligibleChildren</property>
+		<property>${project.parent.artifactId}.concept.eligibleChildren</property>
 		<defaultValue></defaultValue>
 		<description>Concept used for household eligible children property.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.concept.returnVisitDate</property>
+		<property>${project.parent.artifactId}.concept.returnVisitDate</property>
 		<defaultValue></defaultValue>
 		<description>Concept used for household return visit date observations.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.defaultHouseholdDefinition</property>
+		<property>${project.parent.artifactId}.defaultHouseholdDefinition</property>
 		<defaultValue></defaultValue>
 		<description>Household definition id to use when creating households from Mobile Form Entry submissions.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.defaultHouseholdEncounterType</property>
+		<property>${project.parent.artifactId}.defaultHouseholdEncounterType</property>
 		<defaultValue></defaultValue>
 		<description>Household encounter type id to use when creating households from Mobile Form Entry submissions.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.hctIdentifierType</property>
+		<property>${project.parent.artifactId}.hctIdentifierType</property>
 		<defaultValue>8</defaultValue>
 		<description>HCT patient identifier type id to use when creating HCT patient identifiers from Mobile Form Entry submissions.</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.phonenumberAttributeType</property>
+		<property>${project.parent.artifactId}.phonenumberAttributeType</property>
 		<defaultValue>10</defaultValue>
 		<description>Phone number person attribute type id to use when creating phone number person attributes from Mobile Form Entry submissions.</description>
 	</globalProperty>
@@ -147,15 +156,15 @@
 	<dwr>
 		<allow>
 			<create creator="new" javascript="DWRAMRSMobileFormsService">
-				<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRAMRSMobileFormsService"/>
+				<param name="class" value="org.openmrs.module.${project.parent.artifactId}.web.DWRAMRSMobileFormsService"/>
 				<include method="saveEconomicConceptMap"/>
 			</create>
-			<convert converter="bean" match="@MODULE_PACKAGE@.EconomicConceptMap"/>
+			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
 		</allow>
 
 		<signatures>
 			<![CDATA[
-			import @MODULE_PACKAGE@.web.DWRAMRSMobileFormsService;
+			import ${project.parent.groupId}.${project.parent.artifactId}.web.DWRAMRSMobileFormsService;
 				DWRAMRSMobileFormsService.saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId);
 			]]>
 		</signatures>	
@@ -165,21 +174,21 @@
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
 	<servlet>
 		<servlet-name>fileUpload</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.MobileFormFileUploadServlet</servlet-class>
+		<servlet-class>${project.parent.groupId}.${project.parent.artifactId}.web.MobileFormFileUploadServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>formList</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.MobileFormListServlet</servlet-class>
+		<servlet-class>${project.parent.groupId}.${project.parent.artifactId}.web.MobileFormListServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>fileDownload</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.MobileFormDownloadServlet</servlet-class>
+		<servlet-class>${project.parent.groupId}.${project.parent.artifactId}.web.MobileFormDownloadServlet</servlet-class>
 	</servlet>
 	
 	<!-- Add a location header Filter, Necessary a security check for the submitting forms -->
 	<filter>
     	<filter-name>locationFilter</filter-name>
-        <filter-class>@MODULE_PACKAGE@.web.LocationFilter</filter-class>
+        <filter-class>${project.parent.groupId}.${project.parent.artifactId}.web.LocationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>locationFilter</filter-name>
@@ -193,9 +202,5 @@
 		<file>messages.properties</file>
 	</messages>
 	<!-- /Internationalization -->
-	
-	<mappingFiles>
-		${omodHbmConfig}
-	</mappingFiles>
 
 </module>

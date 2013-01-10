@@ -22,6 +22,11 @@
 		<module>omod</module>
 	</modules>
 
+	<properties>
+		<openMRSVersion>1.8.0</openMRSVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 
@@ -82,11 +87,21 @@
 				<scope>test</scope>
 			</dependency>
 
-			<!-- OpenMRS dependencies -->
+			<!-- End External dependencies -->
+
+			<!-- Begin OpenMRS core -->
 
 			<dependency>
 				<groupId>org.openmrs.api</groupId>
 				<artifactId>openmrs-api</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.web</groupId>
+				<artifactId>openmrs-web</artifactId>
 				<version>${openMRSVersion}</version>
 				<type>jar</type>
 				<scope>provided</scope>
@@ -98,14 +113,6 @@
 				<version>${openMRSVersion}</version>
 				<type>test-jar</type>
 				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.openmrs.web</groupId>
-				<artifactId>openmrs-web</artifactId>
-				<version>${openMRSVersion}</version>
-				<type>jar</type>
-				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
@@ -124,12 +131,11 @@
 				<scope>test</scope>
 			</dependency>
 			
+			<!-- End OpenMRS core -->
+
 		</dependencies>
 	</dependencyManagement>
 
-	<properties>
-		<openMRSVersion>1.8.0</openMRSVersion>
-	</properties>
 
 	<build>
 		<pluginManagement>
@@ -138,14 +144,20 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<target>1.5</target>
-						<source>1.5</source>
+						<target>1.6</target>
+						<source>1.6</source>
 					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.openmrs.maven.plugins</groupId>
 					<artifactId>maven-openmrs-plugin</artifactId>
 					<version>1.0.1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.4</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
