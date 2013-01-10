@@ -191,12 +191,19 @@ public class MobileFormUploadProcessor {
 	 * @should return true when more than one name part matches
 	 * @should return true when the found patient has more than one name
 	 * @should return true when the matching name is not preferred
+	 * @should match on name parts with additional spaces
+	 * @should match on name parts with different capitalization
 	 * @should return false if no name part is found and there is only one name
 	 * @should return false if no name part is found and there are multiple names
 	 * @should return false if no providedNames are provided
 	 * @should return false if no personNames are provided
 	 */
-	private boolean matchesOnNameParts(List<String> providedNames, Set<PersonName> personNames) {
+	protected boolean matchesOnNameParts(List<String> providedNames, Set<PersonName> personNames) {
+
+		// check for null
+		if (providedNames == null || personNames == null) {
+			return false;
+		}
 
 		// build a list of normalized name parts from what we got in the form
 		Set<String> nameParts = new HashSet<String>();
