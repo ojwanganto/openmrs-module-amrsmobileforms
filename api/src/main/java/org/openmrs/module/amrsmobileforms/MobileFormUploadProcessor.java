@@ -1,14 +1,7 @@
 package org.openmrs.module.amrsmobileforms;
 
-import java.io.File;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
@@ -21,6 +14,18 @@ import org.openmrs.module.amrsmobileforms.util.XFormEditor;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Processes Mobile forms Split Queue entries. Submits all split forms to the
@@ -136,11 +141,21 @@ public class MobileFormUploadProcessor {
 			//Ensure if not new it is same person
 			if (!MobileFormEntryUtil.isNewPatient(patientIdentifier)) {
 				Patient pat = MobileFormEntryUtil.getPatient(patientIdentifier);
-				PersonName personName = new PersonName(givenName, middleName, familyName);
-				if (!pat.getPersonName().equalsContent(personName)) {
+
+				// if we did not find any matches, throw a comprehensive error
+				if (!matchesOnNameParts(Arrays.asList(givenName, middleName, familyName), pat.getNames())) {
 					saveFormInError(filePath);
-					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-							"A different person (By Name) exists with the same identifier (" + patientIdentifier + ")"));
+					StringBuilder sb = new StringBuilder();
+					sb.append("The person with identifier ");
+					sb.append(patientIdentifier);
+					sb.append(" and name ");
+					sb.append(givenName + " " + middleName + " " + familyName);
+					sb.append(" did not match names in the system: ");
+					sb.append(StringUtils.join(pat.getNames(), ", "));
+					sb.append(".");
+
+					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath),
+							"Error processing patient", sb.toString()));
 					return;
 				}
 			}
@@ -164,6 +179,44 @@ public class MobileFormUploadProcessor {
 			saveFormInError(filePath);
 			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error sending form to xform module", t.getMessage()));
 		}
+	}
+
+	/**
+	 * check for a match of name parts against the names from a given patient
+	 *
+	 * @param providedNames the list of name parts to check against
+	 * @param personNames set of PersonName objects for review
+	 * @return whether a name part from the set of PersonNames matches one from the first list
+	 * @should return true when only one name part is found in a person name
+	 * @should return true when more than one name part matches
+	 * @should return true when the found patient has more than one name
+	 * @should return true when the matching name is not preferred
+	 * @should return false if no name part is found and there is only one name
+	 * @should return false if no name part is found and there are multiple names
+	 * @should return false if no providedNames are provided
+	 * @should return false if no personNames are provided
+	 */
+	private boolean matchesOnNameParts(List<String> providedNames, Set<PersonName> personNames) {
+
+		// build a list of normalized name parts from what we got in the form
+		Set<String> nameParts = new HashSet<String>();
+		for (String namePart : providedNames) {
+			if (!StringUtils.isEmpty(namePart)) {
+				nameParts.add(namePart.trim().toLowerCase());
+			}
+		}
+
+		// check over the set of PersonNames
+		for (PersonName personName : personNames) {
+			for (String namePart : personName.getFullName().split(" ")) {
+				if (!StringUtils.isBlank(namePart) && nameParts.contains(namePart.trim().toLowerCase())) {
+					return true;
+				}
+			}
+		}
+
+		// assume there was no match
+		return false;
 	}
 
 	/**
