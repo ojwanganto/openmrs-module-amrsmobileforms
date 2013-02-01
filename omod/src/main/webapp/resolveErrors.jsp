@@ -57,26 +57,26 @@
 							return '<input name="errorIds" type="checkbox" value="' + id + '"/>';
 						}
 				},
-				{
-					aTargets: [1],
-					mData: "id",
-					sName: "id",
-					sClass: "centered",
-				    mRender: function(data, type, full) {
-							var id = full.id;
-							var out = "";
-							if (full.comment) {
-								out += '<button class="action resolve" errorId="' + id + '">Resolve</button>';
-							} else {
-								out += '<button class="action comment" errorId="' + id + '">Comment</button>';
-							}
-							return out;
-						}
-				},
-				{ aTargets: [2], mData: "error" },
-				{ aTargets: [3], mData: "errorDetails" },
-				{ aTargets: [4], mData: "formName" },
-				{ aTargets: [5], mData: "comment", sClass: "centered" }
+                {
+                    aTargets: [1],
+                    sClass: "centered",
+                    mData: null,
+                    mRender: function(data, type, full) {
+                        var id = full.id;
+                        var out = "";
+                        if (full.comment) {
+                            out += '<button class="action resolve" errorId="' + id + '">Resolve</button>';
+                        } else {
+                            out += '<button class="action comment" errorId="' + id + '">Comment</button>';
+                        }
+                        return out;
+                    }
+                },
+                { aTargets: [2], mData: "id" },
+				{ aTargets: [3], mData: "error" },
+				{ aTargets: [4], mData: "errorDetails" },
+				{ aTargets: [5], mData: "formName" },
+				{ aTargets: [6], mData: "comment", sClass: "centered" }
 			],
 			bProcessing: true,
 			bServerSide: true,
@@ -160,8 +160,9 @@
 					<thead>
 						<tr>
 							<th>Select</th>
-							<th>Action</th>
-							<th>Error</th>
+                            <th>Action</th>
+                            <th>ID</th>
+                            <th>Error</th>
 							<th>Error Details</th>
 							<th>Form Name</th>
 							<th>Comment</th>
