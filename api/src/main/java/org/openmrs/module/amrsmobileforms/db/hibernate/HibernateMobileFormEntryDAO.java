@@ -1,8 +1,13 @@
 package org.openmrs.module.amrsmobileforms.db.hibernate;
 
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -18,29 +23,31 @@ import org.openmrs.module.amrsmobileforms.Survey;
 import org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO;
 
 /**
- * Database interface for the module 
- * 
- * @author Samuel Mbugua
+ * Database interface for the module
  *
+ * @author Samuel Mbugua
  */
 public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
+
+	private static Log log = LogFactory.getLog(MobileFormEntryDAO.class);
 
 	/**
 	 * Hibernate session factory
 	 */
 	private SessionFactory sessionFactory;
-	
+
 	/**
 	 * Default public constructor
 	 */
-	public HibernateMobileFormEntryDAO() { }
-	
+	public HibernateMobileFormEntryDAO() {
+	}
+
 	/**
 	 * Set session factory
-	 * 
+	 *
 	 * @param sessionFactory
 	 */
-	public void setSessionFactory(SessionFactory sessionFactory) { 
+	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
@@ -50,7 +57,7 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	public MobileFormHousehold getHousehold(String householdIdentifier) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MobileFormHousehold.class);
 		MobileFormHousehold household = (MobileFormHousehold) criteria.add(Expression.like("householdIdentifier", householdIdentifier)).uniqueResult();
-		return household;	
+		return household;
 	}
 
 	/**
@@ -65,8 +72,8 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	 */
 	public EconomicObject getEconomicObjectByObjectName(String objectName) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(EconomicObject.class);
-		EconomicObject econObject = (EconomicObject)criteria.add(Expression.like("objectName", objectName)).uniqueResult();
-		
+		EconomicObject econObject = (EconomicObject) criteria.add(Expression.like("objectName", objectName)).uniqueResult();
+
 		return econObject;
 	}
 
@@ -90,7 +97,7 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	@SuppressWarnings("unchecked")
 	public List<EconomicObject> getAllEconomicObjects() {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(EconomicObject.class);
-		return (List<EconomicObject>)criteria.list();
+		return (List<EconomicObject>) criteria.list();
 	}
 
 	/**
@@ -104,7 +111,7 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#deleteEconomicObject(java.lang.Integer)
 	 */
 	public boolean deleteEconomicObject(EconomicObject economicObject) {
-			sessionFactory.getCurrentSession().delete(economicObject);
+		sessionFactory.getCurrentSession().delete(economicObject);
 		return true;
 	}
 
@@ -124,7 +131,7 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 		return (List<MobileFormEntryError>) criteria.list();
 	}
 
-	/***
+	/**
 	 * @see org.openmrs.module.amrsmobileforms.db.MobileFormEntryDAO#getErrorById(java.lang.Integer)
 	 */
 	public MobileFormEntryError getErrorById(Integer errorId) {
@@ -191,13 +198,15 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 
 	private Criteria getErrorCriteria(String query) {
 		Criteria crit = sessionFactory.getCurrentSession().createCriteria(MobileFormEntryError.class);
+		String idQuery = StringUtils.isNumeric(query) ? "%" + query + "%" : "";
 
 		if (query != null && !query.isEmpty()) {
-			crit.add(Restrictions.or(
-				Restrictions.like("error", query, MatchMode.ANYWHERE),
-				Restrictions.or(
-					Restrictions.like("errorDetails", query, MatchMode.ANYWHERE),
-					Restrictions.like("formName", query, MatchMode.ANYWHERE))));
+			Criterion disjunction = Restrictions.disjunction()
+					.add(Restrictions.sqlRestriction("mobile_formentry_error_id like '" + idQuery + "'"))
+					.add(Restrictions.like("error", query, MatchMode.ANYWHERE))
+					.add(Restrictions.like("errorDetails", query, MatchMode.ANYWHERE))
+					.add(Restrictions.like("formName", query, MatchMode.ANYWHERE));
+			crit.add(disjunction);
 		}
 
 		return crit;
