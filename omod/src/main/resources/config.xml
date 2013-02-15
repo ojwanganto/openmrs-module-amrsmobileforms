@@ -158,14 +158,20 @@
 			<create creator="new" javascript="DWRAMRSMobileFormsService">
 				<param name="class" value="org.openmrs.module.${project.parent.artifactId}.web.DWRAMRSMobileFormsService"/>
 				<include method="saveEconomicConceptMap"/>
+                <include method="testDwr"/>
+                <include method="populateCommentForm"/>
 			</create>
 			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
+            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryErrorModel"/>
+             <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryError"/>
 		</allow>
 
 		<signatures>
 			<![CDATA[
 			import ${project.parent.groupId}.${project.parent.artifactId}.web.DWRAMRSMobileFormsService;
 				DWRAMRSMobileFormsService.saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId);
+				DWRAMRSMobileFormsService.testDwr();
+				DWRAMRSMobileFormsService.populateCommentForm(Integer errorId);
 			]]>
 		</signatures>	
 	</dwr>
