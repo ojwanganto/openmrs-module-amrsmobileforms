@@ -160,6 +160,8 @@
 				<include method="saveEconomicConceptMap"/>
                 <include method="testDwr"/>
                 <include method="populateCommentForm"/>
+                <include method="saveComment"/>
+                
 			</create>
 			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
             <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryErrorModel"/>
@@ -172,6 +174,7 @@
 				DWRAMRSMobileFormsService.saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId);
 				DWRAMRSMobileFormsService.testDwr();
 				DWRAMRSMobileFormsService.populateCommentForm(Integer errorId);
+				DWRAMRSMobileFormsService.saveComment(Integer errorId, String comment);
 			]]>
 		</signatures>	
 	</dwr>

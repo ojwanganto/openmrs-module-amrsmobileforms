@@ -11,7 +11,8 @@ import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 
 import java.util.List;
 import java.util.Vector;
-
+import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import java.util.Date;
 /**
  *
  * @author jkeiper
@@ -99,8 +100,22 @@ public class DWRAMRSMobileFormsService {
         return queue.getFileSystemUrl();
     }
 
-    public String testDwr(){
-
-        return "This is a response from DWR class";
-    }
+    /**
+	 * Controller for commentOnError post jsp Page
+	 */
+    public String saveComment(Integer errorId, String comment) {
+		if (comment.trim().length() > 0) {
+			MobileFormEntryService mfs = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
+			MobileFormEntryError error = mfs.getErrorById(errorId);
+			error.setComment(comment);
+			error.setCommentedBy(Context.getAuthenticatedUser());
+			error.setDateCommented(new Date());
+			mfs.saveErrorInDatabase(error);
+			return "Comment saved successfully";
+		} else {
+			
+			return "A null comment was encountered";
+		}
+		
+	}
 }
