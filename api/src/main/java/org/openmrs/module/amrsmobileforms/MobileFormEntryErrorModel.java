@@ -28,6 +28,7 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String identifier = "";
 	
 	// data from the formData encounter section
+    private String provider = "";
 	private String location = "";
 	private String encounterDate = "";
 	private String formModelName = "";
@@ -72,7 +73,9 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 				
 				// parse the encounter info from the form data
 				String location = xp.evaluate("/form/encounter/encounter.location_id", formDataDoc);
-				setLocation(location.substring(location.indexOf("^") + 1));
+                String formProvider=xp.evaluate("/form/encounter/encounter.provider_id", formDataDoc);
+                setLocation(location.substring(location.indexOf("^") + 1));
+                setProvider(formProvider);
 				setEncounterDate(xp.evaluate("/form/encounter/encounter.encounter_datetime", formDataDoc));
 				setFormModelName(xp.evaluate("/form/@name", formDataDoc));
 				setFormId(xp.evaluate("/form/@version", formDataDoc));
@@ -175,7 +178,22 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
     	return formModelName;
     }
 
-	/**
+
+    /**
+     * @return the provider
+     */
+    public String getProvider() {
+        return provider;
+    }
+
+    /**
+     * @param provider to set
+     */
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    /**
      * @param formModelName the formModelName to set
      */
     public void setFormModelName(String formModelName) {
