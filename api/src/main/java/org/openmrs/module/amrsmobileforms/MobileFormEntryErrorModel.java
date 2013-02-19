@@ -27,6 +27,7 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String identifier = "";
 
 	// data from the formData encounter section
+    private String provider = "";
 	private String location = "";
 	private String encounterDate = "";
 	private String formModelName = "";
@@ -60,14 +61,15 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 			try {
 				Document formDataDoc = getDocumentForErrorQueueItem(getFormName());
 				XPath xp = getXPathFactory().newXPath();
-
-				if ("household".equals(errorType)) {
+               if ("household".equals(errorType)) {
 					setName("Household");
 					setBirthdate("N/A");
 					setIdentifier(xp.evaluate("/form/household/meta_data/household_id", formDataDoc));
 					setGender("N/A");
 					setLocation(xp.evaluate("/form/household/meta_data/catchment_area", formDataDoc));
 					setEncounterDate(xp.evaluate("/form/meta/start_time", formDataDoc));
+                   String householdProvider=xp.evaluate("/form/household/meta_data/provider_id", formDataDoc);
+                   setProvider(householdProvider);
 				} else {
 					setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
 							xp.evaluate("/form/patient/patient.middle_name", formDataDoc) + " " +
@@ -80,9 +82,10 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 					// parse the encounter info from the form data
 					String location = xp.evaluate("/form/encounter/encounter.location_id", formDataDoc);
 					setLocation(location.substring(location.indexOf("^") + 1));
+                    String formProvider=xp.evaluate("/form/encounter/encounter.provider_id", formDataDoc);
+                    setProvider(formProvider);
 					setEncounterDate(xp.evaluate("/form/encounter/encounter.encounter_datetime", formDataDoc));
 				}
-
 				setFormModelName(xp.evaluate("/form/@name", formDataDoc));
 				setFormId(xp.evaluate("/form/@version", formDataDoc));
 
@@ -182,7 +185,6 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	public String getFormModelName() {
 		return formModelName;
 	}
-
 	/**
 	 * @param formModelName the formModelName to set
 	 */
@@ -190,6 +192,19 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		this.formModelName = formModelName;
 	}
 
+    /**
+     * @return the provider
+     */
+    public String getProvider() {
+        return provider;
+    }
+
+    /**
+     * @param provider to set
+     */
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 	/**
 	 * @return the formId
 	 */

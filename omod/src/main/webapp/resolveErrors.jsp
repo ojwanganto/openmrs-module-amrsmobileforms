@@ -72,11 +72,13 @@
                         return out;
                     }
                 },
-                { aTargets: [2], mData: "id" },
-				{ aTargets: [3], mData: "error" },
-				{ aTargets: [4], mData: "errorDetails" },
-				{ aTargets: [5], mData: "formName" },
-				{ aTargets: [6], mData: "comment", sClass: "centered" }
+                    { aTargets: [2], mData: "id" },
+                    { aTargets: [3], mData: "location"},
+                    { aTargets: [4], mData: "provider"},
+                    { aTargets: [5], mData: "error" },
+                    { aTargets: [6], mData: "errorDetails" },
+                    { aTargets: [7], mData: "formName" },
+                    { aTargets: [8], mData: "comment", sClass: "centered" }
 			],
 			bProcessing: true,
 			bServerSide: true,
@@ -162,8 +164,10 @@
 							<th>Select</th>
                             <th>Action</th>
                             <th>ID</th>
+                            <th>Location</th>
+                            <th>Provider</th>
                             <th>Error</th>
-							<th>Error Details</th>
+                            <th>Error Details</th>
 							<th>Form Name</th>
 							<th>Comment</th>
 						</tr>
