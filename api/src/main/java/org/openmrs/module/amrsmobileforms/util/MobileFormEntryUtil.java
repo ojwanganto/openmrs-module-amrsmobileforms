@@ -275,8 +275,9 @@ public class MobileFormEntryUtil {
 		return false;
 	}
 
-	public static MobileFormEntryError createError(String formName, String error, String errorDetails) {
+	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId) {
 		MobileFormEntryError mobileFormEntryError = new MobileFormEntryError();
+        mobileFormEntryError.setProviderId(providerId);
 		mobileFormEntryError.setFormName(formName);
 		mobileFormEntryError.setError(error);
 		mobileFormEntryError.setErrorDetails(errorDetails);

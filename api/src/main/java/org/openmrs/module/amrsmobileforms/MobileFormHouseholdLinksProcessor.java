@@ -56,6 +56,7 @@ public class MobileFormHouseholdLinksProcessor {
 	 */
 	private void processPendingLinkForm(String filePath, MobileFormQueue queue) throws APIException {
 		log.debug("Linking Patient to household");
+        String providerId=null;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -63,23 +64,24 @@ public class MobileFormHouseholdLinksProcessor {
 			XPath xp = xpf.newXPath();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
 
-			// First Ensure there is at least a patient identifier in the form
-			if (!StringUtils.hasText(MobileFormEntryUtil.getPatientIdentifier(doc))) {
-				// form has no patient identifier : move to error
-				saveFormInError(filePath);
-				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error linking patient",
-						"Patient has no identifier, or the identifier provided is invalid"));
-				return;
-			}
-
-			Node curNode = (Node) xp.evaluate("/form/patient", doc, XPathConstants.NODE);
+            Node curNode = (Node) xp.evaluate("/form/patient", doc, XPathConstants.NODE);
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode);
 			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
+            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode)));
+            //String  providerId=Integer.toString(intProviderId);
+            // First Ensure there is at least a patient identifier in the form
+            if (!StringUtils.hasText(MobileFormEntryUtil.getPatientIdentifier(doc))) {
+                // form has no patient identifier : move to error
+                saveFormInError(filePath);
+                mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error linking patient",
+                        "Patient has no identifier, or the identifier provided is invalid",providerId));
+                return;
+            }
 
 			if (!StringUtils.hasText(householdId) || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error linking patient",
-						"Patient is not linked to household or household Id provided is invalid"));
+						"Patient is not linked to household or household Id provided is invalid",providerId));
 			} else {
 				Patient pat = MobileFormEntryUtil.getPatient(patientIdentifier);
 				MobileFormHousehold household = mobileService.getHousehold(householdId);
@@ -100,7 +102,7 @@ public class MobileFormHouseholdLinksProcessor {
 			log.error("Error while linking patient to household", t);
 			//put file in error queue
 			saveFormInError(filePath);
-			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error while linking patient to house hold", t.getMessage()));
+			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error while linking patient to house hold", t.getMessage(),providerId));
 		}
 	}
 

@@ -68,8 +68,8 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 					setGender("N/A");
 					setLocation(xp.evaluate("/form/household/meta_data/catchment_area", formDataDoc));
 					setEncounterDate(xp.evaluate("/form/meta/start_time", formDataDoc));
-                   String householdProvider=xp.evaluate("/form/household/meta_data/provider_id", formDataDoc);
-                   setProvider(householdProvider);
+                   String householdProvider=xp.evaluate("/form/survey/provider_id", formDataDoc);
+                    setProvider(householdProvider);
 				} else {
 					setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
 							xp.evaluate("/form/patient/patient.middle_name", formDataDoc) + " " +
