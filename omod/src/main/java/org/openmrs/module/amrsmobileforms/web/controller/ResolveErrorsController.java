@@ -472,18 +472,12 @@ public class ResolveErrorsController {
 	private Map<String, Object> generateObjectMap(MobileFormEntryError error) {
 		// try to stick to basic types; String, Integer, etc (not Date)
 		// JSP expects: [id, error, details, form name, comment]
-
-        //
-     /*   MobileFormEntryService mfs = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
-        String formName = error.getFormName();
-        String filePath = getAbsoluteFilePath(formName, mfs);
-        error.setFormName(createFormData(error.getFormName(), mfs));*/
         MobileFormEntryErrorModel errorModel = new MobileFormEntryErrorModel(error, getFormType( error.getFormName()));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("id", error.getMobileFormEntryErrorId());
         result.put("location", errorModel.getLocation());
         result.put("provider", error.getProvider());
-		result.put("error", error.getError());
+    	result.put("error", error.getError());
 		result.put("errorDetails", error.getErrorDetails());
 		result.put("formName", error.getFormName());
 		result.put("comment", error.getComment());
