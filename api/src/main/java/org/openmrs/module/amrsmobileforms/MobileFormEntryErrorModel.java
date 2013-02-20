@@ -11,8 +11,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * This class is only used as the model for the ResolveErrosFormController and
- * its jsp page
+ * This class is only used as the model for the ResolveErrosFormController and its jsp page
  *
  * @author Samuel Mbugua
  */
@@ -37,8 +36,8 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String errorType = "";
 
 	/**
-	 * Creates a model object from the given MobileFormEntryError. Parses data out of
-	 * the &lt;patient> section to fill in the name/birthdate/etc fields
+	 * Creates a model object from the given MobileFormEntryError. Parses data out of the &lt;patient> section to fill in
+	 * the name/birthdate/etc fields
 	 *
 	 * @param error MobileFormEntryError to duplicate
 	 */
@@ -64,11 +63,10 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 
 				if ("household".equals(errorType)) {
 					setName("Household");
+					setBirthdate("N/A");
 					setIdentifier(xp.evaluate("/form/household/meta_data/household_id", formDataDoc));
 					setGender("N/A");
-					setLocation("village: " + xp.evaluate("/form/household/meta_data/village", formDataDoc)
-							+ ", catchment area: " + xp.evaluate("/form/household/meta_data/catchment_area", formDataDoc)
-							+ ", GPS: " + xp.evaluate("/form/household/meta_data/gps_location", formDataDoc));
+					setLocation(xp.evaluate("/form/household/meta_data/catchment_area", formDataDoc));
 					setEncounterDate(xp.evaluate("/form/meta/start_time", formDataDoc));
 				} else {
 					setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
