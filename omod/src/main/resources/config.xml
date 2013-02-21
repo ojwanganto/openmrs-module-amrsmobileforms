@@ -161,6 +161,7 @@
                 <include method="testDwr"/>
                 <include method="populateCommentForm"/>
                 <include method="saveComment"/>
+                <include method="resolveError"/>
                 
 			</create>
 			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
@@ -175,6 +176,7 @@
 				DWRAMRSMobileFormsService.testDwr();
 				DWRAMRSMobileFormsService.populateCommentForm(Integer errorId);
 				DWRAMRSMobileFormsService.saveComment(Integer errorId, String comment);
+				DWRAMRSMobileFormsService.resolveError(String householdId,Integer errorId,String errorItemAction,String dob,String patientId,String provider,String newHousehold);
 			]]>
 		</signatures>	
 	</dwr>

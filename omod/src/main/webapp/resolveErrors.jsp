@@ -12,7 +12,16 @@
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/css/dataTables_jui.css" />
 
 <h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
-
+<style type="text/css">
+	.tblformat tr:nth-child(odd) {
+		background-color: #009d8e;
+		color: #FFFFFF;
+	}
+	.tblformat tr:nth-child(even) {
+		background-color: #d3d3d3;
+		color: #000000;
+	}
+</style>
 <style type="text/css">
 	/* comment and resolve buttons */
 	button.action { border: 1px solid gray; font-size: .75em; color: black; width: 52px; margin: 2px; padding: 1px; cursor: pointer; }
@@ -107,7 +116,7 @@
                   if(tableExist!=null){
                 	  $j("#errorsummary").remove();  
                   }
-                  generate_table(errObj);
+                  generate_table(errObj,"ttable",1);
 
 
 
@@ -144,8 +153,77 @@
             return false;
 
         });
+		
+		
+		
+		
 
-        $j("button.resolve").live("click", function(){ document.location = "resolveError.form?errorId=" + $j(this).attr("errorId"); return false; });
+        $j("button.resolve").live("click", function(){ 
+        	//document.location = "resolveError.form?errorId=" + $j(this).attr("errorId"); return false;
+        	
+        	var errorId = $j(this).attr("errorId");
+        	
+        	 var tableExist = $j("#resolveerror");
+             if(tableExist!=null){
+           	  $j("#resolveerror").remove();  
+             }
+        	
+        	
+              DWRAMRSMobileFormsService.populateCommentForm(errorId ,function(data){
+                   var errObj= data[0];
+                   generate_ResolveError_table(errObj);
+                  
+
+             });
+
+
+             
+             $j( "#resolveError" ).dialog({
+                 height: 600,
+                 width: 1000,
+                 modal: false,
+                 buttons:{
+                     "Submit Comment":function(){
+                    	 
+                    		var provider = document.getElementById('provider').value;
+                           	var newPatient = document.getElementById('patient').value;
+                           	var patientId = document.getElementById('patientid').value;
+                           	var dob = document.getElementById('dob').value;
+                           	var newHousehold = document.getElementById('household').value;
+                           	var householdId = document.getElementById('householdid').value;
+                           	var errorItemAction = getSelectedRadio();
+               	 
+                    /*String householdId,
+			Integer errorId, 
+			String errorItemAction,
+			String birthDate, 
+			String patientIdentifier,
+			String providerId, 
+			String householdIdentifier  */	 
+                    	 
+                   
+                     	 if(errorItemAction != null){
+  DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,resolveErrorResult);
+                         	  
+                     	 }
+                     	 else{
+                     		 alert("Please select the action to take");
+                     		
+                     	 } 
+                     	 
+
+                     },
+                     Cancel: function() {
+                         $j(this).dialog( "close" );
+                     }
+                 }
+
+             });
+
+             return false;
+
+ 
+        });
 
 		// click event for selectAll checkbox
 		$j("#selectAll").click(function(){
@@ -176,6 +254,11 @@
 			document.location = url + "?" + params.join("&");
 		});
 	});
+	
+	function resolveErrorResult(data){
+		alert(data);
+		document.location.reload(true);
+	}
 	
 	function alertResult(data){
 		alert(data);
@@ -236,20 +319,113 @@ function buildTextArea(label,id){
     
 }
 
-/* Displays error summary on table  */
+function buildResolveOptions(label,id,optval,name,id2,addText){
+	var row = document.createElement("tr");
+    var cell = document.createElement("td");
+    var cell2 = document.createElement("td");
+    var celllabel = document.createTextNode(label);
+    
+    
+    var radio = document.createElement("input");
+    radio.setAttribute('type','radio');
+    radio.setAttribute('id',id);
+    radio.setAttribute('name',name);
+    radio.setAttribute('value',optval);
+    
+    if(addText){
+    	
+    var inputtext = document.createElement("input");
+    inputtext.setAttribute('type','text');
+    inputtext.setAttribute('id',id2);
+    }
+    
+    cell.appendChild(radio);
+    cell.appendChild(celllabel);
+    if(addText){
+    	cell2.appendChild(inputtext);
+    }
+    
+    
+    row.appendChild(cell);
+    row.appendChild(cell2);
+    return row;
+    
+    
+}
 
-    function generate_table(data) {
+
+
+function createOpemrsSpecificInputs(label,id,optval,name,id2){
+	var row = document.createElement("tr");
+    var cell = document.createElement("td");
+    var cell2 = document.createElement("td");
+    var celllabel = document.createTextNode(label);
+    
+    
+    var radio = document.createElement("input");
+    radio.setAttribute('type','radio');
+    radio.setAttribute('id',id);
+    radio.setAttribute('name',name);
+    radio.setAttribute('value',name);
+    
+    	
+    /* var inputtext = document.createElement("openmrs_tag:userField");
+    inputtext.setAttribute('formFieldName',id2);
+    inputtext.setAttribute('searchLabelCode','amrsmobileforms.resolveErrors.action.findProvider');
+    inputtext.setAttribute('initialValue','');
+    inputtext.setAttribute('callback','setErrorAction'); */
+    
+
+    var inputtext = document.createElement("input");
+    inputtext.setAttribute('id','providerId');
+    inputtext.setAttribute('type','text');
+    inputtext.setAttribute('class','ui-autocomplete-input');
+    inputtext.setAttribute("role","textbox");
+    inputtext.setAttribute('aria-autocomplete','list');
+    inputtext.setAttribute('aria-haspopup','true');
+    
+    
+    cell.appendChild(radio);
+    cell.appendChild(celllabel);
+
+    	cell2.appendChild(inputtext);
+
+    
+    
+    row.appendChild(cell);
+    row.appendChild(cell2);
+    return row;
+    
+    
+}
+
+/* Displays error summary on table 
+@param data - returned from the database
+@param bodyDiv - div to hold the table with data
+@param option (1 = comment, 2 = resolve) - selects between comment and resolve data 
+*/
+
+    function generate_table(data,bodyDiv,option) {
 
         
         // get the reference for the body
-        var body = document.getElementById("ttable");
-
-        // creates a <table> element and a <tbody> element
+        var body = document.getElementById(bodyDiv);
+        
         var tbl     = document.createElement("table");
         tbl.setAttribute('width','100%');
-        tbl.setAttribute('id','errorsummary');
-        var tblBody = document.createElement("tbody");
+        tbl.setAttribute('class','tblformat');
+        
+	if(option==1){
+		 tbl.setAttribute('id','errorsummary');
+	}
 
+        var tblBody = document.createElement("tbody");
+	
+    if(option==2){
+    	 var row0 = buildRow("Comment",data.comment);
+    	 var row01 = buildRow("Commented By",data.commentedBy);
+    	 var row02 = buildRow("Date Commented",data.dateCommented);
+   	}
 
         var row1 = buildRow("Person Name",data.name);      
         var row2 = buildRow("Person Identifier",data.identifier);
@@ -264,9 +440,18 @@ function buildTextArea(label,id){
         var row10 = buildRow("Error",data.error);
         var row11 = buildRowWithElement("Error Details",data.errorDetails);
         var row12 = buildRowWithElement("XML Form",data.formName);
-        var comment = buildTextArea("Comment","comment");
         
+        if(option==1){
+        var comment = buildTextArea("Comment","comment");
+        }
      
+        if(option==2){
+        	tblBody.appendChild(row0);
+        	tblBody.appendChild(row01);
+        	tblBody.appendChild(row02);
+       	
+      	}
+        
         tblBody.appendChild(row1);
         tblBody.appendChild(row2);
         tblBody.appendChild(row3); 
@@ -278,7 +463,10 @@ function buildTextArea(label,id){
         tblBody.appendChild(row9);
         tblBody.appendChild(row10); 
         tblBody.appendChild(row11);
+        
+        if(option==1){
         tblBody.appendChild(comment);
+        }
         tblBody.appendChild(row12); 
         tbl.appendChild(tblBody);
         
@@ -288,6 +476,101 @@ function buildTextArea(label,id){
         //---------------------------------------
      
     }
+    
+    
+function generate_ResolveError_table(data) {
+
+        
+        // get the reference for the body
+        var body = document.getElementById("resolveErrorTable");
+        
+        var tbl     = document.createElement("table");
+        tbl.setAttribute('width','100%');
+     
+		 tbl.setAttribute('id','resolveerror');
+		 tbl.setAttribute('class','tblformat');
+	
+        var tblBody = document.createElement("tbody");
+	
+   
+    	 var row0 = buildRow("Comment",data.comment);
+    	 var row01 = buildRow("Commented By",data.commentedBy);
+    	 var row02 = buildRow("Date Commented",data.dateCommented);
+   	
+
+        var row1 = buildRow("Person Name",data.name);      
+        var row2 = buildRow("Person Identifier",data.identifier);
+        var row3 = buildRow("Gender",data.gender);
+        var row4 = buildRow("Location",data.location);
+        
+        var row5 = buildRow("Encounter Date",data.encounterDate);
+        var row6 = buildRow("Form Name",data.formModelName);
+        var row7 = buildRow("Form ID",data.formId);
+        var row8 = buildRow("Error ID",data.mobileFormEntryErrorId);
+        var row9 = buildRow("Date Created",data.dateCreated);
+        var row10 = buildRow("Error",data.error);
+        var row11 = buildRowWithElement("Error Details",data.errorDetails);
+        var row12 = buildRowWithElement("XML Form",data.formName);
+        //createOpemrsSpecificInputs(label,id,name,id2)
+        //(label,id,optval,name,id2,addText)
+       	var row13 = buildResolveOptions('Select Provider for this Patient Encounter','optprovider','linkProvider','errorItemAction','provider',true);
+       	var row14 = buildResolveOptions('Create a new patient using the data from this form','optpatient','createPatient','errorItemAction','patient',true);
+       	var row15 = buildResolveOptions('Assign a new patient Identifier to this Patient','optpatientid','newIdentifier','errorItemAction','patientid',true);
+       	var row16 = buildResolveOptions('Assign a Birth Date to this Patient','optdob','assignBirthdate','errorItemAction','dob',true);
+       	var row17 = buildResolveOptions('Household for this Patient','opthousehold','linkHousehold','errorItemAction','household',true);
+       	var row18 = buildResolveOptions('Assign a new household Identifier to this household','opthouseholdid','newHousehold','errorItemAction','householdid',true);
+       	var row19 = buildResolveOptions('Delete comment','optdelcomment','deleteComment','errorItemAction','provider2',false);
+       	var row20 = buildResolveOptions('Delete this error item because it is invalid','optdelerror','deleteError','errorItemAction','provider2',false);
+       	var row21 = buildResolveOptions('Leave this error item as is and process it at a later point','none','noChange','errorItemAction','provider2',false);
+       	
+        	tblBody.appendChild(row0);
+        	tblBody.appendChild(row01);
+        	tblBody.appendChild(row02);
+       	
+        
+        tblBody.appendChild(row1);
+        tblBody.appendChild(row2);
+        tblBody.appendChild(row3); 
+        tblBody.appendChild(row4);
+        tblBody.appendChild(row5); 
+        tblBody.appendChild(row6); 
+        tblBody.appendChild(row7); 
+        tblBody.appendChild(row8); 
+        tblBody.appendChild(row9);
+        tblBody.appendChild(row10); 
+        tblBody.appendChild(row11);
+       
+        tblBody.appendChild(row12); 
+        tblBody.appendChild(row13);
+        tblBody.appendChild(row14);
+        tblBody.appendChild(row15);
+        tblBody.appendChild(row16);
+        tblBody.appendChild(row17);
+        tblBody.appendChild(row18);
+        tblBody.appendChild(row19);
+        tblBody.appendChild(row20);
+        tblBody.appendChild(row21);
+        tbl.appendChild(tblBody);
+        
+        body.appendChild(tbl);
+        tbl.setAttribute("border", "1");
+        
+        //---------------------------------------
+     
+    }
+    
+    function getSelectedRadio(){
+    	var selOpt = document.getElementsByName('errorItemAction');
+    	
+    	for(var i = 0;i<selOpt.length;i++){
+    		if(selOpt[i].checked){
+    			return selOpt[i].value;
+    		}
+    		
+    	}
+    	return null;
+    }
+
 
 	/**
 	 * updates the numSelected element with a specified amount, with some after-effects
@@ -308,8 +591,15 @@ function buildTextArea(label,id){
 
 </script>
 
-<div id="dialog-form" title="Error Summary" style="display:none;">
+<div class="box" id="dialog-form" title="Error Summary" style="display:none;">
     <div id="ttable"></div>
+
+</div>
+
+<div class="box" id="resolveError" title="Error Resolution Dialog" style="display:none;">
+    <div id="resolveErrorTable">
+    
+    </div>
 
 </div>
 
@@ -319,7 +609,6 @@ function buildTextArea(label,id){
 			<input id="selectAll" type="checkbox"/> Select All <span class="numDisplayed"></span> in Search Results (including unseen)
 			 &nbsp; &nbsp;
 			<button id="reprocessAll" disabled>Reprocess <span class="numSelected">0</span> Selected Errors</button>
-            <button id="test">Test Click</button>
 		</div>
 		<div id="errors">
 			<form method="post">

@@ -4,20 +4,58 @@
  */
 package org.openmrs.module.amrsmobileforms.web;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsmobileforms.*;
-import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
-
-import java.util.List;
-import java.util.Vector;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryErrorModel;
+import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
+import org.openmrs.module.amrsmobileforms.MobileFormQueue;
+import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
+import org.openmrs.module.amrsmobileforms.util.XFormEditor;
+import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.web.WebConstants;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.openmrs.module.amrsmobileforms.EconomicConceptMap;
+
+
+
 /**
- *
- * @author jkeiper
+ *DWR class for AMRSMobileForms module
  */
 public class DWRAMRSMobileFormsService {
+	
+	private static final Log log = LogFactory.getLog(DWRAMRSMobileFormsService.class);
+	
 	public EconomicConceptMap saveEconomicConceptMap(Integer id, Integer economicId, Integer conceptId) {
 		MobileFormEntryService service = Context.getService(MobileFormEntryService.class);
 
@@ -118,4 +156,232 @@ public class DWRAMRSMobileFormsService {
 		}
 		
 	}
+    
+    /**
+	 * Controller for resolveError post jsp Page
+	 */
+	
+	public String resolveError(
+			String householdId,
+			Integer errorId, 
+			String errorItemAction,
+			String birthDate, 
+			String patientIdentifier,
+			String providerId, 
+			String householdIdentifier) {
+		MobileFormEntryService mobileService;
+		String filePath;
+
+		// user must be authenticated (avoids authentication errors)
+		if (Context.isAuthenticated()) {
+			if (!Context.getAuthenticatedUser().hasPrivilege(
+				MobileFormEntryConstants.PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR)) {
+				//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.action.noRights");
+				return "Sorry, you do not have privileges for the operation";
+			}
+
+			mobileService = Context.getService(MobileFormEntryService.class);
+
+			// fetch the MobileFormEntryError item from the database
+			MobileFormEntryError errorItem = mobileService.getErrorById(errorId);
+			filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + errorItem.getFormName();
+			if ("linkHousehold".equals(errorItemAction)) {
+				if (mobileService.getHousehold(householdId) == null) {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createLink.error");
+					return "Wrong household ID";
+				} else {
+					if (XFormEditor.editNode(filePath,
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
+						// put form in queue for normal processing
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+						return "This was ok";
+					}
+				}
+			} else if ("assignBirthdate".equals(errorItemAction)) {
+				// format provided birthdate and insert into patient data like so:
+				// <patient.birthdate openmrs_table="patient" openmrs_attribute="birthdate">2009-12-25</patient.birthdate>
+				if (StringUtils.isNotEmpty(birthDate)) {
+					DateFormat reader = DateFormat.getDateInstance(DateFormat.SHORT, Context.getLocale());
+					DateFormat writer = new SimpleDateFormat("yyyy-MM-dd");
+					try {
+						String formattedDate = writer.format(reader.parse(birthDate));
+						if (XFormEditor.editNode(filePath,
+							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, formattedDate)) {
+							// put form in queue for normal processing
+							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+							return "This was ok";
+						}
+					} catch (ParseException e) {
+						String error = "Birthdate was not assigned, Invalid date entered: " + birthDate;
+						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, error);
+						log.error(error, e);
+						return "Invalid date of birth";
+					}
+				} else {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
+					return "No date was entered";
+				}
+			} else if ("newIdentifier".equals(errorItemAction)) {
+				if (patientIdentifier != null && patientIdentifier.trim() != "") {
+					if (reverseNodes(filePath, patientIdentifier)) {
+						// put form in queue for normal processing
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+						return "This was ok";
+					}
+				} else {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
+					return "You entered an empty identifier";
+				}
+			} else if ("linkProvider".equals(errorItemAction)) {
+				if (providerId != null && providerId.trim() != "") {
+					providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
+					if (XFormEditor.editNode(filePath,
+						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
+						// put form in queue for normal processing
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+						return "This was ok";
+					}
+				} else {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
+					return "You entered an empty Provider Id";
+				}
+			} else if ("createPatient".equals(errorItemAction)) {
+				// put form in queue for normal processing
+				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+				return "This was ok";
+			} else if ("deleteError".equals(errorItemAction)) {
+				// delete the mobileformentry error queue item
+				mobileService.deleteError(errorItem);
+				//and delete from the file system
+				MobileFormEntryUtil.deleteFile(filePath);
+				return "This was ok";
+			} else if ("deleteComment".equals(errorItemAction)) {
+				//set comment to null and save
+				errorItem.setComment(null);
+				mobileService.saveErrorInDatabase(errorItem);
+				return "This was ok";
+			} else if ("newHousehold".equals(errorItemAction)) {
+				if (householdIdentifier != null && householdIdentifier.trim() != "") {
+					// first change household id
+					if (XFormEditor.editNode(filePath,
+						MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX + "/"
+						+ MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, householdIdentifier)) {
+					} else {
+						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+						return "Could not change Household Id";
+					}
+
+					// then change all patient household pointers
+					if (XFormEditor.editNodeList(filePath,
+						MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_INDIVIDUALS_PREFIX,
+						"patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
+						// drop form in queue for normal processing
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
+						return "This was ok";
+					} else {
+						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+						return "Could not change household pointers";
+					}
+				} else {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+					return "Empty Household Id";
+				}
+			} else if ("noChange".equals(errorItemAction)) {
+				return "You selected no change";
+			} else {
+				throw new APIException("Invalid action selected for: " + errorId);
+			}
+		}
+
+		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "amrsmobileforms.resolveErrors.action.success");
+		return "You are not authenticated to do this";
+	}
+	
+	
+	/**
+	 * Reverses patient Identifier nodes after for a form with more than one
+	 *
+	 * @param filePath
+	 * @param patientIdentifier
+	 * @return
+	 */
+	private static boolean reverseNodes(String filePath, String patientIdentifier) {
+		try {
+
+			File file = new File(filePath);
+
+			// Create instance of DocumentBuilderFactory
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = factory.newDocumentBuilder();
+
+			// Using existing XML Document
+			Document doc = docBuilder.parse(file);
+			XPathFactory xpf = XPathFactory.newInstance();
+			XPath xp = xpf.newXPath();
+
+			Node curNode = (Node) xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
+			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
+
+			// If patient has an AMPATH ID we use it to create the patient
+			if (patientAmpathIdentifier != null && patientAmpathIdentifier != "") {
+				XFormEditor.editNode(filePath,
+					MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientAmpathIdentifier);
+				XFormEditor.editNode(filePath,
+					MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "3");
+				XFormEditor.editNode(filePath,
+					MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientIdentifier);
+			} else {
+				//Patient has only one id
+				XFormEditor.editNode(filePath,
+					MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER, patientIdentifier);
+				XFormEditor.editNode(filePath,
+					MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_IDENTIFIER_TYPE, "8");
+			}
+		} catch (Throwable t) {
+			log.error("Error reversing nodes", t);
+			return false;
+		}
+		return true;
+	}
+
+	
+	/**
+	 * Stores a form in a specified folder
+	 */
+	private static void saveForm(String oldFormPath, String newFormPath) {
+		try {
+			if (oldFormPath != null) {
+				File file = new File(oldFormPath);
+
+				//move the file to specified new directory
+				file.renameTo(new File(newFormPath));
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private MobileFormEntryService getMobileFormEntryService(){
+		return Context.getService(MobileFormEntryService.class);
+	}
+	
+	/**
+	 *
+	 * @param destination
+	 * @param error
+	 */
+	private void moveAndDeleteError(String destination, MobileFormEntryError error) {
+		// find error location
+		String filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + error.getFormName();
+		// put form in queue for normal processing
+		saveForm(filePath, destination + error.getFormName());
+		// delete the mobileformentry error queue item
+		getMobileFormEntryService().deleteError(error);
+	}
+
 }
