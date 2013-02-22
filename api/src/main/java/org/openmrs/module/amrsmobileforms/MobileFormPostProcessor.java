@@ -2,7 +2,6 @@ package org.openmrs.module.amrsmobileforms;
 
 import java.io.File;
 import java.util.Iterator;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;

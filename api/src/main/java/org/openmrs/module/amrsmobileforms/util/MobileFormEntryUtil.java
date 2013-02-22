@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.Location;
 import org.openmrs.Person;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
@@ -275,7 +276,7 @@ public class MobileFormEntryUtil {
 		return false;
 	}
 
-	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId) {
+	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId, Integer locationId) {
 		MobileFormEntryError mobileFormEntryError = new MobileFormEntryError();
         mobileFormEntryError.setProviderId(providerId);
 		mobileFormEntryError.setFormName(formName);
@@ -630,7 +631,7 @@ public class MobileFormEntryUtil {
 		return null;
 	}
 
-	/**
+ 	/**
 	 * Deletes a file specified by form path
 	 */
 	public static void deleteFile(String filePath) {

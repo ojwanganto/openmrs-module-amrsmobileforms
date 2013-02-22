@@ -204,6 +204,7 @@ public class HibernateMobileFormEntryDAO implements MobileFormEntryDAO {
 			Criterion disjunction = Restrictions.disjunction()
 					.add(Restrictions.sqlRestriction("mobile_formentry_error_id like '" + idQuery + "'"))
                     .add(Restrictions.like("providerId", query, MatchMode.ANYWHERE))
+                    .add(Restrictions.like("locationId", query, MatchMode.ANYWHERE))
 					.add(Restrictions.like("error", query, MatchMode.ANYWHERE))
 					.add(Restrictions.like("errorDetails", query, MatchMode.ANYWHERE))
 					.add(Restrictions.like("formName", query, MatchMode.ANYWHERE));

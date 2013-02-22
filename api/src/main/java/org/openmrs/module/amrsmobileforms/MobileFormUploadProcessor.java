@@ -62,6 +62,7 @@ public class MobileFormUploadProcessor {
 	private void processSplitForm(String filePath, MobileFormQueue queue) throws APIException {
 		log.debug("Sending splitted mobile forms to the xform module");
         String providerId=null;
+        Integer locationId =0;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -80,6 +81,8 @@ public class MobileFormUploadProcessor {
             curNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
             Integer intProvider = MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
             providerId=intProvider.toString();
+            String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+            locationId = Integer.parseInt(householdLocation);
             //Ensure there is a patient identifier in the form and
 			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
@@ -91,7 +94,7 @@ public class MobileFormUploadProcessor {
 					// form has no patient identifier but has names : move to error
 					saveFormInError(filePath);
 					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-							"Patient has no identifier, or the identifier provided is invalid",providerId));
+							"Patient has no identifier, or the identifier provided is invalid",providerId,locationId));
 				}
 				return;
 			}
@@ -100,7 +103,7 @@ public class MobileFormUploadProcessor {
 			if (familyName == null || familyName.trim() == "" || givenName == null || givenName == "") {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-						"Patient has no valid names specified, Family Name and Given Name are required",providerId));
+						"Patient has no valid names specified, Family Name and Given Name are required",providerId,locationId));
 				return;
 			}
 
@@ -110,11 +113,11 @@ public class MobileFormUploadProcessor {
 				// form has no valid provider : move to error
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient form",
-						"Provider for this encounter is not provided, or the provider identifier provided is invalid",providerId));
+						"Provider for this encounter is not provided, or the provider identifier provided is invalid",providerId,locationId));
 				return;
 			} else {
 				XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId);
+						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER,providerId);
 			}
 
 			// ensure patient has birth date
@@ -122,7 +125,7 @@ public class MobileFormUploadProcessor {
 				Integer yearOfBirth = MobileFormEntryUtil.getBirthDateFromAge(doc);
 				if (yearOfBirth == null) {//patient has no valid birth-date
 					saveFormInError(filePath);
-					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate",providerId));
+					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate",providerId,locationId));
 					return;
 				} else {
 					//fix birth-date from age
@@ -137,7 +140,7 @@ public class MobileFormUploadProcessor {
 			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-						"Patient is not linked to household or household Id provided is invalid",providerId));
+						"Patient is not linked to household or household Id provided is invalid",providerId,locationId));
 				return;
 			}
 
@@ -158,7 +161,7 @@ public class MobileFormUploadProcessor {
 					sb.append(".");
 
 					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath),
-							"Error processing patient", sb.toString(),providerId));
+							"Error processing patient", sb.toString(),providerId,locationId));
 					return;
 				}
 			}
@@ -180,7 +183,7 @@ public class MobileFormUploadProcessor {
 			log.error("Error while sending form to xform module", t);
 			//put file in error queue
 			saveFormInError(filePath);
-			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error sending form to xform module", t.getMessage(),providerId));
+			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error sending form to xform module", t.getMessage(),providerId,locationId));
 		}
 	}
 

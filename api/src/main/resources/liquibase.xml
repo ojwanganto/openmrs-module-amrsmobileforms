@@ -74,6 +74,19 @@
 
         </addColumn>
     </changeSet>
+    <changeSet author="akwatuha" id="Mobileformentry-22-02-2013:12:40">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="mobileformentry_error" columnName="location_id"/>
+            </not>
+
+        </preConditions>
+        <comment>Creating a column that will hold the location of the household or individual</comment>
+        <addColumn tableName="mobileformentry_error">
+            <column name="location_id" type="varchar(20)" defaultValue="null"  />
+
+        </addColumn>
+    </changeSet>
 
 
 </databaseChangeLog>		

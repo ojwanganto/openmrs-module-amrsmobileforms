@@ -14,6 +14,8 @@
 
         <property name="providerId" type="java.lang.String"
                   column="provider_id" length="20" />
+        <property name="locationId" type="java.lang.String"
+                  column="location_id" length="20" />
 
         <property name="formName" type="java.lang.String"
 			column="form_name" not-null="true" length="16777215" />

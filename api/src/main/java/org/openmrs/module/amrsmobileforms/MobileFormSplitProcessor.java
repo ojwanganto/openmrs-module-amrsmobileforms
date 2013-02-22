@@ -35,7 +35,6 @@ public class MobileFormSplitProcessor {
 	private static final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	private DocumentBuilder docBuilder;
 	private MobileFormEntryService mobileService;
-	
 	public MobileFormSplitProcessor(){
 		try{
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -53,6 +52,7 @@ public class MobileFormSplitProcessor {
 	private boolean splitMobileForm(MobileFormQueue queue) throws APIException {
 		String formData = queue.getFormData();
         String providerId=null;
+        Integer locationId=0;
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
@@ -64,7 +64,7 @@ public class MobileFormSplitProcessor {
 			//Move form to error queue
 			saveFormInError(queue.getFileSystemUrl());
 			mobileService.saveErrorInDatabase(MobileFormEntryUtil.
-					createError(getFormName(queue.getFileSystemUrl()), "Error splitting document", t.getMessage(),providerId));
+					createError(getFormName(queue.getFileSystemUrl()), "Error splitting document", t.getMessage(),providerId,locationId));
 			return false;
 		}
 		return true;
