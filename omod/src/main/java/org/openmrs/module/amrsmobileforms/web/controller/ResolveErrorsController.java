@@ -476,7 +476,7 @@ public class ResolveErrorsController {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("id", error.getMobileFormEntryErrorId());
         result.put("location", errorModel.getLocation());
-        result.put("provider", error.getProvider());
+        result.put("provider", error.getProviderId());
     	result.put("error", error.getError());
 		result.put("errorDetails", error.getErrorDetails());
 		result.put("formName", error.getFormName());

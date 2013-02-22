@@ -60,5 +60,20 @@
 			referencedColumnNames="user_id" referencedTableName="users"/>
 			
 	</changeSet>
-			
+
+    <changeSet author="akwatuha" id="Mobileformentry-22-02-2013:09:00">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="mobileformentry_error" columnName="provider_id"/>
+            </not>
+
+        </preConditions>
+        <comment>Creating a column that will hold identity of whoever created the household or individual</comment>
+        <addColumn tableName="mobileformentry_error">
+            <column name="provider_id" type="varchar(20)" defaultValue="null"  />
+
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>		
