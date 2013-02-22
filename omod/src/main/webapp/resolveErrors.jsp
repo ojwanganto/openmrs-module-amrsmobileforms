@@ -407,26 +407,16 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
 
     function generate_table(data,bodyDiv,option) {
 
-        
-        // get the reference for the body
         var body = document.getElementById(bodyDiv);
         
         var tbl     = document.createElement("table");
         tbl.setAttribute('width','100%');
         tbl.setAttribute('class','tblformat');
-        
-	if(option==1){
-		 tbl.setAttribute('id','errorsummary');
-	}
+     
+		tbl.setAttribute('id','errorsummary');
+	
 
         var tblBody = document.createElement("tbody");
-	
-    if(option==2){
-    	 var row0 = buildRow("Comment",data.comment);
-    	 var row01 = buildRow("Commented By",data.commentedBy);
-    	 var row02 = buildRow("Date Commented",data.dateCommented);
-   	}
-
         var row1 = buildRow("Person Name",data.name);      
         var row2 = buildRow("Person Identifier",data.identifier);
         var row3 = buildRow("Gender",data.gender);
@@ -438,19 +428,18 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
         var row8 = buildRow("Error ID",data.mobileFormEntryErrorId);
         var row9 = buildRow("Date Created",data.dateCreated);
         var row10 = buildRow("Error",data.error);
-        var row11 = buildRowWithElement("Error Details",data.errorDetails);
-        var row12 = buildRowWithElement("XML Form",data.formName);
         
-        if(option==1){
+        var totalHousehold = buildRow("Total Household",data.totalHousehold);
+        var totalEligible = buildRow("Total Eligible",data.totalEligible);
+        var providerId = buildRow("Provider Id",data.providerId);
+        
+        var row13 = buildRowWithElement("Error Details",data.errorDetails);
+        //var row14 = buildRowWithElement("XML Form",data.formName);
+        
         var comment = buildTextArea("Comment","comment");
-        }
+        
      
-        if(option==2){
-        	tblBody.appendChild(row0);
-        	tblBody.appendChild(row01);
-        	tblBody.appendChild(row02);
-       	
-      	}
+  
         
         tblBody.appendChild(row1);
         tblBody.appendChild(row2);
@@ -462,12 +451,14 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
         tblBody.appendChild(row8); 
         tblBody.appendChild(row9);
         tblBody.appendChild(row10); 
-        tblBody.appendChild(row11);
+        tblBody.appendChild(totalHousehold);
+        tblBody.appendChild(totalEligible);
+        tblBody.appendChild(providerId);
+        tblBody.appendChild(row13);
+        //tblBody.appendChild(row14);
         
-        if(option==1){
         tblBody.appendChild(comment);
-        }
-        tblBody.appendChild(row12); 
+        
         tbl.appendChild(tblBody);
         
         body.appendChild(tbl);
@@ -509,6 +500,10 @@ function generate_ResolveError_table(data) {
         var row8 = buildRow("Error ID",data.mobileFormEntryErrorId);
         var row9 = buildRow("Date Created",data.dateCreated);
         var row10 = buildRow("Error",data.error);
+        
+        var totalhousehold = buildRow("Total Household",data.totalHousehold);
+        var totaleligible = buildRow("Total Eligible",data.totalEligible);
+        var providerId = buildRow("Provider Id",data.providerId);
         var row11 = buildRowWithElement("Error Details",data.errorDetails);
         var row12 = buildRowWithElement("XML Form",data.formName);
         //createOpemrsSpecificInputs(label,id,name,id2)
@@ -538,6 +533,10 @@ function generate_ResolveError_table(data) {
         tblBody.appendChild(row8); 
         tblBody.appendChild(row9);
         tblBody.appendChild(row10); 
+        
+        tblBody.appendChild(totalhousehold); 
+        tblBody.appendChild(totaleligible); 
+        tblBody.appendChild(providerId);
         tblBody.appendChild(row11);
        
         tblBody.appendChild(row12); 

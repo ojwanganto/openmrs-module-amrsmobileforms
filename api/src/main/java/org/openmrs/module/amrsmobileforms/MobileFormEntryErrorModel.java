@@ -25,9 +25,15 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String birthdate = "";
 	private String gender = "";
 	private String identifier = "";
+	
+	//data from household meta-data section
+	private String totalHousehold = "";
+	private String totalEligible = "";
 
 	// data from the formData encounter section
+	//encounter.provider_id
 	private String location = "";
+	private String providerId = "";
 	private String encounterDate = "";
 	private String formModelName = "";
 	private String formId = "";
@@ -68,6 +74,10 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 					setGender("N/A");
 					setLocation(xp.evaluate("/form/household/meta_data/catchment_area", formDataDoc));
 					setEncounterDate(xp.evaluate("/form/meta/start_time", formDataDoc));
+				
+					setTotalHousehold(xp.evaluate("/form/household/meta_data/total_household", formDataDoc));
+					setTotalEligible(xp.evaluate("/form/household/meta_data/total_eligible", formDataDoc));
+					setProviderId(xp.evaluate("/form/encounter/encounter.provider_id",formDataDoc));
 				} else {
 					setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
 							xp.evaluate("/form/patient/patient.middle_name", formDataDoc) + " " +
@@ -81,6 +91,11 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 					String location = xp.evaluate("/form/encounter/encounter.location_id", formDataDoc);
 					setLocation(location.substring(location.indexOf("^") + 1));
 					setEncounterDate(xp.evaluate("/form/encounter/encounter.encounter_datetime", formDataDoc));
+				
+					setTotalHousehold("N/A");
+					setTotalEligible("N/A");
+					
+					setProviderId(xp.evaluate("/form/encounter/encounter.provider_id",formDataDoc));
 				}
 
 				setFormModelName(xp.evaluate("/form/@name", formDataDoc));
@@ -212,6 +227,48 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		this.formPath = formPath;
 	}
 
+	/**
+	 * @return the totalHousehold
+	 */
+	public String getTotalHousehold() {
+		return totalHousehold;
+	}
+
+	/**
+	 * @param totalHousehold the totalHousehold to set
+	 */
+	public void setTotalHousehold(String totalHousehold) {
+		this.totalHousehold = totalHousehold;
+	}
+	
+	
+	/**
+	 * @return the totalEligible
+	 */
+	public String getTotalEligible() {
+		return totalEligible;
+	}
+
+	/**
+	 * @param totalEligible the totalEligible to set
+	 */
+	public void setTotalEligible(String totalEligible) {
+		this.totalEligible = totalEligible;
+	}
+	
+	/**
+	 * @return the providerId
+	 */
+	public String getProviderId() {
+		return providerId;
+	}
+
+	/**
+	 * @param providerId the providerId to set
+	 */
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
+	}
 
 	/**
 	 * @return the errorType

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import org.openmrs.api.PersonService;
+import org.openmrs.Person;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
@@ -382,6 +384,24 @@ public class DWRAMRSMobileFormsService {
 		saveForm(filePath, destination + error.getFormName());
 		// delete the mobileformentry error queue item
 		getMobileFormEntryService().deleteError(error);
+	}
+	
+	/*
+	 * A function that enables for searching of patients using either patient number or names
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public List<Person> getPersons(String phrase){
+		
+		PersonService ps = Context.getPersonService();
+		List<Person> foundPersons = new ArrayList<Person>();
+		
+		
+		foundPersons = ps.getPeople(phrase, false);
+		
+		return foundPersons;
 	}
 
 }
