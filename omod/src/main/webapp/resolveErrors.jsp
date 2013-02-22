@@ -10,6 +10,7 @@
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/css/dataTables_jui.css" />
+<openmrs:htmlInclude file="/scripts/jquery-ui/js/openmrsSearch.js" />
 
 <h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
 <style type="text/css">
@@ -47,6 +48,17 @@
 	var eTable = null;
 
 	$j(document).ready(function(){
+		
+		
+		 $j("#provider").openmrsSearch({
+	            searchLabel:'Select Provider',
+	            searchPlaceholder: 'Select Provider',
+	            searchHandler: doSearchHandler,
+	            selectionHandler: doSelectionHandler,
+	            fieldsAndHeaders: [ {fieldName:"names", header:"Provider Name"},
+	                    {fieldName:"personId", header:"Person Id"}
+	                ]
+	        });
 
 		// set up the error datatable
 		eTable = $j("#errorTable").dataTable({
@@ -185,7 +197,7 @@
                  buttons:{
                      "Submit Comment":function(){
                     	 
-                    		var provider = document.getElementById('provider').value;
+                    		var provider = document.getElementById('selprovider').value;
                            	var newPatient = document.getElementById('patient').value;
                            	var patientId = document.getElementById('patientid').value;
                            	var dob = document.getElementById('dob').value;
@@ -193,13 +205,7 @@
                            	var householdId = document.getElementById('householdid').value;
                            	var errorItemAction = getSelectedRadio();
                	 
-                    /*String householdId,
-			Integer errorId, 
-			String errorItemAction,
-			String birthDate, 
-			String patientIdentifier,
-			String providerId, 
-			String householdIdentifier  */	 
+              
                     	 
                    
                      	 if(errorItemAction != null){
@@ -399,10 +405,7 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
     
 }
 
-/* Displays error summary on table 
-@param data - returned from the database
-@param bodyDiv - div to hold the table with data
-@param option (1 = comment, 2 = resolve) - selects between comment and resolve data 
+/* Displays a summary dialog window with error details plus a provision to comment on an error
 */
 
     function generate_table(data,bodyDiv,option) {
@@ -417,23 +420,24 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
 	
 
         var tblBody = document.createElement("tbody");
-        var row1 = buildRow("Person Name",data.name);      
-        var row2 = buildRow("Person Identifier",data.identifier);
-        var row3 = buildRow("Gender",data.gender);
-        var row4 = buildRow("Location",data.location);
         
-        var row5 = buildRow("Encounter Date",data.encounterDate);
-        var row6 = buildRow("Form Name",data.formModelName);
-        var row7 = buildRow("Form ID",data.formId);
-        var row8 = buildRow("Error ID",data.mobileFormEntryErrorId);
-        var row9 = buildRow("Date Created",data.dateCreated);
-        var row10 = buildRow("Error",data.error);
+        var pname = buildRow("Person Name",data.name);      
+        var pid = buildRow("Person Identifier",data.identifier);
+        var gender = buildRow("Gender",data.gender);
+        var location = buildRow("Location",data.location);
+        
+        var edate = buildRow("Encounter Date",data.encounterDate);
+        var modelname = buildRow("Form Name",data.formModelName);
+        var formid = buildRow("Form ID",data.formId);
+        var errorid = buildRow("Error ID",data.mobileFormEntryErrorId);
+        var datecreated = buildRow("Date Created",data.dateCreated);
+        var error = buildRow("Error",data.error);
         
         var totalHousehold = buildRow("Total Household",data.totalHousehold);
         var totalEligible = buildRow("Total Eligible",data.totalEligible);
         var providerId = buildRow("Provider Id",data.providerId);
         
-        var row13 = buildRowWithElement("Error Details",data.errorDetails);
+        var errdetails = buildRowWithElement("Error Details",data.errorDetails);
         //var row14 = buildRowWithElement("XML Form",data.formName);
         
         var comment = buildTextArea("Comment","comment");
@@ -441,21 +445,21 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
      
   
         
-        tblBody.appendChild(row1);
-        tblBody.appendChild(row2);
-        tblBody.appendChild(row3); 
-        tblBody.appendChild(row4);
-        tblBody.appendChild(row5); 
-        tblBody.appendChild(row6); 
-        tblBody.appendChild(row7); 
-        tblBody.appendChild(row8); 
-        tblBody.appendChild(row9);
-        tblBody.appendChild(row10); 
+        tblBody.appendChild(pname);
+        tblBody.appendChild(pid);
+        tblBody.appendChild(gender); 
+        tblBody.appendChild(location);
+        tblBody.appendChild(edate); 
+        tblBody.appendChild(modelname); 
+        tblBody.appendChild(formid); 
+        tblBody.appendChild(errorid); 
+        tblBody.appendChild(datecreated);
+        tblBody.appendChild(error); 
         tblBody.appendChild(totalHousehold);
         tblBody.appendChild(totalEligible);
         tblBody.appendChild(providerId);
-        tblBody.appendChild(row13);
-        //tblBody.appendChild(row14);
+        tblBody.appendChild(errdetails);
+       
         
         tblBody.appendChild(comment);
         
@@ -468,11 +472,12 @@ function createOpemrsSpecificInputs(label,id,optval,name,id2){
      
     }
     
-    
+/* Displays a dialog window for resolving errors. It provides relevant option buttons and textboxes for selecting err
+resolution options*/
+
 function generate_ResolveError_table(data) {
 
-        
-        // get the reference for the body
+
         var body = document.getElementById("resolveErrorTable");
         
         var tbl     = document.createElement("table");
@@ -484,75 +489,74 @@ function generate_ResolveError_table(data) {
         var tblBody = document.createElement("tbody");
 	
    
-    	 var row0 = buildRow("Comment",data.comment);
-    	 var row01 = buildRow("Commented By",data.commentedBy);
-    	 var row02 = buildRow("Date Commented",data.dateCommented);
+    	 var comment = buildRow("Comment",data.comment);
+    	 var commentedBy = buildRow("Commented By",data.commentedBy);
+    	 var dateCommented = buildRow("Date Commented",data.dateCommented);
    	
 
-        var row1 = buildRow("Person Name",data.name);      
-        var row2 = buildRow("Person Identifier",data.identifier);
-        var row3 = buildRow("Gender",data.gender);
-        var row4 = buildRow("Location",data.location);
+        var pname = buildRow("Person Name",data.name);      
+        var pid = buildRow("Person Identifier",data.identifier);
+        var gender = buildRow("Gender",data.gender);
+        var location = buildRow("Location",data.location);
         
-        var row5 = buildRow("Encounter Date",data.encounterDate);
-        var row6 = buildRow("Form Name",data.formModelName);
-        var row7 = buildRow("Form ID",data.formId);
-        var row8 = buildRow("Error ID",data.mobileFormEntryErrorId);
-        var row9 = buildRow("Date Created",data.dateCreated);
-        var row10 = buildRow("Error",data.error);
+        var encdate = buildRow("Encounter Date",data.encounterDate);
+        var formmodelname = buildRow("Form Name",data.formModelName);
+        var formid = buildRow("Form ID",data.formId);
+        var errorid = buildRow("Error ID",data.mobileFormEntryErrorId);
+        var datecreated = buildRow("Date Created",data.dateCreated);
+        var err = buildRow("Error",data.error);
         
         var totalhousehold = buildRow("Total Household",data.totalHousehold);
         var totaleligible = buildRow("Total Eligible",data.totalEligible);
         var providerId = buildRow("Provider Id",data.providerId);
-        var row11 = buildRowWithElement("Error Details",data.errorDetails);
-        var row12 = buildRowWithElement("XML Form",data.formName);
-        //createOpemrsSpecificInputs(label,id,name,id2)
-        //(label,id,optval,name,id2,addText)
-       	var row13 = buildResolveOptions('Select Provider for this Patient Encounter','optprovider','linkProvider','errorItemAction','provider',true);
-       	var row14 = buildResolveOptions('Create a new patient using the data from this form','optpatient','createPatient','errorItemAction','patient',true);
-       	var row15 = buildResolveOptions('Assign a new patient Identifier to this Patient','optpatientid','newIdentifier','errorItemAction','patientid',true);
-       	var row16 = buildResolveOptions('Assign a Birth Date to this Patient','optdob','assignBirthdate','errorItemAction','dob',true);
-       	var row17 = buildResolveOptions('Household for this Patient','opthousehold','linkHousehold','errorItemAction','household',true);
-       	var row18 = buildResolveOptions('Assign a new household Identifier to this household','opthouseholdid','newHousehold','errorItemAction','householdid',true);
-       	var row19 = buildResolveOptions('Delete comment','optdelcomment','deleteComment','errorItemAction','provider2',false);
-       	var row20 = buildResolveOptions('Delete this error item because it is invalid','optdelerror','deleteError','errorItemAction','provider2',false);
-       	var row21 = buildResolveOptions('Leave this error item as is and process it at a later point','none','noChange','errorItemAction','provider2',false);
+        var errdetails = buildRowWithElement("Error Details",data.errorDetails);
+        var formname = buildRowWithElement("XML Form",data.formName);
+        
+       	var optprovider = buildResolveOptions('Select Provider for this Patient Encounter','optprovider','linkProvider','errorItemAction','provider',true);
+       	var optpatient = buildResolveOptions('Create a new patient using the data from this form','optpatient','createPatient','errorItemAction','patient',true);
+       	var optpatientid = buildResolveOptions('Assign a new patient Identifier to this Patient','optpatientid','newIdentifier','errorItemAction','patientid',true);
+       	var optdob = buildResolveOptions('Assign a Birth Date to this Patient','optdob','assignBirthdate','errorItemAction','dob',true);
+       	var opthousehold = buildResolveOptions('Household for this Patient','opthousehold','linkHousehold','errorItemAction','household',true);
+       	var opthouseholdid = buildResolveOptions('Assign a new household Identifier to this household','opthouseholdid','newHousehold','errorItemAction','householdid',true);
+       	var optdelcomment = buildResolveOptions('Delete comment','optdelcomment','deleteComment','errorItemAction','provider2',false);
+       	var optdelerror = buildResolveOptions('Delete this error item because it is invalid','optdelerror','deleteError','errorItemAction','provider2',false);
+       	var none = buildResolveOptions('Leave this error item as is and process it at a later point','none','noChange','errorItemAction','provider2',false);
        	
-        	tblBody.appendChild(row0);
-        	tblBody.appendChild(row01);
-        	tblBody.appendChild(row02);
+        	tblBody.appendChild(comment);
+        	tblBody.appendChild(commentedBy);
+        	tblBody.appendChild(dateCommented);
        	
         
-        tblBody.appendChild(row1);
-        tblBody.appendChild(row2);
-        tblBody.appendChild(row3); 
-        tblBody.appendChild(row4);
-        tblBody.appendChild(row5); 
-        tblBody.appendChild(row6); 
-        tblBody.appendChild(row7); 
-        tblBody.appendChild(row8); 
-        tblBody.appendChild(row9);
-        tblBody.appendChild(row10); 
+        tblBody.appendChild(pname);
+        tblBody.appendChild(pid);
+        tblBody.appendChild(gender); 
+        tblBody.appendChild(location);
+        tblBody.appendChild(encdate); 
+        tblBody.appendChild(formmodelname); 
+        tblBody.appendChild(formid); 
+        tblBody.appendChild(errorid); 
+        tblBody.appendChild(datecreated);
+        tblBody.appendChild(err); 
         
         tblBody.appendChild(totalhousehold); 
         tblBody.appendChild(totaleligible); 
         tblBody.appendChild(providerId);
-        tblBody.appendChild(row11);
+        tblBody.appendChild(errdetails);
        
-        tblBody.appendChild(row12); 
-        tblBody.appendChild(row13);
-        tblBody.appendChild(row14);
-        tblBody.appendChild(row15);
-        tblBody.appendChild(row16);
-        tblBody.appendChild(row17);
-        tblBody.appendChild(row18);
-        tblBody.appendChild(row19);
-        tblBody.appendChild(row20);
-        tblBody.appendChild(row21);
+        //tblBody.appendChild(formname); 
+        tblBody.appendChild(optprovider);
+        tblBody.appendChild(optpatient);
+        tblBody.appendChild(optpatientid);
+        tblBody.appendChild(optdob);
+        tblBody.appendChild(opthousehold);
+        tblBody.appendChild(opthouseholdid);
+        tblBody.appendChild(optdelcomment);
+        tblBody.appendChild(optdelerror);
+        tblBody.appendChild(none);
         tbl.appendChild(tblBody);
         
         body.appendChild(tbl);
-        tbl.setAttribute("border", "1");
+        tbl.setAttribute("border", "0");
         
         //---------------------------------------
      
@@ -587,6 +591,22 @@ function generate_ResolveError_table(data) {
 		if (numSelected != $j("span.numDisplayed").html())
 			$j("#selectAll").removeAttr("checked");
 	}
+	
+	
+	
+	function doSelectionHandler(index, data) {
+	        document.getElementById("selprovider").value =data.personId;
+	    }
+	 
+	    //Contains the logic that fetches the results from the server,, should return a map of the form <String, Object>
+	function doSearchHandler(text) {
+	        lastSearch = text;
+	        DWRAMRSMobileFormsService.getPersons(text,handleResult);
+	    }
+	    
+	function handleResult(data){
+	    	alert(data);
+	    }
 
 </script>
 
@@ -599,7 +619,7 @@ function generate_ResolveError_table(data) {
     <div id="resolveErrorTable">
     
     </div>
-
+<input type="hidden" id="selprovider" value=""/>
 </div>
 
 <div><b class="boxHeader">Mobile Form Entry Errors</b>
