@@ -59,7 +59,7 @@ public class MobileFormQueueProcessor {
 		String householdGps = null;
 		MobileFormEntryService mfes = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
         String providerId=null;
-        Integer locationId=0;
+        String locationId=null;
 
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -70,8 +70,11 @@ public class MobileFormQueueProcessor {
 			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode);
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
             String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
-            locationId= Integer.parseInt(householdLocation);
-            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode)));
+
+            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+            locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
+
+            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
 			// check household identifier and gps were entered correctly
 			if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
 				log.debug("Null household identifier or GPS");

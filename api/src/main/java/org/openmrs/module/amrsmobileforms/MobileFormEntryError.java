@@ -15,7 +15,7 @@ public class MobileFormEntryError extends BaseOpenmrsObject implements Auditable
 
 	private Integer mobileFormEntryErrorId;
     private String providerId;
-    private Integer locationId;
+    private String locationId;
 	private String formName;
 	private String error;
 	private String errorDetails;
@@ -118,7 +118,7 @@ public class MobileFormEntryError extends BaseOpenmrsObject implements Auditable
     /**
      * @return Returns the Location Id
      */
-    public Integer getLocationId() {
+    public String getLocationId() {
         return locationId;
     }
 
@@ -126,7 +126,7 @@ public class MobileFormEntryError extends BaseOpenmrsObject implements Auditable
      * @param Location Id
      *            The formData to set.
      */
-    public void setLocationId(Integer locationId) {
+    public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
 	/**

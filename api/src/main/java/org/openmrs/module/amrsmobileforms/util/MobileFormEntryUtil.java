@@ -276,15 +276,30 @@ public class MobileFormEntryUtil {
 		return false;
 	}
 
-	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId, Integer locationId) {
+	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId, String locationId) {
 		MobileFormEntryError mobileFormEntryError = new MobileFormEntryError();
-        mobileFormEntryError.setProviderId(providerId);
 		mobileFormEntryError.setFormName(formName);
 		mobileFormEntryError.setError(error);
 		mobileFormEntryError.setErrorDetails(errorDetails);
+        mobileFormEntryError.setProviderId(providerId);
+        mobileFormEntryError.setLocationId(locationId);
 		return mobileFormEntryError;
 	}
+    public static String cleanLocationEntry(String householdLocation) {
+        householdLocation=householdLocation.trim();
+        String locationId=null;
+        if(householdLocation.length()>0)  {
 
+            String lastDec=householdLocation.substring(householdLocation.length()-2);
+            if (lastDec.equals(".0")) {
+                locationId=householdLocation.substring(0,householdLocation.length()-2);
+            } else {
+                locationId= householdLocation;
+            }
+        }
+
+        return   locationId;
+    }
 	public static MobileFormHousehold getHousehold(MobileFormHousehold household, Document doc, XPath xp) throws XPathExpressionException {
 		Node householdMetaNode = (Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 		if (household == null) {

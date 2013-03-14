@@ -62,7 +62,7 @@ public class MobileFormUploadProcessor {
 	private void processSplitForm(String filePath, MobileFormQueue queue) throws APIException {
 		log.debug("Sending splitted mobile forms to the xform module");
         String providerId=null;
-        Integer locationId =0;
+        String locationId =null;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -78,11 +78,19 @@ public class MobileFormUploadProcessor {
 			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, curNode);
 			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, curNode);
 
-            curNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
+           /* curNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
             Integer intProvider = MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
-            providerId=intProvider.toString();
+            providerId=intProvider.toString();*/
             String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
-            locationId = Integer.parseInt(householdLocation);
+
+            //Clean location id by removing decimal points
+            locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
+
+            //find  provider Id from the document
+            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
+
+
             //Ensure there is a patient identifier in the form and
 			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {

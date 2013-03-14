@@ -52,7 +52,7 @@ public class MobileFormSplitProcessor {
 	private boolean splitMobileForm(MobileFormQueue queue) throws APIException {
 		String formData = queue.getFormData();
         String providerId=null;
-        Integer locationId=0;
+        String locationId=null;
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
