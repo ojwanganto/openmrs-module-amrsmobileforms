@@ -74,8 +74,9 @@ public class MobileFormHouseholdLinksProcessor {
 
              //find  provider Id from the document
             Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-
+            //providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
+            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
+            providerId=providerId.trim();
             //Clean location id by removing decimal points
             locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
 

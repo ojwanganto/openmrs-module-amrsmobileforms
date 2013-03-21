@@ -74,7 +74,10 @@ public class MobileFormQueueProcessor {
             Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
             locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
 
-            providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
+           // providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
+
+            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
+            providerId=providerId.trim();
 			// check household identifier and gps were entered correctly
 			if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
 				log.debug("Null household identifier or GPS");
