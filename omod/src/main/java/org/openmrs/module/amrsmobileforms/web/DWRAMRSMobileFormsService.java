@@ -163,7 +163,7 @@ public class DWRAMRSMobileFormsService {
 	 * Controller for resolveError post jsp Page
 	 */
 	
-	public String resolveError(
+	public List resolveError(
 			String householdId,
 			Integer errorId, 
 			String errorItemAction,
@@ -173,13 +173,17 @@ public class DWRAMRSMobileFormsService {
 			String householdIdentifier) {
 		MobileFormEntryService mobileService;
 		String filePath;
+		List statusInfo = new ArrayList();
+		
 
 		// user must be authenticated (avoids authentication errors)
 		if (Context.isAuthenticated()) {
 			if (!Context.getAuthenticatedUser().hasPrivilege(
 				MobileFormEntryConstants.PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR)) {
 				//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.action.noRights");
-				return "Sorry, you do not have privileges for the operation";
+				statusInfo.add(0);
+				statusInfo.add("Sorry, you do not have privileges for the operation");
+				return statusInfo;
 			}
 
 			mobileService = Context.getService(MobileFormEntryService.class);
@@ -190,13 +194,20 @@ public class DWRAMRSMobileFormsService {
 			if ("linkHousehold".equals(errorItemAction)) {
 				if (mobileService.getHousehold(householdId) == null) {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createLink.error");
-					return "Wrong household ID";
+					statusInfo.add(0);
+					statusInfo.add("You provided a wrong household ID!");
+					return statusInfo;
+					
 				} else {
 					if (XFormEditor.editNode(filePath,
 						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
 						// put form in queue for normal processing
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-						return "This was ok";
+						
+						statusInfo.add(1);
+						statusInfo.add("The process was completed successfully");
+						return statusInfo;
+						
 					}
 				}
 			} else if ("assignBirthdate".equals(errorItemAction)) {
@@ -211,28 +222,46 @@ public class DWRAMRSMobileFormsService {
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, formattedDate)) {
 							// put form in queue for normal processing
 							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-							return "This was ok";
+							
+							statusInfo.add(1);
+							statusInfo.add("The process was completed successfully");
+							return statusInfo;
 						}
 					} catch (ParseException e) {
 						String error = "Birthdate was not assigned, Invalid date entered: " + birthDate;
 						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, error);
 						log.error(error, e);
-						return "Invalid date of birth";
+						
+						statusInfo.add(0);
+						statusInfo.add("Invalid date of birth");
+						return statusInfo;
+						
 					}
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
-					return "No date was entered";
+					
+					statusInfo.add(0);
+					statusInfo.add("You entered an empty date of birth");
+					return statusInfo;
+					
 				}
 			} else if ("newIdentifier".equals(errorItemAction)) {
 				if (patientIdentifier != null && patientIdentifier.trim() != "") {
 					if (reverseNodes(filePath, patientIdentifier)) {
 						// put form in queue for normal processing
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-						return "This was ok";
+						
+						statusInfo.add(1);
+						statusInfo.add("The process was completed successfully");
+						return statusInfo;
+						
 					}
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
-					return "You entered an empty identifier";
+					statusInfo.add(0);
+					statusInfo.add("You entered an empty identifier");
+					return statusInfo;
+					
 				}
 			} else if ("linkProvider".equals(errorItemAction)) {
 				if (providerId != null && providerId.trim() != "") {
@@ -241,27 +270,44 @@ public class DWRAMRSMobileFormsService {
 						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
 						// put form in queue for normal processing
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-						return "This was ok";
+						
+						statusInfo.add(1);
+						statusInfo.add("The process was completed successfully");
+						return statusInfo;
 					}
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
-					return "You entered an empty Provider Id";
+					
+					statusInfo.add(0);
+					statusInfo.add("You entered an empty Provider Id");
+					return statusInfo;
 				}
 			} else if ("createPatient".equals(errorItemAction)) {
 				// put form in queue for normal processing
 				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-				return "This was ok";
+				
+				statusInfo.add(1);
+				statusInfo.add("The process was completed successfully");
+				return statusInfo;
+				
 			} else if ("deleteError".equals(errorItemAction)) {
 				// delete the mobileformentry error queue item
 				mobileService.deleteError(errorItem);
 				//and delete from the file system
 				MobileFormEntryUtil.deleteFile(filePath);
-				return "This was ok";
+				statusInfo.add(1);
+				statusInfo.add("The process was completed successfully");
+				return statusInfo;
+				
 			} else if ("deleteComment".equals(errorItemAction)) {
 				//set comment to null and save
 				errorItem.setComment(null);
 				mobileService.saveErrorInDatabase(errorItem);
-				return "This was ok";
+				
+				statusInfo.add(1);
+				statusInfo.add("The process was completed successfully");
+				return statusInfo;
+				
 			} else if ("newHousehold".equals(errorItemAction)) {
 				if (householdIdentifier != null && householdIdentifier.trim() != "") {
 					// first change household id
@@ -270,7 +316,10 @@ public class DWRAMRSMobileFormsService {
 						+ MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, householdIdentifier)) {
 					} else {
 						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-						return "Could not change Household Id";
+						
+						statusInfo.add(0);
+						statusInfo.add("Could not change Household Id");
+						return statusInfo;
 					}
 
 					// then change all patient household pointers
@@ -279,24 +328,40 @@ public class DWRAMRSMobileFormsService {
 						"patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
 						// drop form in queue for normal processing
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
-						return "This was ok";
+						statusInfo.add(1);
+						statusInfo.add("The process was completed successfully");
+						return statusInfo;
+						
 					} else {
 						//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-						return "Could not change household pointers";
+						
+						statusInfo.add(0);
+						statusInfo.add("Could not change household pointers");
+						return statusInfo;
 					}
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-					return "Empty Household Id";
+					
+					statusInfo.add(0);
+					statusInfo.add("You provided an empty Household Id");
+					return statusInfo;
 				}
 			} else if ("noChange".equals(errorItemAction)) {
-				return "You selected no change";
+				
+				statusInfo.add(2);
+				statusInfo.add("No change was made to the error");
+				return statusInfo;
+				
 			} else {
 				throw new APIException("Invalid action selected for: " + errorId);
 			}
 		}
 
 		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "amrsmobileforms.resolveErrors.action.success");
-		return "You are not authenticated to do this";
+		
+		statusInfo.add(2);
+		statusInfo.add("Please, you are not authenticated to do this");
+		return statusInfo;
 	}
 	
 	

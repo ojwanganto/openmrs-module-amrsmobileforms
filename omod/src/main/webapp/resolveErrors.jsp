@@ -50,13 +50,11 @@
 
 <script>
 	var eTable = null;
-	
-	//define var for openmrs search widget 
-	var lastSearch;
+		
 
 	$j(document).ready(function(){
 
-		// set up the error datatable
+		// set up the error datatable 
 		eTable = $j("#errorTable").dataTable({
 			bAutoWidth: false,
 			bDeferRender: true,
@@ -258,8 +256,27 @@
 	});
 	
 	function resolveErrorResult(data){
-		alert(data);
-		document.location.reload(true);
+		
+		
+		var resultId =data[0].trim();
+		var resultMsg = data[1].trim();
+		
+		if(resultId==0){
+			alert(resultMsg);	
+		}
+		else if(resultId==1){
+			alert(resultMsg);
+			document.location.reload(true);
+		}
+		else if(resultId==2){
+			alert(resultMsg);
+			document.location.reload(true);
+		}
+		else{
+			alert(data);
+		}
+		
+		
 	}
 	
 	function alertResult(data){
