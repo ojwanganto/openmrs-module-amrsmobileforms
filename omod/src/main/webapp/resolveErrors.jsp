@@ -5,12 +5,16 @@
 <%@ include file="/WEB-INF/template/header.jsp" %>
 <%@ include file="localHeader.jsp"%>
 
+<openmrs:htmlInclude file="/scripts/calendar/calendar.js" />
+<openmrs:htmlInclude file="/scripts/dojoConfig.js" />
+<openmrs:htmlInclude file="/scripts/dojo/dojo.js" />
+
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/js/jquery.dataTables.min.js" />
 <openmrs:htmlInclude file="/dwr/interface/DWRAMRSMobileFormsService.js"/>
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsmobileforms/css/dataTables_jui.css" />
-<openmrs:htmlInclude file="/scripts/jquery-ui/js/openmrsSearch.js" />
+
 
 <h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
 <style type="text/css">
@@ -46,19 +50,11 @@
 
 <script>
 	var eTable = null;
+	
+	//define var for openmrs search widget 
+	var lastSearch;
 
 	$j(document).ready(function(){
-		
-		
-		 $j("#provider").openmrsSearch({
-	            searchLabel:'Select Provider',
-	            searchPlaceholder: 'Select Provider',
-	            searchHandler: doSearchHandler,
-	            selectionHandler: doSelectionHandler,
-	            fieldsAndHeaders: [ {fieldName:"names", header:"Provider Name"},
-	                    {fieldName:"personId", header:"Person Id"}
-	                ]
-	        });
 
 		// set up the error datatable
 		eTable = $j("#errorTable").dataTable({
@@ -133,8 +129,7 @@
 
 
             });
-
-
+            
             
             $j( "#dialog-form" ).dialog({
                 height: 600,
@@ -195,28 +190,29 @@
                  width: 1000,
                  modal: false,
                  buttons:{
-                     "Submit Comment":function(){
+                     "Resolve Error":function(){
                     	 
                     		var provider = document.getElementById('selprovider').value;
-                           	var newPatient = document.getElementById('patient').value;
-                           	var patientId = document.getElementById('patientid').value;
-                           	var dob = document.getElementById('dob').value;
-                           	var newHousehold = document.getElementById('household').value;
-                           	var householdId = document.getElementById('householdid').value;
+                           	//var newPatient = document.getElementById('patient').value;
+                           	var patientId = document.getElementsByName('patientIdentifier').value;
+                           	var dob = document.getElementsByName('birthDate').value;
+                           	var newHousehold = document.getElementsByName('householdId').value;
+                           	var householdId = document.getElementsByName('householdIdentifier').value;
                            	var errorItemAction = getSelectedRadio();
                	 
               
                     	 
                    
-                     	 if(errorItemAction != null){
-  DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,resolveErrorResult);
-                         	  
-                     	 }
-                     	 else{
-                     		 alert("Please select the action to take");
-                     		
-                     	 } 
+	                   	 if(errorItemAction != null){
+	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,resolveErrorResult);
+	                      	  
+	                   	 }
+	                   	 else{
+	                   		 alert("Please select the action to take");
+	                   		
+	                   	 }  
                      	 
+                     	                    	 
 
                      },
                      Cancel: function() {
@@ -270,6 +266,7 @@
 		alert(data);
 		document.location.reload(true);
 	}
+	
 	
 	function buildRow(label,tdvalue){
 		
@@ -359,51 +356,6 @@ function buildResolveOptions(label,id,optval,name,id2,addText){
     
 }
 
-
-
-function createOpemrsSpecificInputs(label,id,optval,name,id2){
-	var row = document.createElement("tr");
-    var cell = document.createElement("td");
-    var cell2 = document.createElement("td");
-    var celllabel = document.createTextNode(label);
-    
-    
-    var radio = document.createElement("input");
-    radio.setAttribute('type','radio');
-    radio.setAttribute('id',id);
-    radio.setAttribute('name',name);
-    radio.setAttribute('value',name);
-    
-    	
-    /* var inputtext = document.createElement("openmrs_tag:userField");
-    inputtext.setAttribute('formFieldName',id2);
-    inputtext.setAttribute('searchLabelCode','amrsmobileforms.resolveErrors.action.findProvider');
-    inputtext.setAttribute('initialValue','');
-    inputtext.setAttribute('callback','setErrorAction'); */
-    
-
-    var inputtext = document.createElement("input");
-    inputtext.setAttribute('id','providerId');
-    inputtext.setAttribute('type','text');
-    inputtext.setAttribute('class','ui-autocomplete-input');
-    inputtext.setAttribute("role","textbox");
-    inputtext.setAttribute('aria-autocomplete','list');
-    inputtext.setAttribute('aria-haspopup','true');
-    
-    
-    cell.appendChild(radio);
-    cell.appendChild(celllabel);
-
-    	cell2.appendChild(inputtext);
-
-    
-    
-    row.appendChild(cell);
-    row.appendChild(cell2);
-    return row;
-    
-    
-}
 
 /* Displays a summary dialog window with error details plus a provision to comment on an error
 */
@@ -512,16 +464,6 @@ function generate_ResolveError_table(data) {
         var errdetails = buildRowWithElement("Error Details",data.errorDetails);
         var formname = buildRowWithElement("XML Form",data.formName);
         
-       	var optprovider = buildResolveOptions('Select Provider for this Patient Encounter','optprovider','linkProvider','errorItemAction','provider',true);
-       	var optpatient = buildResolveOptions('Create a new patient using the data from this form','optpatient','createPatient','errorItemAction','patient',true);
-       	var optpatientid = buildResolveOptions('Assign a new patient Identifier to this Patient','optpatientid','newIdentifier','errorItemAction','patientid',true);
-       	var optdob = buildResolveOptions('Assign a Birth Date to this Patient','optdob','assignBirthdate','errorItemAction','dob',true);
-       	var opthousehold = buildResolveOptions('Household for this Patient','opthousehold','linkHousehold','errorItemAction','household',true);
-       	var opthouseholdid = buildResolveOptions('Assign a new household Identifier to this household','opthouseholdid','newHousehold','errorItemAction','householdid',true);
-       	var optdelcomment = buildResolveOptions('Delete comment','optdelcomment','deleteComment','errorItemAction','provider2',false);
-       	var optdelerror = buildResolveOptions('Delete this error item because it is invalid','optdelerror','deleteError','errorItemAction','provider2',false);
-       	var none = buildResolveOptions('Leave this error item as is and process it at a later point','none','noChange','errorItemAction','provider2',false);
-       	
         	tblBody.appendChild(comment);
         	tblBody.appendChild(commentedBy);
         	tblBody.appendChild(dateCommented);
@@ -543,16 +485,6 @@ function generate_ResolveError_table(data) {
         tblBody.appendChild(providerId);
         tblBody.appendChild(errdetails);
        
-        //tblBody.appendChild(formname); 
-        tblBody.appendChild(optprovider);
-        tblBody.appendChild(optpatient);
-        tblBody.appendChild(optpatientid);
-        tblBody.appendChild(optdob);
-        tblBody.appendChild(opthousehold);
-        tblBody.appendChild(opthouseholdid);
-        tblBody.appendChild(optdelcomment);
-        tblBody.appendChild(optdelerror);
-        tblBody.appendChild(none);
         tbl.appendChild(tblBody);
         
         body.appendChild(tbl);
@@ -572,6 +504,11 @@ function generate_ResolveError_table(data) {
     		
     	}
     	return null;
+    }
+    
+    // sets the value of the hidden field (provider id)
+    function setErrorAction(index,data){
+    	document.getElementById("selprovider").value = data.personId;
     }
 
 
@@ -616,10 +553,115 @@ function generate_ResolveError_table(data) {
 </div>
 
 <div class="box" id="resolveError" title="Error Resolution Dialog" style="display:none;">
+
     <div id="resolveErrorTable">
     
     </div>
-<input type="hidden" id="selprovider" value=""/>
+    
+    <div>
+    	<table>
+    		   <tr>
+			    	<td>
+					<!-- Pick a provider -->
+					<input type="radio" name="errorItemAction" value="linkProvider"/> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.providerLink"/>
+					</td>
+					<td>
+					<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+				
+			
+					<!-- Have the machinery create a new patient -->
+					<input type="radio" name="errorItemAction" value="createPatient" /> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/>
+					</td>
+					<td/>
+				</tr>	
+				 <tr>
+			    	<td>
+					<!-- Assign a new patient identifier-->
+					<input type="radio" name="errorItemAction" value="newIdentifier" /> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.newIdentifier"/>:
+											
+					</td>
+					<td>
+					<input type="text" name="patientIdentifier"/>
+					</td>
+				</tr>
+				 <tr>
+			    	<td>
+					<!-- Assign a birth date to patient -->
+				<input type="radio" name="errorItemAction" value="assignBirthdate" /> 
+				<spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
+					</td>
+					<td>
+					<input type="text" name="birthDate" onClick="showCalendar(this)"/>
+					</td>
+				</tr>
+				
+				<tr>
+			    	<td>
+					<!-- Link patient to household -->
+				<input type="radio" name="errorItemAction" value="linkHousehold" />	
+				<spring:message code="amrsmobileforms.resolveErrors.action.createLink"/>:
+					</td>
+					<td>
+					<input type="text" name="householdId"/>
+					</td>
+				</tr>
+				<tr>
+			    	<td>
+					<input type="radio" name="errorItemAction" value="newHousehold" />	
+					<spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
+					</td>
+					<td>
+					<input type="text" name="householdIdentifier"/>
+					</td>
+				</tr>
+				<tr>
+			    	<td>
+					<!-- This is an invalid comment, delete it -->
+					<input type="radio" name="errorItemAction" value="deleteComment" />	
+					<spring:message code="amrsmobileforms.resolveErrors.action.deleteComment"/>
+					</td>
+					<td>
+					
+					</td>
+				</tr>
+				<tr>
+			    	<td>
+				<!-- This is an invalid error, delete it -->
+				<input type="radio" name="errorItemAction" value="deleteError" /> 
+				<spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
+				</td>
+					<td>
+					
+					</td>
+				</tr>	
+				
+				<tr>
+			    	<td>
+				<!-- I don't want to do anything to this one now -->
+				<input type="radio" name="errorItemAction" value="noChange" checked="checked"/> 
+				<spring:message code="amrsmobileforms.resolveErrors.action.noChange"/>
+				</td>
+					<td>
+					<input type="hidden" id="selprovider" value=""/>
+					</td>
+				</tr>
+    	
+    	
+    	
+    	</table>
+    
+    
+    </div>
+    
+    
+
 </div>
 
 <div><b class="boxHeader">Mobile Form Entry Errors</b>
@@ -630,6 +672,10 @@ function generate_ResolveError_table(data) {
 			<button id="reprocessAll" disabled>Reprocess <span class="numSelected">0</span> Selected Errors</button>
 		</div>
 		<div id="errors">
+		
+		
+		
+		
 			<form method="post">
 				<table id="errorTable" cellpadding="8" cellspacing="0">
 					<thead>
