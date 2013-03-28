@@ -258,9 +258,10 @@
 	function resolveErrorResult(data){
 		
 		
-		var resultId =data[0].trim();
-		var resultMsg = data[1].trim();
-		
+		var resultId =data[0];
+		//resultId.trim();
+		var resultMsg = data[1];
+		//resultMsg.trim();
 		if(resultId==0){
 			alert(resultMsg);	
 		}
