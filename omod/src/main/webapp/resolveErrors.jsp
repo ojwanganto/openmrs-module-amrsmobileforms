@@ -19,7 +19,7 @@
 <h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
 <style type="text/css">
 	.tblformat tr:nth-child(odd) {
-		background-color: #009d8e;
+		background-color: #005C5C;
 		color: #FFFFFF;
 	}
 	.tblformat tr:nth-child(even) {
@@ -289,7 +289,7 @@
 	function buildRow(label,tdvalue){
 		
 		var row = document.createElement("tr");
-        var cell = document.createElement("td");
+        var cell = document.createElement("th");
         var cell2 = document.createElement("td");
         var celllabel = document.createTextNode(label+": ");
         var cellval = document.createTextNode(tdvalue);
@@ -303,7 +303,7 @@
 function buildRowWithElement(label,tdvalue){
 		
 		var row = document.createElement("tr");
-        var cell = document.createElement("td");
+        var cell = document.createElement("th");
         var cell2 = document.createElement("td");
         var div = document.createElement("div");
         div.setAttribute('style','height: 40px; overflow-y: scroll; border: 1px solid #BBB;');
@@ -320,7 +320,7 @@ function buildRowWithElement(label,tdvalue){
 	
 function buildTextArea(label,id){
 	var row = document.createElement("tr");
-    var cell = document.createElement("td");
+    var cell = document.createElement("th");
     var cell2 = document.createElement("td");
     var celllabel = document.createTextNode(label+": ");
     
@@ -332,40 +332,6 @@ function buildTextArea(label,id){
     
     cell.appendChild(celllabel);
     cell2.appendChild(textarea);
-    
-    row.appendChild(cell);
-    row.appendChild(cell2);
-    return row;
-    
-    
-}
-
-function buildResolveOptions(label,id,optval,name,id2,addText){
-	var row = document.createElement("tr");
-    var cell = document.createElement("td");
-    var cell2 = document.createElement("td");
-    var celllabel = document.createTextNode(label);
-    
-    
-    var radio = document.createElement("input");
-    radio.setAttribute('type','radio');
-    radio.setAttribute('id',id);
-    radio.setAttribute('name',name);
-    radio.setAttribute('value',optval);
-    
-    if(addText){
-    	
-    var inputtext = document.createElement("input");
-    inputtext.setAttribute('type','text');
-    inputtext.setAttribute('id',id2);
-    }
-    
-    cell.appendChild(radio);
-    cell.appendChild(celllabel);
-    if(addText){
-    	cell2.appendChild(inputtext);
-    }
-    
     
     row.appendChild(cell);
     row.appendChild(cell2);
