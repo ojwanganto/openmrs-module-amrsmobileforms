@@ -528,6 +528,10 @@ function generate_ResolveError_table(data) {
     function setErrorAction(index,data){
     	document.getElementById("selprovider").value = data.personId;
     }
+    
+    function setPatient(index,data){
+    	document.getElementById("patientId").value = data.personId;
+    }
 
 
 	/**
@@ -586,6 +590,16 @@ function generate_ResolveError_table(data) {
 					</td>
 					<td>
 					<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
+					</td>
+				</tr>
+				 <tr>
+			    	<td>
+					<!-- Pick a patient -->
+					<input type="radio" name="errorItemAction" value="linkPatient"/> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.linkPatient"/>
+					</td>
+					<td>
+					<openmrs_tag:patientField formFieldName="patientId" searchLabelCode="amrsmobileforms.resolveErrors.action.linkPatient" initialValue="" callback="setPatient" />
 					</td>
 				</tr>
 				<tr>
@@ -656,7 +670,7 @@ function generate_ResolveError_table(data) {
 				<spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
 				</td>
 					<td>
-					
+						<input type="hidden" id="patientId" value=""/>
 					</td>
 				</tr>	
 				
