@@ -50,64 +50,77 @@
 
 <script>
 	var eTable = null;
+	
 		
 
 	$j(document).ready(function(){
 
-		// set up the error datatable 
-		eTable = $j("#errorTable").dataTable({
-			bAutoWidth: false,
-			bDeferRender: true,
-			bJQueryUI: true,
-			bPaginate: true,
-			sPaginationType: "full_numbers",
-			aoColumnDefs: [
-				{ aTargets: ["_all"], bSortable: false },
-				{
-					aTargets: [0],
-					sClass: "centered",
-					mData: null,
-				    mRender: function(data, type, full) {
-							var id = full.id;
-							return '<input name="errorIds" type="checkbox" value="' + id + '"/>';
-						}
+		if (eTable == null) {
+			
+			eTable = $j("#errorTable").dataTable({
+				bAutoWidth: false,
+				bDeferRender: true,
+				bJQueryUI: true,
+				bPaginate: true,
+				sPaginationType: "full_numbers",
+				aoColumnDefs: [
+					{ aTargets: ["_all"], bSortable: false },
+					{
+						aTargets: [0],
+						sClass: "centered",
+						mData: null,
+					    mRender: function(data, type, full) {
+								var id = full.id;
+								return '<input name="errorIds" type="checkbox" value="' + id + '"/>';
+							}
+					},
+	                {
+	                    aTargets: [1],
+	                    sClass: "centered",
+	                    mData: null,
+	                    mRender: function(data, type, full) {
+	                        var id = full.id;
+	                        var out = "";
+	                        if (full.comment) {
+	                            out += '<button class="action resolve" errorId="' + id + '">Resolve</button>';
+	                        } else {
+	                            out += '<button class="action comment" errorId="' + id + '">Comment</button>';
+	                        }
+	                        return out;
+	                    }
+	                },
+	                { aTargets: [2], mData: "id" },
+					{ aTargets: [3], mData: "error" },
+					{ aTargets: [4], mData: "errorDetails" },
+					{ aTargets: [5], mData: "formName" },
+					{ aTargets: [6], mData: "comment", sClass: "centered" }
+				],
+				bProcessing: true,
+				bServerSide: true,
+				bStateSave: false,
+				fnDrawCallback: function(oSettings){
+					if ($j("span.numSelected").html() == oSettings.fnRecordsDisplay()) {
+						$j("input[name=errorIds]").attr("checked", "checked");
+					} else {
+						$j("span.numDisplayed").html(oSettings.fnRecordsDisplay());
+						$j("#selectAll").removeAttr("checked");
+						$j("input[name=errorIds]").removeAttr("checked");
+						updateNumSelected(0);
+					}
 				},
-                {
-                    aTargets: [1],
-                    sClass: "centered",
-                    mData: null,
-                    mRender: function(data, type, full) {
-                        var id = full.id;
-                        var out = "";
-                        if (full.comment) {
-                            out += '<button class="action resolve" errorId="' + id + '">Resolve</button>';
-                        } else {
-                            out += '<button class="action comment" errorId="' + id + '">Comment</button>';
-                        }
-                        return out;
-                    }
-                },
-                { aTargets: [2], mData: "id" },
-				{ aTargets: [3], mData: "error" },
-				{ aTargets: [4], mData: "errorDetails" },
-				{ aTargets: [5], mData: "formName" },
-				{ aTargets: [6], mData: "comment", sClass: "centered" }
-			],
-			bProcessing: true,
-			bServerSide: true,
-			bStateSave: false,
-			fnDrawCallback: function(oSettings){
-				if ($j("span.numSelected").html() == oSettings.fnRecordsDisplay()) {
-					$j("input[name=errorIds]").attr("checked", "checked");
-				} else {
-					$j("span.numDisplayed").html(oSettings.fnRecordsDisplay());
-					$j("#selectAll").removeAttr("checked");
-					$j("input[name=errorIds]").removeAttr("checked");
-					updateNumSelected(0);
-				}
-			},
-			sAjaxSource: "<openmrs:contextPath/>/module/amrsmobileforms/errorList.json"
-		});
+				sAjaxSource: "<openmrs:contextPath/>/module/amrsmobileforms/errorList.json"
+			});
+			
+		}
+		else{
+			
+			eTable.fnClearTable( 0 );
+			eTable.fnDraw();
+			
+		}
+		// set up the error datatable 
+		
+
 
 		// click events for comment and resolve buttons
 		
@@ -148,6 +161,7 @@
                     	 
 
                     },
+                    close:closecFunction,
                     Cancel: function() {
                         $j(this).dialog( "close" );
                     }
@@ -213,6 +227,7 @@
                      	                    	 
 
                      },
+                     close:closeFunction,
                      Cancel: function() {
                          $j(this).dialog( "close" );
                      }
@@ -255,7 +270,20 @@
 		});
 	});
 	
+	function closecFunction(){
+		 $j("#dialog-form").dialog( "close" );
+	}
+	function closeFunction(){
+		 $j("#resolveError").dialog( "close" );
+	}
+	function refreshDataTable(){
+		eTable.fnClearTable( 0 );
+		eTable.fnDraw();
+	}
+	
 	function resolveErrorResult(data){
+		
+		var div = document.getElementById("openmrs_msg");		
 		
 		
 		var resultId =data[0];
@@ -263,26 +291,44 @@
 		var resultMsg = data[1];
 		//resultMsg.trim();
 		if(resultId==0){
-			alert(resultMsg);	
+			closeFunction();
+			div.style.display = "block";
+			div.innerHTML = " <b>" + resultMsg + "</b>";
+			
+			
+				
 		}
 		else if(resultId==1){
-			alert(resultMsg);
-			document.location.reload(true);
+			closeFunction();
+			div.style.display = "block";
+			div.innerHTML = " <b>" + resultMsg + "</b>";
+			refreshDataTable();
+			//document.location.reload(true);
 		}
 		else if(resultId==2){
-			alert(resultMsg);
-			document.location.reload(true);
+			closeFunction();
+			div.style.display = "block";
+			div.innerHTML = " <b>" + resultMsg + "</b>";
+			refreshDataTable();
+			//document.location.reload(true);
 		}
 		else{
-			alert(data);
+			closeFunction();
+			div.style.display = "block";
+			div.innerHTML = " <b>" + resultMsg + "</b>";
+			refreshDataTable();
 		}
 		
 		
 	}
 	
 	function alertResult(data){
-		alert(data);
-		document.location.reload(true);
+		
+		var div = document.getElementById("openmrs_msg");
+		closecFunction();
+		div.style.display = "block";
+		div.innerHTML = " <b>" + data + "</b>";
+		refreshDataTable();
 	}
 	
 	
@@ -647,6 +693,8 @@ function generate_ResolveError_table(data) {
     
 
 </div>
+
+<div id="openmrs_msg" ></div>
 
 <div><b class="boxHeader">Mobile Form Entry Errors</b>
 	<div class="box">
