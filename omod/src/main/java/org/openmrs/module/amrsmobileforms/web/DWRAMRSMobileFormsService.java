@@ -75,7 +75,7 @@ public class DWRAMRSMobileFormsService {
 		return service.saveEconomicConceptMap(ecm);
 	}
 
-    ///////////////////////////////////////////////////////////
+
 
     public List<MobileFormEntryErrorModel> populateCommentForm(Integer errorId) {
         return getErrorObject(errorId);
@@ -205,7 +205,7 @@ public class DWRAMRSMobileFormsService {
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 						
 						statusInfo.add(1);
-						statusInfo.add("The process was completed successfully");
+						statusInfo.add("Patient-Household link creation was successfull");
 						return statusInfo;
 						
 					}
@@ -224,7 +224,7 @@ public class DWRAMRSMobileFormsService {
 							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 							
 							statusInfo.add(1);
-							statusInfo.add("The process was completed successfully");
+							statusInfo.add("Birth Date assigned successfully");
 							return statusInfo;
 						}
 					} catch (ParseException e) {
@@ -252,7 +252,7 @@ public class DWRAMRSMobileFormsService {
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 						
 						statusInfo.add(1);
-						statusInfo.add("The process was completed successfully");
+						statusInfo.add("The new Patient ID was assigned successfully");
 						return statusInfo;
 						
 					}
@@ -272,7 +272,7 @@ public class DWRAMRSMobileFormsService {
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 						
 						statusInfo.add(1);
-						statusInfo.add("The process was completed successfully");
+						statusInfo.add("Error-Provider link created successfully");
 						return statusInfo;
 					}
 				} else {
@@ -287,7 +287,7 @@ public class DWRAMRSMobileFormsService {
 				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
 				
 				statusInfo.add(1);
-				statusInfo.add("The process was completed successfully");
+				statusInfo.add("Patient created successfully");
 				return statusInfo;
 				
 			} else if ("deleteError".equals(errorItemAction)) {
@@ -296,7 +296,7 @@ public class DWRAMRSMobileFormsService {
 				//and delete from the file system
 				MobileFormEntryUtil.deleteFile(filePath);
 				statusInfo.add(1);
-				statusInfo.add("The process was completed successfully");
+				statusInfo.add("Error Deleted successfully");
 				return statusInfo;
 				
 			} else if ("deleteComment".equals(errorItemAction)) {
@@ -305,7 +305,7 @@ public class DWRAMRSMobileFormsService {
 				mobileService.saveErrorInDatabase(errorItem);
 				
 				statusInfo.add(1);
-				statusInfo.add("The process was completed successfully");
+				statusInfo.add("Comment Deleted successfully");
 				return statusInfo;
 				
 			} else if ("newHousehold".equals(errorItemAction)) {
@@ -329,7 +329,7 @@ public class DWRAMRSMobileFormsService {
 						// drop form in queue for normal processing
 						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
 						statusInfo.add(1);
-						statusInfo.add("The process was completed successfully");
+						statusInfo.add("The new Household ID was assigned successfully");
 						return statusInfo;
 						
 					} else {

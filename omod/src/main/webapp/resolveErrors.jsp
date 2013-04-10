@@ -291,7 +291,7 @@
 		var resultMsg = data[1];
 		//resultMsg.trim();
 		if(resultId==0){
-			closeFunction();
+			
 			div.style.display = "block";
 			div.innerHTML = " <b>" + resultMsg + "</b>";
 			
@@ -309,8 +309,7 @@
 			closeFunction();
 			div.style.display = "block";
 			div.innerHTML = " <b>" + resultMsg + "</b>";
-			refreshDataTable();
-			//document.location.reload(true);
+			
 		}
 		else{
 			closeFunction();
@@ -323,12 +322,18 @@
 	}
 	
 	function alertResult(data){
-		
+				
 		var div = document.getElementById("openmrs_msg");
-		closecFunction();
+		
 		div.style.display = "block";
 		div.innerHTML = " <b>" + data + "</b>";
-		refreshDataTable();
+		
+		if(data =="Comment saved successfully"){
+			closecFunction();
+			refreshDataTable();
+		}
+		
+		
 	}
 	
 	
@@ -420,8 +425,7 @@ function buildTextArea(label,id){
         var providerId = buildRow("Provider Id",data.providerId);
         
         var errdetails = buildRowWithElement("Error Details",data.errorDetails);
-        //var row14 = buildRowWithElement("XML Form",data.formName);
-        
+                
         var comment = buildTextArea("Comment","comment");
         
      
@@ -454,8 +458,7 @@ function buildTextArea(label,id){
      
     }
     
-/* Displays a dialog window for resolving errors. It provides relevant option buttons and textboxes for selecting err
-resolution options*/
+/* Displays a dialog window for resolving errors. It provides relevant options for resolving errors*/
 
 function generate_ResolveError_table(data) {
 
@@ -565,15 +568,6 @@ function generate_ResolveError_table(data) {
 	        document.getElementById("selprovider").value =data.personId;
 	    }
 	 
-	    //Contains the logic that fetches the results from the server,, should return a map of the form <String, Object>
-	function doSearchHandler(text) {
-	        lastSearch = text;
-	        DWRAMRSMobileFormsService.getPersons(text,handleResult);
-	    }
-	    
-	function handleResult(data){
-	    	alert(data);
-	    }
 
 </script>
 
