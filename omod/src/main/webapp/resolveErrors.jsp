@@ -18,13 +18,20 @@
 
 <h2><spring:message code="amrsmobileforms.resolveErrors.title"/></h2>
 <style type="text/css">
-	.tblformat tr:nth-child(odd) {
-		background-color: #005C5C;
-		color: #FFFFFF;
+	.tblformat tr:nth-child(odd) td {
+	  background-color: #eee;
 	}
-	.tblformat tr:nth-child(even) {
-		background-color: #d3d3d3;
-		color: #000000;
+	
+	.tblformat tr:nth-child(odd) th {
+	  background-color: #ddd;
+	}
+	
+	.tblformat tr:nth-child(even) td {
+	  background-color: #d3d3d3;
+	}
+	
+	.tblformat tr:nth-child(even) th {
+	  background-color: #bbb;
 	}
 </style>
 <style type="text/css">
