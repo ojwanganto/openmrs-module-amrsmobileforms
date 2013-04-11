@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Vector;
 import org.openmrs.api.PersonService;
 import org.openmrs.Person;
+import java.lang.Integer;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
@@ -170,7 +171,8 @@ public class DWRAMRSMobileFormsService {
 			String birthDate, 
 			String patientIdentifier,
 			String providerId, 
-			String householdIdentifier) {
+			String householdIdentifier,
+			Integer patientId	) {
 		MobileFormEntryService mobileService;
 		String filePath;
 		List statusInfo = new ArrayList();
@@ -280,6 +282,29 @@ public class DWRAMRSMobileFormsService {
 					
 					statusInfo.add(0);
 					statusInfo.add("You entered an empty Provider Id");
+					return statusInfo;
+				}
+			}else if ("linkPatient".equals(errorItemAction)) {
+				
+				log.info("This id was encountered "+patientId);
+				
+				 if (patientId != null) {
+					// patientId = Context.getPatientService().getPatient(Integer.parseInt(patientId)).getPatientId();
+					if (XFormEditor.editNode(filePath,
+						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_ID, patientId.toString())) {
+						// put form in queue for normal processing
+						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+						
+						log.info("The system managed to find the following patient: "+patientId);
+						statusInfo.add(1);
+						statusInfo.add("Error-Patient link created successfully");
+						return statusInfo;
+					}
+				} else {
+					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
+					
+					statusInfo.add(0);
+					statusInfo.add("ZThe system encountered an empty patient!");
 					return statusInfo;
 				}
 			} else if ("createPatient".equals(errorItemAction)) {

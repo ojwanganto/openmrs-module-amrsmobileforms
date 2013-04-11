@@ -176,7 +176,7 @@
 				
 				DWRAMRSMobileFormsService.populateCommentForm(Integer errorId);
 				DWRAMRSMobileFormsService.saveComment(Integer errorId, String comment);
-				DWRAMRSMobileFormsService.resolveError(String householdId,Integer errorId,String errorItemAction,String dob,String patientId,String provider,String newHousehold);
+				DWRAMRSMobileFormsService.resolveError(String householdId,Integer errorId,String errorItemAction,String dob,String patientId,String provider,String newHousehold,Integer patientId);
 				
 			]]>
 		</signatures>	

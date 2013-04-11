@@ -205,18 +205,18 @@
                      "Resolve Error":function(){
                     	 
                     		var provider = document.getElementById('selprovider').value;
-                           	//var newPatient = document.getElementById('patient').value;
                            	var patientId = document.getElementsByName('patientIdentifier').value;
                            	var dob = document.getElementsByName('birthDate').value;
                            	var newHousehold = document.getElementsByName('householdId').value;
                            	var householdId = document.getElementsByName('householdIdentifier').value;
+                            var patientId = document.getElementById('selpatient').value;
                            	var errorItemAction = getSelectedRadio();
                	 
               
                     	 
                    
 	                   	 if(errorItemAction != null){
-	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,resolveErrorResult);
+	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,patientId,resolveErrorResult);
 	                      	  
 	                   	 }
 	                   	 else{
@@ -543,6 +543,11 @@ function generate_ResolveError_table(data) {
     function setErrorAction(index,data){
     	document.getElementById("selprovider").value = data.personId;
     }
+    
+    // sets the value of the hidden field (patient id)
+    function setPatientId(index,data){
+    	document.getElementById("selpatient").value = data.personId;
+    }
 
 
 	/**
@@ -592,6 +597,16 @@ function generate_ResolveError_table(data) {
 					</td>
 					<td>
 					<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
+					</td>
+				</tr>
+				<tr>
+			    	<td>
+					<!-- Pick a patient -->
+					<input type="radio" name="errorItemAction" value="linkPatient"/> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.patientLink"/>
+					</td>
+					<td>
+					<openmrs_tag:patientField formFieldName="patientId" searchLabelCode="amrsmobileforms.resolveErrors.action.findPatient" initialValue="" callback="setPatientId" />
 					</td>
 				</tr>
 				<tr>
@@ -662,7 +677,7 @@ function generate_ResolveError_table(data) {
 				<spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
 				</td>
 					<td>
-					
+					<input type="hidden" id="selpatient" value=""/>
 					</td>
 				</tr>	
 				
