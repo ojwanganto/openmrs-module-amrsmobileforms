@@ -544,9 +544,11 @@ function generate_ResolveError_table(data) {
     	document.getElementById("selprovider").value = data.personId;
     }
     
+
     // sets the value of the hidden field (patient id)
     function setPatientId(index,data){
     	document.getElementById("selpatient").value = data.personId;
+
     }
 
 
@@ -599,16 +601,17 @@ function generate_ResolveError_table(data) {
 					<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
 					</td>
 				</tr>
-				<tr>
+				 <tr>
 			    	<td>
 					<!-- Pick a patient -->
 					<input type="radio" name="errorItemAction" value="linkPatient"/> 
-					<spring:message code="amrsmobileforms.resolveErrors.action.patientLink"/>
+					<spring:message code="amrsmobileforms.resolveErrors.action.linkPatient"/>
 					</td>
 					<td>
-					<openmrs_tag:patientField formFieldName="patientId" searchLabelCode="amrsmobileforms.resolveErrors.action.findPatient" initialValue="" callback="setPatientId" />
+					<openmrs_tag:patientField formFieldName="patientId" searchLabelCode="amrsmobileforms.resolveErrors.action.linkPatient" initialValue="" callback="setPatient" />
 					</td>
 				</tr>
+				
 				<tr>
 					<td>
 				
@@ -677,7 +680,9 @@ function generate_ResolveError_table(data) {
 				<spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
 				</td>
 					<td>
+
 					<input type="hidden" id="selpatient" value=""/>
+
 					</td>
 				</tr>	
 				
