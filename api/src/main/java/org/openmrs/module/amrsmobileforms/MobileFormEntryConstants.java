@@ -136,6 +136,7 @@ public class MobileFormEntryConstants {
 	public final static String ECONOMIC_CHILDREN_IN_SCHOOL = "children_in_school";
 	
 	public final static String PATIENT_NODE = "/form/patient";
+	public final static String PATIENT_ID = "patient.patient_id";
 	public final static String PATIENT_IDENTIFIER = "patient.medical_record_number";
 	public final static String PATIENT_IDENTIFIER_TYPE = "patient_identifier.identifier_type_id";
 	public final static String PATIENT_HCT_IDENTIFIER = "patient.hct_id";
