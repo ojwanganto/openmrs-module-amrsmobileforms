@@ -286,8 +286,7 @@ public class DWRAMRSMobileFormsService {
 				}
 			}else if ("linkPatient".equals(errorItemAction)) {
 				
-				log.info("This id was encountered "+patientId);
-				
+								
 				 if (patientId != null) {
 					// patientId = Context.getPatientService().getPatient(Integer.parseInt(patientId)).getPatientId();
 					if (XFormEditor.editNode(filePath,
@@ -300,11 +299,18 @@ public class DWRAMRSMobileFormsService {
 						statusInfo.add("Error-Patient link created successfully");
 						return statusInfo;
 					}
+					else{
+						
+						statusInfo.add(0);
+						statusInfo.add("Error! Could not associate the error with the selected Patient.");
+						return statusInfo;
+						
+					}
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
 					
 					statusInfo.add(0);
-					statusInfo.add("ZThe system encountered an empty patient!");
+					statusInfo.add("No Patient was selected!");
 					return statusInfo;
 				}
 			} else if ("createPatient".equals(errorItemAction)) {
