@@ -282,6 +282,7 @@
 	}
 	function closeFunction(){
 		 $j("#resolveError").dialog( "close" );
+		 clearDivSelections();
 	}
 	function refreshDataTable(){
 		eTable.fnClearTable( 0 );
@@ -532,6 +533,24 @@ function generate_ResolveError_table(data) {
         
         //---------------------------------------
      
+    }
+    
+    /* clears out marked options on error resolution dialog window on close of the window  */
+    function clearDivSelections(){
+		var selOpt = document.getElementsByName('errorItemAction');
+    	var noChangeOptionPosition = selOpt.length - 1;
+    	
+    	if(selOpt[noChangeOptionPosition].checked==false){
+			selOpt[noChangeOptionPosition].checked=true;
+		}
+    	
+    	//
+    	document.getElementById("selpatient").value = "";
+    	document.getElementById("selprovider").value = "";
+    	document.getElementById("patientId_id_selection").innerHTML = "";
+    	document.getElementById("providerId_id_selection").innerHTML = "";
+    	
+    	
     }
     
     function getSelectedRadio(){
