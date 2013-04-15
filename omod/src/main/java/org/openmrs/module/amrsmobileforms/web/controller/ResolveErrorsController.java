@@ -107,7 +107,7 @@ public class ResolveErrorsController {
 		MobileFormEntryService mobileService;
 		String filePath;
 		
-		log.info("Error ID is "+errorId);
+		log.debug("Error ID is "+errorId);
 
 		// user must be authenticated (avoids authentication errors)
 		if (Context.isAuthenticated()) {
