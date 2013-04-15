@@ -212,7 +212,7 @@
                      "Resolve Error":function(){
                     	 
                     		var provider = document.getElementById('selprovider').value;
-                           	var patientId = document.getElementsByName('patientIdentifier').value;
+                           	var patientIdentifier = document.getElementsByName('patientIdentifier').value;
                            	var dob = document.getElementsByName('birthDate').value;
                            	var newHousehold = document.getElementsByName('householdId').value;
                            	var householdId = document.getElementsByName('householdIdentifier').value;
@@ -223,7 +223,7 @@
                     	 
                    
 	                   	 if(errorItemAction != null){
-	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,patientId,resolveErrorResult);
+	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientIdentifier,provider,newHousehold,patientId,resolveErrorResult);
 	                      	  
 	                   	 }
 	                   	 else{
@@ -553,7 +553,7 @@ function generate_ResolveError_table(data) {
     
 
     // sets the value of the hidden field (patient id)
-    function setPatientId(index,data){
+    function setPatient(index,data){
     	document.getElementById("selpatient").value = data.personId;
 
     }
