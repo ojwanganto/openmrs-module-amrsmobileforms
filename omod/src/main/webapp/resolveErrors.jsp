@@ -212,18 +212,18 @@
                      "Resolve Error":function(){
                     	 
                     		var provider = document.getElementById('selprovider').value;
-                           	//var newPatient = document.getElementById('patient').value;
-                           	var patientId = document.getElementsByName('patientIdentifier').value;
+                           	var patientIdentifier = document.getElementsByName('patientIdentifier').value;
                            	var dob = document.getElementsByName('birthDate').value;
                            	var newHousehold = document.getElementsByName('householdId').value;
                            	var householdId = document.getElementsByName('householdIdentifier').value;
+                            var patientId = document.getElementById('selpatient').value;
                            	var errorItemAction = getSelectedRadio();
                	 
               
                     	 
                    
 	                   	 if(errorItemAction != null){
-	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientId,provider,newHousehold,resolveErrorResult);
+	DWRAMRSMobileFormsService.resolveError(householdId,errorId,errorItemAction,dob,patientIdentifier,provider,newHousehold,patientId,resolveErrorResult);
 	                      	  
 	                   	 }
 	                   	 else{
@@ -282,6 +282,7 @@
 	}
 	function closeFunction(){
 		 $j("#resolveError").dialog( "close" );
+		 clearDivSelections();
 	}
 	function refreshDataTable(){
 		eTable.fnClearTable( 0 );
@@ -534,6 +535,24 @@ function generate_ResolveError_table(data) {
      
     }
     
+    /* clears out marked options on error resolution dialog window on close of the window  */
+    function clearDivSelections(){
+		var selOpt = document.getElementsByName('errorItemAction');
+    	var noChangeOptionPosition = selOpt.length - 1;
+    	
+    	if(selOpt[noChangeOptionPosition].checked==false){
+			selOpt[noChangeOptionPosition].checked=true;
+		}
+    	
+    	//
+    	document.getElementById("selpatient").value = "";
+    	document.getElementById("selprovider").value = "";
+    	document.getElementById("patientId_id_selection").innerHTML = "";
+    	document.getElementById("providerId_id_selection").innerHTML = "";
+    	
+    	
+    }
+    
     function getSelectedRadio(){
     	var selOpt = document.getElementsByName('errorItemAction');
     	
@@ -549,6 +568,13 @@ function generate_ResolveError_table(data) {
     // sets the value of the hidden field (provider id)
     function setErrorAction(index,data){
     	document.getElementById("selprovider").value = data.personId;
+    }
+    
+
+    // sets the value of the hidden field (patient id)
+    function setPatient(index,data){
+    	document.getElementById("selpatient").value = data.personId;
+
     }
 
 
@@ -601,6 +627,17 @@ function generate_ResolveError_table(data) {
 					<openmrs_tag:userField formFieldName="providerId" searchLabelCode="amrsmobileforms.resolveErrors.action.findProvider" initialValue="" callback="setErrorAction" />
 					</td>
 				</tr>
+				 <tr>
+			    	<td>
+					<!-- Pick a patient -->
+					<input type="radio" name="errorItemAction" value="linkPatient"/> 
+					<spring:message code="amrsmobileforms.resolveErrors.action.linkPatient"/>
+					</td>
+					<td>
+					<openmrs_tag:patientField formFieldName="patientId" searchLabelCode="amrsmobileforms.resolveErrors.action.linkPatient" initialValue="" callback="setPatient" />
+					</td>
+				</tr>
+				
 				<tr>
 					<td>
 				
@@ -669,7 +706,9 @@ function generate_ResolveError_table(data) {
 				<spring:message code="amrsmobileforms.resolveErrors.action.deleteError"/>
 				</td>
 					<td>
-					
+
+					<input type="hidden" id="selpatient" value=""/>
+
 					</td>
 				</tr>	
 				
