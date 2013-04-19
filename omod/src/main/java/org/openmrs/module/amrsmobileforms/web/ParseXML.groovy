@@ -1,50 +1,46 @@
-package org.openmrs.module.amrsmobileforms.web
-/**
- * a class that loops through phct forms and strips off unnecessary white spaces
- * before and/or after patient.medical_record_number" value
- */
+import groovy.xml.StreamingMarkupBuilder
 public class ParseXML{
 
 
-    def cleanPatientIdentifier(){
-        //todo: define path to the forms
-
+    def getDirFileListing(){
         def filePath = "phctforms/small"
 
         new File(filePath).eachFile() { file->
 
             def fullFilePath = filePath +"/" + file.getName()
-            def fileData = new XmlParser().parse(fullFilePath);
-
+            def fileData = new XmlSlurper().parse(fullFilePath);
 
             if(fileData==null){
-               //todo: add code to handle blank files
+                //todo:
             }
             else{
 
-                def individuals = fileData.household.individuals.individual
 
-                individuals.each{ it ->
-                    String patient_number = it.patient."patient.medical_record_number".text()
+                def individuals = fileData.household.individuals.individual
+                //def petientNo = patient.medical_record_number
+                individuals.each{
+                    String patient_number = it.patient."patient.medical_record_number"
+
 
                     if(patient_number){
 
-                        String cleanId = patient_number.trim()
-                        it.patient."patient.medical_record_number".value = cleanId
+                        patient_number.trim()
 
-                        def writer = new FileWriter(fullFilePath)
+                        patient_number.replaceAll(/ *$/, '')
 
-                        def printer = new XmlNodePrinter(new PrintWriter(writer))
-                        printer.preserveWhitespace = true
-                        printer.print(fileData)
+                        it.patient."patient.medical_record_number".replaceBody(patient_number)
+
+                        def writable = new StreamingMarkupBuilder().bind { mkp.yield fileData }
+                        writable.writeTo(new PrintWriter(new FileWriter(fullFilePath)))
+
+                        println "Patient Identifier: " + it.patient."patient.medical_record_number"
 
                     }
                     else{
 
-                      //todo:add code to perfom any  task for such a scenario
+                        //todo:add code to perfom any  task for such a scenario
 
                     }
-
 
                 }
 
@@ -66,4 +62,5 @@ public class ParseXML{
 
 def xmlObj = new ParseXML();
 
-xmlObj.cleanPatientIdentifier();
+xmlObj.getDirFileListing();
+
