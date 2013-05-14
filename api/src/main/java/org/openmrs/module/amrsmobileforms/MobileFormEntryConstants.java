@@ -89,7 +89,7 @@ public class MobileFormEntryConstants {
 	/** The survey nodes prefix. */
 	public final static String SURVEY_PREFIX = "/form/survey";
 
-	/** The household nodes prefix. */
+    /** The household nodes prefix. */
 	public final static String HOUSEHOLD_PREFIX = "/form/household";
 
 	/** The economics nodes prefix. */

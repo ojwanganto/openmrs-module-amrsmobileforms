@@ -121,7 +121,7 @@
 			CREATE TABLE IF NOT EXISTS `mobileformentry_error` (
 			  `mobile_formentry_error_id` int(11) NOT NULL auto_increment,
 			  `form_name` mediumtext NOT NULL,
-			  `error` varchar(255) NOT NULL default '',
+              `error` varchar(255) NOT NULL default '',
 			  `error_details` text,
 			  `comment` varchar(255) default '',
 			  `commented_by` int(11) default '0',
