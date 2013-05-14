@@ -49,7 +49,7 @@ public class MobileFormEntryUtil {
 	public static File getMobileFormsResourcesDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_RESOURCES_DIR,
-			MobileFormEntryConstants.GP_MOBILE_FORMS_RESOURCES_DIR_DEFAULT);
+				MobileFormEntryConstants.GP_MOBILE_FORMS_RESOURCES_DIR_DEFAULT);
 		File mobileFormsErrorDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		if (log.isDebugEnabled()) {
 			log.debug("Loaded mobile forms resources directory from global properties: " + mobileFormsErrorDir.getAbsolutePath());
@@ -91,7 +91,7 @@ public class MobileFormEntryUtil {
 	public static File getMobileFormsErrorDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_ERROR_DIR,
-			MobileFormEntryConstants.GP_MOBILE_FORMS_ERROR_DIR_DEFAULT);
+				MobileFormEntryConstants.GP_MOBILE_FORMS_ERROR_DIR_DEFAULT);
 		File mobileFormsErrorDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		if (log.isDebugEnabled()) {
 			log.debug("Loaded mobile forms error directory from global properties: " + mobileFormsErrorDir.getAbsolutePath());
@@ -154,7 +154,7 @@ public class MobileFormEntryUtil {
 	public static File getMobileFormsDropDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_DROP_DIR,
-			MobileFormEntryConstants.GP_MOBILE_FORMS_DROP_DIR_DEFAULT);
+				MobileFormEntryConstants.GP_MOBILE_FORMS_DROP_DIR_DEFAULT);
 		File mobileFormsDropDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		if (log.isDebugEnabled()) {
 			log.debug("Loaded mobile forms drop queue directory from global properties: " + mobileFormsDropDir.getAbsolutePath());
@@ -166,7 +166,7 @@ public class MobileFormEntryUtil {
 	public static File getMobileFormsQueueDir() {
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty(MobileFormEntryConstants.GP_MOBILE_FORMS_QUEUE_DIR,
-			MobileFormEntryConstants.GP_MOBILE_FORMS_QUEUE_DIR_DEFAULT);
+				MobileFormEntryConstants.GP_MOBILE_FORMS_QUEUE_DIR_DEFAULT);
 		File mobileFormQueueDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		if (log.isDebugEnabled()) {
 			log.debug("Loaded mobile forms queue directory from global properties: " + mobileFormQueueDir.getAbsolutePath());
@@ -181,7 +181,7 @@ public class MobileFormEntryUtil {
 	 * with week of the year Replaces %W with week of the month
 	 *
 	 * @param str String filename containing variables to replace with date
-	 * strings
+	 *            strings
 	 * @return String with variables replaced
 	 */
 	public static String replaceVariables(String str, Date d) {
@@ -252,7 +252,7 @@ public class MobileFormEntryUtil {
 		}
 		return false;
 		*/
-		
+
 		return (household != null);
 	}
 
@@ -276,30 +276,32 @@ public class MobileFormEntryUtil {
 		return false;
 	}
 
-	public static MobileFormEntryError createError(String formName, String error, String errorDetails,String  providerId, String locationId) {
+	public static MobileFormEntryError createError(String formName, String error, String errorDetails, String providerId, String locationId) {
 		MobileFormEntryError mobileFormEntryError = new MobileFormEntryError();
 		mobileFormEntryError.setFormName(formName);
 		mobileFormEntryError.setError(error);
 		mobileFormEntryError.setErrorDetails(errorDetails);
-        mobileFormEntryError.setProviderId(providerId);
-        mobileFormEntryError.setLocationId(locationId);
+		mobileFormEntryError.setProviderId(providerId);
+		mobileFormEntryError.setLocationId(locationId);
 		return mobileFormEntryError;
 	}
-    public static String cleanLocationEntry(String householdLocation) {
-        householdLocation=householdLocation.trim();
-        String locationId=null;
-        if(householdLocation.length()>0)  {
 
-            String lastDec=householdLocation.substring(householdLocation.length()-2);
-            if (lastDec.equals(".0")) {
-                locationId=householdLocation.substring(0,householdLocation.length()-2);
-            } else {
-                locationId= householdLocation;
-            }
-        }
+	public static String cleanLocationEntry(String householdLocation) {
+		householdLocation = householdLocation.trim();
+		String locationId = null;
+		if (householdLocation.length() > 0) {
 
-        return   locationId;
-    }
+			String lastDec = householdLocation.substring(householdLocation.length() - 2);
+			if (lastDec.equals(".0")) {
+				locationId = householdLocation.substring(0, householdLocation.length() - 2);
+			} else {
+				locationId = householdLocation;
+			}
+		}
+
+		return locationId;
+	}
+
 	public static MobileFormHousehold getHousehold(MobileFormHousehold household, Document doc, XPath xp) throws XPathExpressionException {
 		Node householdMetaNode = (Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 		if (household == null) {
@@ -525,7 +527,7 @@ public class MobileFormEntryUtil {
 	 *
 	 * @param auth
 	 * @return <b>true</b> if authentication was successful otherwise
-	 * <b>false</b>
+	 *         <b>false</b>
 	 */
 	public static boolean authenticate(String auth) {
 		boolean authenticated = false;
@@ -565,7 +567,7 @@ public class MobileFormEntryUtil {
 			}
 
 			if ("patient_identifier".equalsIgnoreCase(((Element) child).getAttribute("openmrs_table"))
-				&& "identifier".equalsIgnoreCase(((Element) child).getAttribute("openmrs_attribute"))) {
+					&& "identifier".equalsIgnoreCase(((Element) child).getAttribute("openmrs_attribute"))) {
 				return child.getTextContent();
 			}
 		}
@@ -646,7 +648,7 @@ public class MobileFormEntryUtil {
 		return null;
 	}
 
- 	/**
+	/**
 	 * Deletes a file specified by form path
 	 */
 	public static void deleteFile(String filePath) {

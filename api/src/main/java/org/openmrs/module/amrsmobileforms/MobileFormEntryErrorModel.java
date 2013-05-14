@@ -25,6 +25,10 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	private String birthdate = "";
 	private String gender = "";
 	private String identifier = "";
+	
+	//data from household meta-data section
+	private String totalHousehold = "";
+	private String totalEligible = "";
 
 	// data from the formData encounter section
 	private String location = "";
@@ -50,6 +54,8 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		setError(error.getError());
 		setErrorDetails(error.getErrorDetails());
 		setDateCreated(error.getDateCreated());
+		setProviderId(error.getProviderId());
+		setLocationId(error.getLocationId());
 
 		//For resolve form
 		setComment(error.getComment());
@@ -61,7 +67,7 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 				Document formDataDoc = getDocumentForErrorQueueItem(getFormName());
 				XPath xp = getXPathFactory().newXPath();
 
-               if ("household".equals(errorType)) {
+				if ("household".equals(errorType)) {
 					setName("Household");
 					setBirthdate("N/A");
 					setIdentifier(xp.evaluate("/form/household/meta_data/household_id", formDataDoc));
@@ -71,7 +77,10 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 				
 					setTotalHousehold(xp.evaluate("/form/household/meta_data/total_household", formDataDoc));
 					setTotalEligible(xp.evaluate("/form/household/meta_data/total_eligible", formDataDoc));
-					setProviderId(xp.evaluate("/form/encounter/encounter.provider_id",formDataDoc));
+
+					if (getProviderId() == null)
+						setProviderId(xp.evaluate("/form/survey/provider_id", formDataDoc));
+
 				} else {
 					setName(xp.evaluate("/form/patient/patient.given_name", formDataDoc) + " " +
 							xp.evaluate("/form/patient/patient.middle_name", formDataDoc) + " " +
@@ -85,7 +94,15 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 					String location = xp.evaluate("/form/encounter/encounter.location_id", formDataDoc);
 					setLocation(location.substring(location.indexOf("^") + 1));
 					setEncounterDate(xp.evaluate("/form/encounter/encounter.encounter_datetime", formDataDoc));
+				
+					setTotalHousehold("N/A");
+					setTotalEligible("N/A");
+
+					if (getProviderId() == null)
+						setProviderId(xp.evaluate("/form/encounter/encounter.provider_id", formDataDoc));
 				}
+
+				// common properties for both household and individual
 				setFormModelName(xp.evaluate("/form/@name", formDataDoc));
 				setFormId(xp.evaluate("/form/@version", formDataDoc));
 
@@ -185,12 +202,14 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 	public String getFormModelName() {
 		return formModelName;
 	}
+
 	/**
 	 * @param formModelName the formModelName to set
 	 */
 	public void setFormModelName(String formModelName) {
 		this.formModelName = formModelName;
 	}
+
 	/**
 	 * @return the formId
 	 */
@@ -213,7 +232,35 @@ public class MobileFormEntryErrorModel extends MobileFormEntryError {
 		this.formPath = formPath;
 	}
 
+	/**
+	 * @return the totalHousehold
+	 */
+	public String getTotalHousehold() {
+		return totalHousehold;
+	}
 
+	/**
+	 * @param totalHousehold the totalHousehold to set
+	 */
+	public void setTotalHousehold(String totalHousehold) {
+		this.totalHousehold = totalHousehold;
+	}
+	
+	
+	/**
+	 * @return the totalEligible
+	 */
+	public String getTotalEligible() {
+		return totalEligible;
+	}
+
+	/**
+	 * @param totalEligible the totalEligible to set
+	 */
+	public void setTotalEligible(String totalEligible) {
+		this.totalEligible = totalEligible;
+	}
+	
 	/**
 	 * @return the errorType
 	 */

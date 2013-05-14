@@ -32,7 +32,6 @@ import java.util.Set;
  * xforms module for processing
  *
  * @author Samuel Mbugua
- *
  */
 @Transactional
 public class MobileFormUploadProcessor {
@@ -61,8 +60,8 @@ public class MobileFormUploadProcessor {
 	 */
 	private void processSplitForm(String filePath, MobileFormQueue queue) throws APIException {
 		log.debug("Sending splitted mobile forms to the xform module");
-        String providerId=null;
-        String locationId =null;
+		String providerId = null;
+		String locationId = null;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -77,22 +76,16 @@ public class MobileFormUploadProcessor {
 			String familyName = xp.evaluate(MobileFormEntryConstants.PATIENT_FAMILYNAME, curNode);
 			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, curNode);
 			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, curNode);
+			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
 
-           /* curNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
-            Integer intProvider = MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
-            providerId=intProvider.toString();*/
-            String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+			//Clean location id by removing decimal points
+			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
 
-            //Clean location id by removing decimal points
-            locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
+			//find  provider Id from the document
+			Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode).trim();
 
-            //find  provider Id from the document
-            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-            //providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-
-            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
-            providerId=providerId.trim();
-            //Ensure there is a patient identifier in the form and
+			//Ensure there is a patient identifier in the form and
 			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
 				if ((familyName == null || familyName.trim() == "")
@@ -103,7 +96,7 @@ public class MobileFormUploadProcessor {
 					// form has no patient identifier but has names : move to error
 					saveFormInError(filePath);
 					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-							"Patient has no identifier, or the identifier provided is invalid",providerId,locationId));
+							"Patient has no identifier, or the identifier provided is invalid", providerId, locationId));
 				}
 				return;
 			}
@@ -112,21 +105,21 @@ public class MobileFormUploadProcessor {
 			if (familyName == null || familyName.trim() == "" || givenName == null || givenName == "") {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-						"Patient has no valid names specified, Family Name and Given Name are required",providerId,locationId));
+						"Patient has no valid names specified, Family Name and Given Name are required", providerId, locationId));
 				return;
 			}
 
 			// Ensure there is a valid provider id or name and return provider_id in the form
 
-			if ((providerId) == null) {
+			if (providerId == null) {
 				// form has no valid provider : move to error
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient form",
-						"Provider for this encounter is not provided, or the provider identifier provided is invalid",providerId,locationId));
+						"Provider for this encounter is not provided, or the provider identifier provided is invalid", providerId, locationId));
 				return;
 			} else {
 				XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER,providerId);
+						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId);
 			}
 
 			// ensure patient has birth date
@@ -134,7 +127,7 @@ public class MobileFormUploadProcessor {
 				Integer yearOfBirth = MobileFormEntryUtil.getBirthDateFromAge(doc);
 				if (yearOfBirth == null) {//patient has no valid birth-date
 					saveFormInError(filePath);
-					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate",providerId,locationId));
+					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient", "Patient has no valid Birthdate", providerId, locationId));
 					return;
 				} else {
 					//fix birth-date from age
@@ -149,7 +142,7 @@ public class MobileFormUploadProcessor {
 			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
-						"Patient is not linked to household or household Id provided is invalid",providerId,locationId));
+						"Patient is not linked to household or household Id provided is invalid", providerId, locationId));
 				return;
 			}
 
@@ -170,7 +163,7 @@ public class MobileFormUploadProcessor {
 					sb.append(".");
 
 					mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath),
-							"Error processing patient", sb.toString(),providerId,locationId));
+							"Error processing patient", sb.toString(), providerId, locationId));
 					return;
 				}
 			}
@@ -192,7 +185,7 @@ public class MobileFormUploadProcessor {
 			log.error("Error while sending form to xform module", t);
 			//put file in error queue
 			saveFormInError(filePath);
-			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error sending form to xform module", t.getMessage(),providerId,locationId));
+			mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error sending form to xform module", t.getMessage(), providerId, locationId));
 		}
 	}
 
@@ -200,7 +193,7 @@ public class MobileFormUploadProcessor {
 	 * check for a match of name parts against the names from a given patient
 	 *
 	 * @param providedNames the list of name parts to check against
-	 * @param personNames set of PersonName objects for review
+	 * @param personNames   set of PersonName objects for review
 	 * @return whether a name part from the set of PersonNames matches one from the first list
 	 * @should return true when only one name part is found in a person name
 	 * @should return true when more than one name part matches

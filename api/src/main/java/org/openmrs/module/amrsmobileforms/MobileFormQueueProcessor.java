@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -22,12 +23,11 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Processes Mobile forms Queue entries.
- *
+ * <p/>
  * When the processing is successful, For unsuccessful processing, the queue
  * entry is put in the Mobile forms error folder.
  *
  * @author Samuel Mbugua
- *
  */
 @Transactional
 public class MobileFormQueueProcessor {
@@ -58,8 +58,8 @@ public class MobileFormQueueProcessor {
 		String householdIdentifier = null;
 		String householdGps = null;
 		MobileFormEntryService mfes = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
-        String providerId=null;
-        String locationId=null;
+		String providerId = null;
+		String locationId = null;
 
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -69,22 +69,19 @@ public class MobileFormQueueProcessor {
 			Node curNode = (Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode);
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
-            String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
 
-            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-            locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
+			Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
+			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode).trim();
 
-           // providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-
-            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
-            providerId=providerId.trim();
 			// check household identifier and gps were entered correctly
 			if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
 				log.debug("Null household identifier or GPS");
 				saveFormInError(queue.getFileSystemUrl());
 				mfes.saveErrorInDatabase(MobileFormEntryUtil.
-					createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
-					"This household has no identifier or GPS specified", providerId,locationId ));
+						createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+								"This household has no identifier or GPS specified", providerId, locationId));
 				return;
 			}
 
@@ -92,13 +89,13 @@ public class MobileFormQueueProcessor {
 
 			//Search for the identifier in the household database
 			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier)
-				&& !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)) {
+					&& !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)) {
 
 				log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
 				saveFormInError(queue.getFileSystemUrl());
 				mfes.saveErrorInDatabase(MobileFormEntryUtil.
-					createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
-					"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId,locationId ));
+						createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+								"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId, locationId));
 			} else {
 
 				// get or create household
@@ -132,7 +129,7 @@ public class MobileFormQueueProcessor {
 			//put file in error table and move it to error directory
 			saveFormInError(queue.getFileSystemUrl());
 			mfes.saveErrorInDatabase(MobileFormEntryUtil.
-				createError(getFormName(queue.getFileSystemUrl()), "Error Parsing household form", t.getMessage(), providerId,locationId ));
+					createError(getFormName(queue.getFileSystemUrl()), "Error Parsing household form", t.getMessage(), providerId, locationId));
 		}
 	}
 
@@ -222,7 +219,7 @@ public class MobileFormQueueProcessor {
 
 	/**
 	 * @return XPathFactory to be used for obtaining data from the parsed
-	 * XML
+	 *         XML
 	 */
 	private XPathFactory getXPathFactory() {
 		if (xPathFactory == null) {
