@@ -1,12 +1,5 @@
 package org.openmrs.module.amrsmobileforms;
 
-import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -18,8 +11,14 @@ import org.openmrs.module.amrsmobileforms.util.SyncLogger;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.openmrs.Location;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
 
 /**
  * Processes Mobile forms Queue entries.
@@ -60,12 +59,18 @@ public class MobileFormQueueProcessor {
 		MobileFormEntryService mfes = (MobileFormEntryService) Context.getService(MobileFormEntryService.class);
 		String providerId = null;
 		String locationId = null;
+        String formID = null;
 
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 			XPathFactory xpf = getXPathFactory();
 			XPath xp = xpf.newXPath();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
+
+            Node formNode = (Node) xp.evaluate(MobileFormEntryConstants.FORM_PREFIX,doc, XPathConstants.NODE);
+
+            formID = formNode.getAttributes().getNamedItem("id").getNodeValue();
+
 			Node curNode = (Node) xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX, doc, XPathConstants.NODE);
 			householdIdentifier = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, curNode);
 			householdGps = xp.evaluate(MobileFormEntryConstants.HOUSEHOLD_META_GPS_LOCATION, curNode);
@@ -75,27 +80,55 @@ public class MobileFormQueueProcessor {
 			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
 			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode).trim();
 
-			// check household identifier and gps were entered correctly
-			if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
-				log.debug("Null household identifier or GPS");
-				saveFormInError(queue.getFileSystemUrl());
-				mfes.saveErrorInDatabase(MobileFormEntryUtil.
-						createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
-								"This household has no identifier or GPS specified", providerId, locationId));
-				return;
-			}
+            //
+            /**
+             *  skip GPS  validation if form is phct followup form
+             *  phct initial form (id=115)
+             *  phct followup form (id=332)
+             */
+
+            if(formID.equals("115")){
+                // check household identifier and gps were entered correctly
+                if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
+                    log.debug("Null household identifier or GPS");
+                    saveFormInError(queue.getFileSystemUrl());
+                    mfes.saveErrorInDatabase(MobileFormEntryUtil.
+                            createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+                                    "This household has no identifier or GPS specified", providerId, locationId));
+                    return;
+                }
+
+            }
+            else{
+                // check for blank household identifier
+                if (StringUtils.isBlank(householdIdentifier)) {
+                    log.debug("Null household identifier for phct followup form");
+                    saveFormInError(queue.getFileSystemUrl());
+                    mfes.saveErrorInDatabase(MobileFormEntryUtil.
+                            createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+                                    "This household has no identifier", providerId, locationId));
+                    return;
+                }
+            }
+
+
+
 
 			//pull out household data: includes meta, survey, economic, household_meta
 
 			//Search for the identifier in the household database
-			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier)
-					&& !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)) {
+			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier)) {
+                    //&&
+                    if(formID.equals("115")  && !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)){
 
-				log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
-				saveFormInError(queue.getFileSystemUrl());
-				mfes.saveErrorInDatabase(MobileFormEntryUtil.
-						createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
-								"A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId, locationId));
+                        log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
+                        saveFormInError(queue.getFileSystemUrl());
+                        mfes.saveErrorInDatabase(MobileFormEntryUtil.
+                                createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+                                        "A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId, locationId));
+
+                    }
+
 			} else {
 
 				// get or create household
