@@ -8,6 +8,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
 import org.openmrs.module.amrsmobileforms.util.SyncLogger;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -87,7 +88,7 @@ public class MobileFormQueueProcessor {
              *  phct followup form (id=332)
              */
 
-            if(formID.equals("115")){
+            if(OpenmrsUtil.nullSafeEquals(formID, "115")){
                 // check household identifier and gps were entered correctly
                 if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
                     log.debug("Null household identifier or GPS");
@@ -118,8 +119,8 @@ public class MobileFormQueueProcessor {
 
 			//Search for the identifier in the household database
 			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier)) {
-                    //&&
-                    if(formID.equals("115")  && !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)){
+
+                    if(OpenmrsUtil.nullSafeEquals(formID, "115")  && !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)){
 
                         log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
                         saveFormInError(queue.getFileSystemUrl());
