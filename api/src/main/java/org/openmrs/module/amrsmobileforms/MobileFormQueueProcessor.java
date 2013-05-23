@@ -81,7 +81,6 @@ public class MobileFormQueueProcessor {
 			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
 			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode).trim();
 
-            //
             /**
              *  skip GPS  validation if form is phct followup form
              *  phct initial form (id=115)
@@ -89,9 +88,11 @@ public class MobileFormQueueProcessor {
              */
 
             if(OpenmrsUtil.nullSafeEquals(formID, "115")){
+
                 // check household identifier and gps were entered correctly
                 if (StringUtils.isBlank(householdIdentifier) || StringUtils.isBlank(householdGps)) {
                     log.debug("Null household identifier or GPS");
+
                     saveFormInError(queue.getFileSystemUrl());
                     mfes.saveErrorInDatabase(MobileFormEntryUtil.
                             createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
@@ -112,25 +113,27 @@ public class MobileFormQueueProcessor {
                 }
             }
 
-
-
-
-			//pull out household data: includes meta, survey, economic, household_meta
+            //pull out household data: includes meta, survey, economic, household_meta
 
 			//Search for the identifier in the household database
 			if (!MobileFormEntryUtil.isNewHousehold(householdIdentifier)) {
 
-                    if(OpenmrsUtil.nullSafeEquals(formID, "115")  && !MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)){
+                    if(OpenmrsUtil.nullSafeEquals(formID, "115")){
 
-                        log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
-                        saveFormInError(queue.getFileSystemUrl());
-                        mfes.saveErrorInDatabase(MobileFormEntryUtil.
-                                createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
-                                        "A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId, locationId));
+                        if(!MobileFormEntryUtil.isSameHousehold(householdIdentifier, householdGps)){
+
+                            log.error("household with identifier " + householdIdentifier + " has conflicting GPS coordinates: " + householdGps);
+                            saveFormInError(queue.getFileSystemUrl());
+                            mfes.saveErrorInDatabase(MobileFormEntryUtil.
+                                    createError(getFormName(queue.getFileSystemUrl()), "Error processing household",
+                                            "A duplicate household different from this one exists with the same identifier (" + householdIdentifier + ")", providerId, locationId));
+
+                            return;
+                        }
 
                     }
 
-			} else {
+			}
 
 				// get or create household
 				log.debug("Processing household with id " + householdIdentifier);
@@ -154,7 +157,7 @@ public class MobileFormQueueProcessor {
 
 				// queue form for splitting
 				saveFormInPendingSplit(queue.getFileSystemUrl());
-			}
+
 		} catch (SAXParseException s) {
 			log.info("An invalid household file. Automatically deleted", s);
 			MobileFormEntryUtil.deleteFile(queue.getFileSystemUrl());
@@ -189,6 +192,7 @@ public class MobileFormQueueProcessor {
 			return;
 		}
 		try {
+
 			File queueDir = MobileFormEntryUtil.getMobileFormsDropDir();
 			for (File file : queueDir.listFiles()) {
 				MobileFormQueue queue = mobileService.getMobileFormEntryQueue(file.getAbsolutePath());
