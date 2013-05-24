@@ -44,7 +44,7 @@ public class MobileFormUploadProcessor {
 	private MobileFormEntryService mobileService;
 	// allow only one running instance
 	private static Boolean isRunning = false;
-
+    private Integer providerPerson_id;
 	public MobileFormUploadProcessor() {
 		try {
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -87,12 +87,12 @@ public class MobileFormUploadProcessor {
             locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
 
             //find  provider Id from the document
-            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
+            Node encounterNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
             //providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-
-            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
+            providerPerson_id=MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
+            providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, encounterNode);
             providerId=providerId.trim();
-            //Ensure there is a patient identifier in the form and
+               //Ensure there is a patient identifier in the form and
 			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
 				if ((familyName == null || familyName.trim() == "")
@@ -126,7 +126,7 @@ public class MobileFormUploadProcessor {
 				return;
 			} else {
 				XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER,providerId);
+						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER,providerPerson_id.toString());
 			}
 
 			// ensure patient has birth date
