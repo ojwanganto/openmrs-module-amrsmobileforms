@@ -23,7 +23,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -59,35 +58,46 @@ public class MobileFormUploadProcessor {
 	 * @param filePath
 	 */
 	private void processSplitForm(String filePath, MobileFormQueue queue) throws APIException {
+
 		log.debug("Sending splitted mobile forms to the xform module");
+
 		String providerId = null;
 		String locationId = null;
+
 		try {
+
+			// establish a doc to work from
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 			XPathFactory xpf = getXPathFactory();
 			XPath xp = xpf.newXPath();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
-			Node curNode = (Node) xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
-			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode);
-			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, curNode);
-			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
-			String birthDate = xp.evaluate(MobileFormEntryConstants.PATIENT_BIRTHDATE, curNode);
-			String familyName = xp.evaluate(MobileFormEntryConstants.PATIENT_FAMILYNAME, curNode);
-			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, curNode);
-			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, curNode);
-			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+
+			// start with the /form/patient node
+			Node patientNode = (Node) xp.evaluate(MobileFormEntryConstants.PATIENT_NODE, doc, XPathConstants.NODE);
+
+			// get patient-related information
+			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, patientNode);
+			String patientAmpathIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_HCT_IDENTIFIER, patientNode);
+			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, patientNode);
+			String birthDate = xp.evaluate(MobileFormEntryConstants.PATIENT_BIRTHDATE, patientNode);
+			String familyName = xp.evaluate(MobileFormEntryConstants.PATIENT_FAMILYNAME, patientNode);
+			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, patientNode);
+			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, patientNode);
+			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, patientNode);
 
 			//Clean location id by removing decimal points
 			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
 
-			//find  provider Id from the document
-			Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode).trim();
+			//find provider's personId from the encounter
+			Node encounterNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
+			providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, encounterNode).trim();
 
-			//Ensure there is a patient identifier in the form and
-			// if without names just delete the form
-			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
+			// find the provider's person id from the person node?
+			Integer providerPerson_id = MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, patientNode));
+
+			//Ensure there is a patient identifier in the form and if without names just delete the form
+			if (StringUtils.isBlank(MobileFormEntryUtil.getPatientIdentifier(doc))) {
 				if ((familyName == null || familyName.trim() == "")
 						&& (givenName == null || givenName == "")) {
 					MobileFormEntryUtil.deleteFile(filePath);
@@ -102,7 +112,7 @@ public class MobileFormUploadProcessor {
 			}
 
 			//Ensure Family name and Given names are not blanks
-			if (familyName == null || familyName.trim() == "" || givenName == null || givenName == "") {
+			if (StringUtils.isBlank(familyName) || StringUtils.isBlank(givenName)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
 						"Patient has no valid names specified, Family Name and Given Name are required", providerId, locationId));
@@ -110,7 +120,6 @@ public class MobileFormUploadProcessor {
 			}
 
 			// Ensure there is a valid provider id or name and return provider_id in the form
-
 			if (providerId == null) {
 				// form has no valid provider : move to error
 				saveFormInError(filePath);
@@ -119,11 +128,11 @@ public class MobileFormUploadProcessor {
 				return;
 			} else {
 				XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId);
+						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerPerson_id.toString());
 			}
 
 			// ensure patient has birth date
-			if (birthDate == null || birthDate.trim().length() == 0) {
+			if (StringUtils.isBlank(birthDate)) {
 				Integer yearOfBirth = MobileFormEntryUtil.getBirthDateFromAge(doc);
 				if (yearOfBirth == null) {//patient has no valid birth-date
 					saveFormInError(filePath);
@@ -134,12 +143,11 @@ public class MobileFormUploadProcessor {
 					birthDate = "" + yearOfBirth + "-01-01";
 					XFormEditor.editNode(filePath,
 							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, birthDate);
-
 				}
 			}
 
 			//Ensure that the patient has a household to link to
-			if (householdId == null || householdId.trim() == "" || MobileFormEntryUtil.isNewHousehold(householdId)) {
+			if (StringUtils.isBlank(householdId) || MobileFormEntryUtil.isNewHousehold(householdId)) {
 				saveFormInError(filePath);
 				mobileService.saveErrorInDatabase(MobileFormEntryUtil.createError(getFormName(filePath), "Error processing patient",
 						"Patient is not linked to household or household Id provided is invalid", providerId, locationId));
