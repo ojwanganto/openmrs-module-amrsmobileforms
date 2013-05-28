@@ -150,7 +150,8 @@ public class MobileFormEntryConstants {
 	
 	public final static String ENCOUNTER_NODE = "/form/encounter";
 	public final static String ENCOUNTER_PROVIDER = "encounter.provider_id";
-	
+    public final static String ENCOUNTER_LOCATION= "encounter.location_id";
+
 	//TEMPORAL
 	public final static String OBS_NODE = "/form/obs";
 	public final static String OBS_RELATIONSHIP = "relation_to_househead";

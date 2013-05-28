@@ -63,6 +63,7 @@ public class MobileFormUploadProcessor {
 		log.debug("Sending splitted mobile forms to the xform module");
         String providerId=null;
         String locationId =null;
+        String householdLocation=null;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -78,21 +79,20 @@ public class MobileFormUploadProcessor {
 			String givenName = xp.evaluate(MobileFormEntryConstants.PATIENT_GIVENNAME, curNode);
 			String middleName = xp.evaluate(MobileFormEntryConstants.PATIENT_MIDDLENAME, curNode);
 
-           /* curNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
-            Integer intProvider = MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
-            providerId=intProvider.toString();*/
-            String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+
+          //find  provider Id from the document
+            curNode=(Node)  xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
+            providerPerson_id=MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
+
+            providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode);
+            providerId=providerId.trim();
+
+            householdLocation=xp.evaluate(MobileFormEntryConstants.ENCOUNTER_LOCATION, curNode);
 
             //Clean location id by removing decimal points
             locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
 
-            //find  provider Id from the document
-            Node encounterNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
-            //providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-            providerPerson_id=MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode));
-            providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, encounterNode);
-            providerId=providerId.trim();
-               //Ensure there is a patient identifier in the form and
+           //Ensure there is a patient identifier in the form and
 			// if without names just delete the form
 			if (MobileFormEntryUtil.getPatientIdentifier(doc) == null || MobileFormEntryUtil.getPatientIdentifier(doc).trim() == "") {
 				if ((familyName == null || familyName.trim() == "")
@@ -186,9 +186,10 @@ public class MobileFormUploadProcessor {
 			}
 
 			//Finally send to xforms for processing
-			MobileFormEntryFileUploader.submitXFormFile(filePath);
-			saveFormInPendingLink(filePath);
-		} catch (Throwable t) {
+           	MobileFormEntryFileUploader.submitXFormFile(filePath);
+            saveFormInPendingLink(filePath);
+
+        } catch (Throwable t) {
 			log.error("Error while sending form to xform module", t);
 			//put file in error queue
 			saveFormInError(filePath);

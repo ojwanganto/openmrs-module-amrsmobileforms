@@ -59,6 +59,7 @@ public class MobileFormHouseholdLinksProcessor {
 		log.debug("Linking Patient to household");
         String providerId=null;
         String locationId=null;
+        String householdLocation=null;
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -70,15 +71,17 @@ public class MobileFormHouseholdLinksProcessor {
 			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode);
 			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
             providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode)));
-            String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
 
              //find  provider Id from the document
-            Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-            //providerId = Integer.toString(MobileFormEntryUtil.getProviderId(xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode)));
-            providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
+            curNode=(Node)  xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
+            providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, curNode);
             providerId=providerId.trim();
+
+            householdLocation=xp.evaluate(MobileFormEntryConstants.ENCOUNTER_LOCATION, curNode);
+
             //Clean location id by removing decimal points
             locationId=MobileFormEntryUtil.cleanLocationEntry(householdLocation) ;
+
 
             // First Ensure there is at least a patient identifier in the form
             if (!StringUtils.hasText(MobileFormEntryUtil.getPatientIdentifier(doc))) {

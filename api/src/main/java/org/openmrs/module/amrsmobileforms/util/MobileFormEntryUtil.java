@@ -290,12 +290,19 @@ public class MobileFormEntryUtil {
         String locationId=null;
         if(householdLocation.length()>0)  {
 
-            String lastDec=householdLocation.substring(householdLocation.length()-2);
-            if (lastDec.equals(".0")) {
-                locationId=householdLocation.substring(0,householdLocation.length()-2);
-            } else {
+            if(householdLocation.length()>2) {
+                        String lastDec=householdLocation.substring(householdLocation.length()-2);
+                        if (lastDec.equals(".0")) {
+                            locationId=householdLocation.substring(0,householdLocation.length()-2);
+                        } else {
+                            locationId= householdLocation;
+                        }
+
+            }
+            else{
                 locationId= householdLocation;
             }
+
         }
 
         return   locationId;
