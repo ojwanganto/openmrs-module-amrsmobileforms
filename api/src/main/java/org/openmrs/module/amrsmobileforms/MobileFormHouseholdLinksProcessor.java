@@ -1,18 +1,9 @@
 package org.openmrs.module.amrsmobileforms;
 
-import java.io.File;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
-import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
@@ -20,6 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
 
 /**
  * Processes Patient forms by linking patients to their specified households
@@ -56,9 +54,13 @@ public class MobileFormHouseholdLinksProcessor {
 	 * @throws APIException
 	 */
 	private void processPendingLinkForm(String filePath, MobileFormQueue queue) throws APIException {
+
 		log.debug("Linking Patient to household");
+
 		String providerId = null;
 		String locationId = null;
+		String householdLocation = null;
+
 		try {
 			String formData = queue.getFormData();
 			docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -66,18 +68,19 @@ public class MobileFormHouseholdLinksProcessor {
 			XPath xp = xpf.newXPath();
 			Document doc = docBuilder.parse(IOUtils.toInputStream(formData));
 
-			Node curNode = (Node) xp.evaluate("/form/patient", doc, XPathConstants.NODE);
-			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, curNode);
-			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, curNode);
-			String householdLocation = xp.evaluate(MobileFormEntryConstants.PATIENT_CATCHMENT_AREA, curNode);
+			Node patientNode = (Node) xp.evaluate("/form/patient", doc, XPathConstants.NODE);
+			String patientIdentifier = xp.evaluate(MobileFormEntryConstants.PATIENT_IDENTIFIER, patientNode);
+			String householdId = xp.evaluate(MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, patientNode);
 
 			//find  provider Id from the document
-			Node surveyNode = (Node) xp.evaluate(MobileFormEntryConstants.SURVEY_PREFIX, doc, XPathConstants.NODE);
-			providerId = xp.evaluate(MobileFormEntryConstants.SURVEY_PROVIDER_ID, surveyNode);
-			providerId = providerId.trim();
+			Node encounterNode = (Node) xp.evaluate(MobileFormEntryConstants.ENCOUNTER_NODE, doc, XPathConstants.NODE);
+			providerId = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_PROVIDER, encounterNode).trim();
+
+			householdLocation = xp.evaluate(MobileFormEntryConstants.ENCOUNTER_LOCATION, encounterNode);
 
 			//Clean location id by removing decimal points
 			locationId = MobileFormEntryUtil.cleanLocationEntry(householdLocation);
+
 
 			// First Ensure there is at least a patient identifier in the form
 			if (!StringUtils.hasText(MobileFormEntryUtil.getPatientIdentifier(doc))) {
