@@ -228,6 +228,7 @@ $j(document).ready(function () {
 
         DWRAMRSMobileFormsService.populateCommentForm(errorId, function (data) {
             var errObj = data[0];
+            //alert(data[0]);
             generate_ResolveError_table(errObj);
         });
 
@@ -475,7 +476,7 @@ function generate_ResolveError_table(data) {
     var tblBody = document.createElement("tbody");
 
     var comment = buildRow("Comment", data.comment);
-    var commentedBy = buildRow("Commented By", data.commentedBy);
+    var commentedBy = buildRow("Commented By", data.commentedBy.username);
     var dateCommented = buildRow("Date Commented", data.dateCommented);
 
     var pname = buildRow("Person Name", data.name);
