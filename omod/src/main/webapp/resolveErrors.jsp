@@ -238,17 +238,18 @@ $j(document).ready(function () {
             buttons: {
                 "Resolve Error": function () {
 
-                    var provider = document.getElementById('selprovider').value;
-                    //var newPatient = document.getElementById('patient').value;
-                    var patientId = document.getElementsByName('patientIdentifier').value;
-                    var dob = document.getElementsByName('birthDate').value;
-                    var newHousehold = document.getElementsByName('householdId').value;
-                    var householdId = document.getElementsByName('householdIdentifier').value;
+                    var providerId = document.getElementById('selprovider').value;
+                    var patientId = document.getElementById('selpatient').value;
+                    var patientIdentifier = document.getElementById('patientIdentifier').value;
+                    var birthDate = document.getElementById('birthDate').value;
+                    var householdId = document.getElementById('householdId').value;
+                    var householdIdentifier = document.getElementById('householdIdentifier').value;
                     var errorItemAction = getSelectedRadio();
 
 
                     if (errorItemAction != null) {
-                        DWRAMRSMobileFormsService.resolveError(householdId, errorId, errorItemAction, dob, patientId, provider, newHousehold, resolveErrorResult);
+
+                       DWRAMRSMobileFormsService.resolveError(householdId, errorId, errorItemAction, birthDate, patientIdentifier, providerId, householdIdentifier,patientId, resolveErrorResult);
                     } else {
                         alert("Please select the action to take");
                     }
@@ -534,6 +535,10 @@ function setErrorAction(index, data) {
     document.getElementById("selprovider").value = data.personId;
 }
 
+function setPatientField(index, data) {
+    document.getElementById("selpatient").value = data.patientId;
+}
+
 /**
  * updates the numSelected element with a specified amount, with some after-effects
  **/
@@ -586,6 +591,18 @@ function doSelectionHandler(index, data) {
             </tr>
             <tr>
                 <td>
+                    <!-- Pick a patient -->
+                    <input type="radio" name="errorItemAction" value="linkPatient"/>
+                    <spring:message code="amrsmobileforms.resolveErrors.action.patientLink"/>
+                </td>
+                <td>
+                    <openmrs_tag:patientField formFieldName="patientId"
+                                           searchLabelCode="amrsmobileforms.resolveErrors.action.findPatient"
+                                           initialValue="" callback="setPatientField"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <!-- Have the machinery create a new patient -->
                     <input type="radio" name="errorItemAction" value="createPatient"/>
                     <spring:message code="amrsmobileforms.resolveErrors.action.createPatient"/>
@@ -599,7 +616,7 @@ function doSelectionHandler(index, data) {
                     <spring:message code="amrsmobileforms.resolveErrors.action.newIdentifier"/>:
                 </td>
                 <td>
-                    <input type="text" name="patientIdentifier"/>
+                    <input type="text" id="patientIdentifier" name="patientIdentifier"/>
                 </td>
             </tr>
             <tr>
@@ -609,7 +626,7 @@ function doSelectionHandler(index, data) {
                     <spring:message code="amrsmobileforms.resolveErrors.action.assignBirthDate"/>:
                 </td>
                 <td>
-                    <input type="text" name="birthDate" onClick="showCalendar(this)"/>
+                    <input type="text" name="birthDate" id="birthDate" onClick="showCalendar(this)"/>
                 </td>
             </tr>
 
@@ -620,7 +637,7 @@ function doSelectionHandler(index, data) {
                     <spring:message code="amrsmobileforms.resolveErrors.action.createLink"/>:
                 </td>
                 <td>
-                    <input type="text" name="householdId"/>
+                    <input type="text" id="householdId" name="householdId"/>
                 </td>
             </tr>
             <tr>
@@ -629,7 +646,7 @@ function doSelectionHandler(index, data) {
                     <spring:message code="amrsmobileforms.resolveErrors.action.newHouseholdIdentifier"/>:
                 </td>
                 <td>
-                    <input type="text" name="householdIdentifier"/>
+                    <input type="text" id="householdIdentifier" name="householdIdentifier"/>
                 </td>
             </tr>
             <tr>
@@ -661,6 +678,7 @@ function doSelectionHandler(index, data) {
                 </td>
                 <td>
                     <input type="hidden" id="selprovider" value=""/>
+                    <input type="hidden" id="selpatient" value=""/>
                 </td>
             </tr>
         </table>

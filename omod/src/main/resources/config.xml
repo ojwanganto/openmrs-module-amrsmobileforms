@@ -165,7 +165,7 @@
 			</create>
 			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
             <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryErrorModel"/>
-             <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryError"/>
+            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryError"/>
              
 		</allow>
 
@@ -176,8 +176,8 @@
 				
 				DWRAMRSMobileFormsService.populateCommentForm(Integer errorId);
 				DWRAMRSMobileFormsService.saveComment(Integer errorId, String comment);
-				DWRAMRSMobileFormsService.resolveError(String householdId,Integer errorId,String errorItemAction,String dob,String patientId,String provider,String newHousehold,Integer patientId);
-				
+				DWRAMRSMobileFormsService.resolveError(String householdId,Integer errorId,String errorItemAction,String birthDate,String patientIdentifier,String providerId,String householdIdentifier,Integer patientId);
+
 			]]>
 		</signatures>	
 	</dwr>

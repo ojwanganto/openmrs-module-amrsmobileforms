@@ -4,51 +4,32 @@
  */
 package org.openmrs.module.amrsmobileforms.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import org.openmrs.api.PersonService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
-import java.lang.Integer;
+import org.openmrs.api.APIException;
+import org.openmrs.api.PersonService;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsmobileforms.*;
+import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
+import org.openmrs.module.amrsmobileforms.util.XFormEditor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.APIException;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryConstants;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryError;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryErrorModel;
-import org.openmrs.module.amrsmobileforms.MobileFormEntryService;
-import org.openmrs.module.amrsmobileforms.MobileFormQueue;
-import org.openmrs.module.amrsmobileforms.util.MobileFormEntryUtil;
-import org.openmrs.module.amrsmobileforms.util.XFormEditor;
-import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.web.WebConstants;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.openmrs.module.amrsmobileforms.EconomicConceptMap;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 
 
@@ -163,7 +144,7 @@ public class DWRAMRSMobileFormsService {
     /**
 	 * Controller for resolveError post jsp Page
 	 */
-	
+
 	public List resolveError(
 			String householdId,
 			Integer errorId, 
@@ -172,7 +153,8 @@ public class DWRAMRSMobileFormsService {
 			String patientIdentifier,
 			String providerId, 
 			String householdIdentifier,
-			Integer patientId	) {
+            Integer patientId
+    ) {
 		MobileFormEntryService mobileService;
 		String filePath;
 		List statusInfo = new ArrayList();
@@ -277,6 +259,11 @@ public class DWRAMRSMobileFormsService {
 						statusInfo.add("Error-Provider link created successfully");
 						return statusInfo;
 					}
+                    else{
+                        statusInfo.add(0);
+                        statusInfo.add("Could not link the form to the provider");
+                        return statusInfo;
+                    }
 				} else {
 					//httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
 					
