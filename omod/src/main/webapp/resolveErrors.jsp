@@ -228,6 +228,7 @@ $j(document).ready(function () {
 
         DWRAMRSMobileFormsService.populateCommentForm(errorId, function (data) {
             var errObj = data[0];
+            clearElements();
             generate_ResolveError_table(errObj);
         });
 
@@ -466,6 +467,7 @@ function generate_table(data, bodyDiv, option) {
 
 function generate_ResolveError_table(data) {
 
+
     var body = document.getElementById("resolveErrorTable");
 
     var tbl = document.createElement("table");
@@ -476,7 +478,7 @@ function generate_ResolveError_table(data) {
     var tblBody = document.createElement("tbody");
 
     var comment = buildRow("Comment", data.comment);
-    var commentedBy = buildRow("Commented By", data.commentedBy);
+    var commentedBy = buildRow("Commented By", data.commentedBy.username);
     var dateCommented = buildRow("Date Commented", data.dateCommented);
 
     var pname = buildRow("Person Name", data.name);
@@ -559,6 +561,33 @@ function updateNumSelected(amount) {
 
 function doSelectionHandler(index, data) {
     document.getElementById("selprovider").value = data.personId;
+}
+
+function clearElements(){
+
+    var textElements = document.getElementsByTagName("input");
+    for (var i=0; i < textElements.length; i++) {
+        if (textElements[i].type == 'text') {
+            textElements[i].value = '';
+        }
+    }
+
+    var radioElements = document.getElementsByName("errorItemAction");
+    var radioLength = radioElements.length;
+    var lastRadioPosition = radioLength - 1;
+
+    for (var i=0; i < radioElements.length; i++) {
+
+        if (i != lastRadioPosition) {
+
+            radioElements[i].checked = false;
+        }
+        radioElements[i].checked = true;
+    }
+
+
+
+
 }
 
 
@@ -679,6 +708,7 @@ function doSelectionHandler(index, data) {
                 <td>
                     <input type="hidden" id="selprovider" value=""/>
                     <input type="hidden" id="selpatient" value=""/>
+
                 </td>
             </tr>
         </table>

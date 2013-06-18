@@ -249,7 +249,7 @@ public class DWRAMRSMobileFormsService {
 				}
 			} else if ("linkProvider".equals(errorItemAction)) {
 				if (providerId != null && providerId.trim() != "") {
-					providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
+					//providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
 					if (XFormEditor.editNode(filePath,
 						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
 						// put form in queue for normal processing

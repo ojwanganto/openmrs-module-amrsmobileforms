@@ -163,10 +163,11 @@
                 <include method="resolveError"/>
                 
 			</create>
-			<convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
-            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryErrorModel"/>
-            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryError"/>
-             
+            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.EconomicConceptMap"/>
+            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryErrorModel" javascript="MobileFormEntryErrorModel"/>
+            <convert converter="bean" match="${project.parent.groupId}.${project.parent.artifactId}.MobileFormEntryError" javascript="MobileFormEntryError"/>
+            <convert converter="bean" match="org.openmrs.User" javascript="User"/>
+
 		</allow>
 
 		<signatures>
