@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/template/include.jsp"%>
+ <%@ include file="/WEB-INF/template/include.jsp"%>
 
 <openmrs:require privilege="Resolve Mobile Form Entry Error" otherwise="/login.htm" redirect="/module/amrsmobileforms/resolveErrors.form" />
 

@@ -1,13 +1,14 @@
+package org.openmrs.module.amrsmobileforms.groovy
+
 import groovy.xml.StreamingMarkupBuilder
+
 public class ParseXML{
 
+    def getDirFileListing(String pathToFolder){
 
-    def getDirFileListing(){
-        def filePath = "phctforms/small"
+        new File(pathToFolder).eachFile() { file->
 
-        new File(filePath).eachFile() { file->
-
-            def fullFilePath = filePath +"/" + file.getName()
+            def fullFilePath = pathToFolder +"/" + file.getName()
             def fileData = new XmlSlurper(false,false).parse(fullFilePath);
 
             if(fileData==null){
@@ -59,12 +60,6 @@ public class ParseXML{
     }
 
 
-
-
-
 }
 
-def xmlObj = new ParseXML();
-
-xmlObj.getDirFileListing();
 

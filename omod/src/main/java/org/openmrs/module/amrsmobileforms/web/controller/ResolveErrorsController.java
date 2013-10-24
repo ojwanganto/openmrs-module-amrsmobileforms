@@ -55,12 +55,141 @@ public class ResolveErrorsController {
 	/**
 	 * Controller for Error list jsp page
 	 */
-	@RequestMapping(value = "/module/amrsmobileforms/resolveErrors")
+	@RequestMapping(value = "/module/amrsmobileforms/resolveErrors",method = RequestMethod.GET)
 	public String showErrorList() {
 		return "/module/amrsmobileforms/resolveErrors";
 	}
+    /*controller method used to resolve an error from resolveErrors dialog window*/
+    @RequestMapping(value = "/module/amrsmobileforms/resolveErrorsFromDialog")
+    public String resolveErrorfromDialog(HttpSession httpSession, @RequestParam("householdId") String householdId,
+                               @RequestParam("errorId") Integer errorId, @RequestParam("errorItemAction") String errorItemAction,
+                               @RequestParam("birthDate") String birthDate, @RequestParam("patientIdentifier") String patientIdentifier,
+                               @RequestParam("providerId") String providerId, @RequestParam("householdIdentifier") String householdIdentifier) {
+        MobileFormEntryService mobileService;
+        String filePath;
 
-	/**
+        log.debug("Error ID is "+errorId);
+
+        // user must be authenticated (avoids authentication errors)
+        if (Context.isAuthenticated()) {
+            if (!Context.getAuthenticatedUser().hasPrivilege(
+                    MobileFormEntryConstants.PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR)) {
+                httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.action.noRights");
+                return "redirect:resolveErrors.list";
+            }
+
+            mobileService = Context.getService(MobileFormEntryService.class);
+
+            // fetch the MobileFormEntryError item from the database
+            MobileFormEntryError errorItem = mobileService.getErrorById(errorId);
+            filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + errorItem.getFormName();
+            if ("linkHousehold".equals(errorItemAction)) {
+                if (mobileService.getHousehold(householdId) == null) {
+                    httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createLink.error");
+                    return "redirect:resolveErrors.list";
+                } else {
+                    if (XFormEditor.editNode(filePath,
+                            MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
+                        // put form in queue for normal processing
+                        moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+                    }
+                }
+            } else if ("assignBirthdate".equals(errorItemAction)) {
+                // format provided birthdate and insert into patient data like so:
+                // <patient.birthdate openmrs_table="patient" openmrs_attribute="birthdate">2009-12-25</patient.birthdate>
+                if (StringUtils.isNotEmpty(birthDate)) {
+                    DateFormat reader = DateFormat.getDateInstance(DateFormat.SHORT, Context.getLocale());
+                    DateFormat writer = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        String formattedDate = writer.format(reader.parse(birthDate));
+                        if (XFormEditor.editNode(filePath,
+                                MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, formattedDate)) {
+                            // put form in queue for normal processing
+                            moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+                        }
+                    } catch (ParseException e) {
+                        String error = "Birthdate was not assigned, Invalid date entered: " + birthDate;
+                        httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, error);
+                        log.error(error, e);
+                        return "redirect:resolveErrors.list";
+                    }
+                } else {
+                    httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
+                    return "redirect:resolveErrors.list";
+                }
+            } else if ("newIdentifier".equals(errorItemAction)) {
+                if (patientIdentifier != null && patientIdentifier.trim() != "") {
+                    if (reverseNodes(filePath, patientIdentifier)) {
+                        // put form in queue for normal processing
+                        moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+                    }
+                } else {
+                    httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
+                    return "redirect:resolveErrors.list";
+                }
+            } else if ("linkProvider".equals(errorItemAction)) {
+                if (providerId != null && providerId.trim() != "") {
+                    //providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
+                    if (XFormEditor.editNode(filePath,
+                            MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
+                        // put form in queue for normal processing
+                        moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+                    }
+                } else {
+                    httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
+                    return "redirect:resolveErrors.list";
+                }
+            } else if ("createPatient".equals(errorItemAction)) {
+                // put form in queue for normal processing
+                moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
+            } else if ("deleteError".equals(errorItemAction)) {
+                // delete the mobileformentry error queue item
+                mobileService.deleteError(errorItem);
+                //and delete from the file system
+                MobileFormEntryUtil.deleteFile(filePath);
+
+            } else if ("deleteComment".equals(errorItemAction)) {
+                //set comment to null and save
+                errorItem.setComment(null);
+                mobileService.saveErrorInDatabase(errorItem);
+            } else if ("newHousehold".equals(errorItemAction)) {
+                if (householdIdentifier != null && householdIdentifier.trim() != "") {
+                    // first change household id
+                    if (XFormEditor.editNode(filePath,
+                            MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX + "/"
+                                    + MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, householdIdentifier)) {
+                    } else {
+                        httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+                        return "redirect:resolveErrors.list";
+                    }
+
+                    // then change all patient household pointers
+                    if (XFormEditor.editNodeList(filePath,
+                            MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_INDIVIDUALS_PREFIX,
+                            "patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
+                        // drop form in queue for normal processing
+                        moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
+                    } else {
+                        httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+                        return "redirect:resolveErrors.list";
+                    }
+                } else {
+                    httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
+                    return "redirect:resolveErrors.list";
+                }
+            } else if ("noChange".equals(errorItemAction)) {
+                // do nothing here
+            } else {
+                throw new APIException("Invalid action selected for: " + errorId);
+            }
+        }
+
+        httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "amrsmobileforms.resolveErrors.action.success");
+        return "redirect:resolveErrors.list";
+    }
+
+
+    /**
 	 * Controller for commentOnError jsp Page
 	 */
 	@ModelAttribute("errorFormComment")
@@ -96,136 +225,6 @@ public class ResolveErrorsController {
 		return getErrorObject(errorId);
 	}
 
-	/**
-	 * Controller for resolveError post jsp Page
-	 */
-	@RequestMapping(value = "/module/amrsmobileforms/resolveError", method = RequestMethod.POST)
-	public String resolveError(HttpSession httpSession, @RequestParam("householdId") String householdId,
-		@RequestParam("errorId") Integer errorId, @RequestParam("errorItemAction") String errorItemAction,
-		@RequestParam("birthDate") String birthDate, @RequestParam("patientIdentifier") String patientIdentifier,
-		@RequestParam("providerId") String providerId, @RequestParam("householdIdentifier") String householdIdentifier) {
-		MobileFormEntryService mobileService;
-		String filePath;
-		
-		log.debug("Error ID is "+errorId);
-
-		// user must be authenticated (avoids authentication errors)
-		if (Context.isAuthenticated()) {
-			if (!Context.getAuthenticatedUser().hasPrivilege(
-				MobileFormEntryConstants.PRIV_RESOLVE_MOBILE_FORM_ENTRY_ERROR)) {
-				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.action.noRights");
-				return "redirect:resolveErrors.list";
-			}
-
-			mobileService = Context.getService(MobileFormEntryService.class);
-
-			// fetch the MobileFormEntryError item from the database
-			MobileFormEntryError errorItem = mobileService.getErrorById(errorId);
-			filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + errorItem.getFormName();
-			if ("linkHousehold".equals(errorItemAction)) {
-				if (mobileService.getHousehold(householdId) == null) {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.createLink.error");
-					return "redirect:resolveErrors.list";
-				} else {
-					if (XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdId)) {
-						// put form in queue for normal processing
-						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-					}
-				}
-			} else if ("assignBirthdate".equals(errorItemAction)) {
-				// format provided birthdate and insert into patient data like so:
-				// <patient.birthdate openmrs_table="patient" openmrs_attribute="birthdate">2009-12-25</patient.birthdate>
-				if (StringUtils.isNotEmpty(birthDate)) {
-					DateFormat reader = DateFormat.getDateInstance(DateFormat.SHORT, Context.getLocale());
-					DateFormat writer = new SimpleDateFormat("yyyy-MM-dd");
-					try {
-						String formattedDate = writer.format(reader.parse(birthDate));
-						if (XFormEditor.editNode(filePath,
-							MobileFormEntryConstants.PATIENT_NODE + "/" + MobileFormEntryConstants.PATIENT_BIRTHDATE, formattedDate)) {
-							// put form in queue for normal processing
-							moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-						}
-					} catch (ParseException e) {
-						String error = "Birthdate was not assigned, Invalid date entered: " + birthDate;
-						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, error);
-						log.error(error, e);
-						return "redirect:resolveErrors.list";
-					}
-				} else {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Birthdate was not assigned, Null object entered");
-					return "redirect:resolveErrors.list";
-				}
-			} else if ("newIdentifier".equals(errorItemAction)) {
-				if (patientIdentifier != null && patientIdentifier.trim() != "") {
-					if (reverseNodes(filePath, patientIdentifier)) {
-						// put form in queue for normal processing
-						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-					}
-				} else {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "amrsmobileforms.resolveErrors.action.newIdentifier.error");
-					return "redirect:resolveErrors.list";
-				}
-			} else if ("linkProvider".equals(errorItemAction)) {
-				if (providerId != null && providerId.trim() != "") {
-					providerId = Context.getUserService().getUser(Integer.parseInt(providerId)).getSystemId();
-					if (XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.ENCOUNTER_NODE + "/" + MobileFormEntryConstants.ENCOUNTER_PROVIDER, providerId)) {
-						// put form in queue for normal processing
-						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-					}
-				} else {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "(Null) Invalid provider ID");
-					return "redirect:resolveErrors.list";
-				}
-			} else if ("createPatient".equals(errorItemAction)) {
-				// put form in queue for normal processing
-				moveAndDeleteError(MobileFormEntryUtil.getMobileFormsQueueDir().getAbsolutePath(), errorItem);
-			} else if ("deleteError".equals(errorItemAction)) {
-				// delete the mobileformentry error queue item
-				mobileService.deleteError(errorItem);
-				//and delete from the file system
-				MobileFormEntryUtil.deleteFile(filePath);
-
-			} else if ("deleteComment".equals(errorItemAction)) {
-				//set comment to null and save
-				errorItem.setComment(null);
-				mobileService.saveErrorInDatabase(errorItem);
-			} else if ("newHousehold".equals(errorItemAction)) {
-				if (householdIdentifier != null && householdIdentifier.trim() != "") {
-					// first change household id
-					if (XFormEditor.editNode(filePath,
-						MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_META_PREFIX + "/"
-						+ MobileFormEntryConstants.HOUSEHOLD_META_HOUSEHOLD_ID, householdIdentifier)) {
-					} else {
-						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-						return "redirect:resolveErrors.list";
-					}
-
-					// then change all patient household pointers
-					if (XFormEditor.editNodeList(filePath,
-						MobileFormEntryConstants.HOUSEHOLD_PREFIX + MobileFormEntryConstants.HOUSEHOLD_INDIVIDUALS_PREFIX,
-						"patient/" + MobileFormEntryConstants.PATIENT_HOUSEHOLD_IDENTIFIER, householdIdentifier)) {
-						// drop form in queue for normal processing
-						moveAndDeleteError(MobileFormEntryUtil.getMobileFormsDropDir().getAbsolutePath(), errorItem);
-					} else {
-						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-						return "redirect:resolveErrors.list";
-					}
-				} else {
-					httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Error assigning new household identififer");
-					return "redirect:resolveErrors.list";
-				}
-			} else if ("noChange".equals(errorItemAction)) {
-				// do nothing here
-			} else {
-				throw new APIException("Invalid action selected for: " + errorId);
-			}
-		}
-
-		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "amrsmobileforms.resolveErrors.action.success");
-		return "redirect:resolveErrors.list";
-	}
 
 	/**
 	 * Given an id, this method creates an error model
@@ -290,17 +289,32 @@ public class ResolveErrorsController {
 	/**
 	 * Stores a form in a specified folder
 	 */
-	private static void saveForm(String oldFormPath, String newFormPath) {
+	private static boolean saveForm(String oldFormPath, String newFormPath) {
+
 		try {
 			if (oldFormPath != null) {
 				File file = new File(oldFormPath);
+                File newDestination = new File(newFormPath);
 
 				//move the file to specified new directory
-				file.renameTo(new File(newFormPath));
+                /*check to see if the new file path exists. renameTo does nothing if same path is encountered*/
+                if(newDestination.exists())
+                    newDestination.deleteOnExit();//safely deletes the file.
+
+				if(file.renameTo(new File(newFormPath))){
+                   log.info("Moving error file to drop directory was successful");
+                   return true;
+                }
+                else {
+                    log.info("Failed to move file to drop directory");
+                    return false;
+                }
 			}
 		} catch (Exception e) {
+            e.printStackTrace();
 			log.error(e.getMessage(), e);
 		}
+        return false;
 
 	}
 
@@ -420,9 +434,14 @@ public class ResolveErrorsController {
 		// find error location
 		String filePath = MobileFormEntryUtil.getMobileFormsErrorDir().getAbsolutePath() + error.getFormName();
 		// put form in queue for normal processing
-		saveForm(filePath, destination + error.getFormName());
-		// delete the mobileformentry error queue item
-		getMobileFormEntryService().deleteError(error);
+		if(saveForm(filePath, destination + error.getFormName())){
+            // delete the mobileformentry error queue item
+            getMobileFormEntryService().deleteError(error);
+        }
+        else{
+            log.error("Could not complete error resolution process");
+        }
+
 	}
 
 	/**
